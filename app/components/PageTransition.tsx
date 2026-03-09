@@ -42,9 +42,10 @@ export default function PageTransition({ children }: Props) {
 
   return (
     <div ref={container}>
+
       <div
         ref={flashRef}
-        className=" opacity-0 absolute z-30 w-full h-screen bg-white"
+        className=" opacity-0 absolute z-30 w-full h-screen bg-white pointer-events-none"
       >
         {" "}
       </div>

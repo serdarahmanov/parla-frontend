@@ -16,30 +16,12 @@ html {
 
 a{
   text-decoration: none;
-  padding: 0;
-  margin: 0;
-}
+ }
 
-.site-nav {
-  margin: 0 auto;
-  display: flex;
-  align-items: flex-start;
-  gap: 1.5em;
-  /* flex-wrap: wrap; */
-  flex-direction: column;
-}
 
-.site-nav-link {
-  font-weight: 500;
-  font-size: 0.85em;
-  line-height: 0.85em;
-}
 
-.site-header__link:hover,
-.site-header__brand:hover,
-.site-header__view-toggle:hover {
-  opacity: 0.4;
-}
+
+
 
 .nav-bar__outer {
   position: fixed;
@@ -64,7 +46,7 @@ a{
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
+  --destructive: oklch(69.601% 0.00008 271.152);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
