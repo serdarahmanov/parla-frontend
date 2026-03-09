@@ -1,6 +1,6 @@
 
 import { GoogleTagManager } from "@next/third-parties/google";
-import { IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Sans, Geist } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -8,12 +8,9 @@ import NavBar from "./components/NavBar";
 import PageTransition from "./components/PageTransition";
 import ScrollCounter from "./components/ScrollCounter";
 import { Metadata } from "next";
+import { cn } from "@/lib/utils";
 
-
-
-
-
-
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
  export const metadata: Metadata = {
   title: "Parla",
@@ -39,7 +36,7 @@ export default function RootLayout({
 
 
   return (
-    <html lang="en" className="m-0 p-0" >
+    <html lang="en" className={cn("m-0 p-0", "font-sans", geist.variable)} >
       <body className={`${ibmPlexSans.className} relative p-0 m-0 min-h-screen bg-black text-ce-text`} >
         <Header />
         <NavBar />
