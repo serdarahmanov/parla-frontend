@@ -4,6 +4,10 @@ import React, { useRef } from 'react'
 import SplitText from 'gsap/SplitText'
 import gsap from 'gsap'
 
+
+gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(SplitText);
+
 type Props ={
     text: string,
     isLines?: boolean,
@@ -17,42 +21,56 @@ type Props ={
 
 const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Props) => {
 
-  const paragraphRef = useRef<HTMLParagraphElement | null>(null);
+    const paragraphRef = useRef<HTMLParagraphElement | null>(null);
 
-  useGSAP(()=>{
+  useGSAP(() => {
+    const el = paragraphRef.current;
+    if (!el) return;
 
-    if(!paragraphRef.current){return}
+    let split: SplitText | null = null;
+    let cancelled = false;
 
-     const split = new SplitText(paragraphRef.current, {
-          type: isLines ? "lines" : "chars, words"
-         });
+    const init = async () => {
+      if ("fonts" in document) {
+        await document.fonts.ready;
+      }
 
-     if(isLines){
-        gsap.from(split.lines,{
-autoAlpha: 0,
-  yPercent:10,
-  duration:duration,
-  ease: "expo.out",
-  stagger: stagger,
-  delay: delay,
- xPercent: 5,
- rotation: -0.5,
-        })      
+      if (cancelled || !paragraphRef.current) return;
 
+      split = new SplitText(paragraphRef.current, {
+        type: isLines ? "lines" : "chars, words",
+      });
 
-     }  else {
+      if (isLines) {
+        gsap.from(split.lines, {
+          autoAlpha: 0,
+          yPercent: 10,
+          xPercent: 5,
+          rotation: -0.5,
+          duration,
+          ease: "expo.out",
+          stagger,
+          delay,
+        });
+      } else {
+        gsap.from(split.chars, {
+          autoAlpha: 0,
+          yPercent: 10,
+          duration,
+          ease: "expo.out",
+          stagger,
+          delay,
+        });
+      }
+    };
 
-      gsap.from(split.chars,{
-        
-        autoAlpha: 0,
-        yPercent: 10,
-        duration: duration,
-        ease: "expo.out",
-        stagger: stagger,
-        delay: delay
-      })
-     }  
-    },[]) // if we leave the dependency section empty , it runs only once when page load
+    init();
+
+    return () => {
+      cancelled = true;
+      split?.revert();
+    };
+  }, [text, isLines, delay, stagger, duration]); // if we leave the dependency section empty , it runs only once when page load
 
 
     return (

@@ -20,19 +20,24 @@ export default function PageTransition({ children }: Props) {
 
   useGSAP(() => {
    
+        const context =gsap.context(()=>{
 
-      setDisplayedPath(pathname);
+            setDisplayedPath(pathname);
 
         // flash animation
-        gsap.fromTo(
-          flashRef.current,
-          { opacity: 0.2 },
-          { opacity: 0, duration: 0.3 }
-        ).then(()=>{
-            
-        setDisplayChildren(children);
-       });
-    
+                                gsap.fromTo(
+                                flashRef.current,
+                                { opacity: 0.2 },
+                                { opacity: 0, duration: 0.3 }
+                                ).then(()=>{
+                                    
+                                setDisplayChildren(children);
+                            });
+
+        })
+        
+      
+   return () =>  context.revert();
   }, [pathname]);
 
   return (

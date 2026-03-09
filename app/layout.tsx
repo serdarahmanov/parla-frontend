@@ -8,12 +8,12 @@ import NavBar from "./components/NavBar";
 import PageTransition from "./components/PageTransition";
 import ScrollCounter from "./components/ScrollCounter";
 import { Metadata } from "next";
-import { useGSAP } from "@gsap/react";
-import SplitText from "gsap/SplitText"
-import gsap from "gsap";
 
-gsap.registerPlugin(useGSAP);
-gsap.registerPlugin(SplitText);
+
+
+
+
+
 
  export const metadata: Metadata = {
   title: "Parla",

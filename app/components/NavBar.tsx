@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import HoverSwapLink from "../animations/HoverSwapLink";
 
 const navItems = [
   { label: "About", href: "/about" },
@@ -10,9 +11,10 @@ function NavBar() {
     <div className="nav-bar__outer">
       <nav className="site-nav">
         {navItems.map((item) => (
-          <Link key={item.href} href={item.href} className="site-nav-link">
-            {item.label}
-          </Link>
+        
+         <HoverSwapLink key={item.href}  href={item.href} text={item.label} className="font-medium text-xs"  />
+            
+          
         ))}
       </nav>
         

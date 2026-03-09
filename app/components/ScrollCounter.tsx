@@ -10,16 +10,16 @@ export default function ScrollCounter() {
 
   const { scrollYProgress } = useScroll();
    
-  const y = useTransform(scrollYProgress, [0, 1], ["calc(100vh+ 1.85rem)", "calc(50vh - 0.8rem)"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["calc(100vh + 1.85rem)", "calc(50vh - 0.8rem)"]);
 
   // map scroll progress (0 → 1) to numbers (0 → 100)
   const value = useTransform(scrollYProgress, [0, 1], [0, 100]);
 
   const [count, setCount] = useState(0);
 
-  useMotionValueEvent(value, "change", (latest) => {
-    setCount(Math.floor(latest));
-  });
+                                    useMotionValueEvent(value, "change", (latest) => {
+                                        setCount(Math.floor(latest));
+                                    });
   return (
     <div className=" text-xs font-medium overflow-hidden">
 
