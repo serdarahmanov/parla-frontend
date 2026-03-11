@@ -1,14 +1,79 @@
-import React from 'react'
-import { ContactForm } from '../components/ContactForm'
+"use client";
+import React from "react";
+import { ContactForm } from "../components/ContactForm";
+import Paragraph from "../animations/Paragraph";
+import { useEffect, useState, useMemo } from "react";
 
 function Contact() {
-  return (
-    <div className='py-20 grid grid-cols-12 bg-white'>
+  const [now, setNow] = useState<Date | null>(null);
 
-      <div className=' col-span-7 col-start-4'><ContactForm/></div>
-      
+  const timeFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Ashgabat",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }),
+    [],
+  );
+
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Ashgabat",
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      }),
+    [],
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const time = now ? timeFormatter.format(now) : "--:--:--";
+  const date = now ? dateFormatter.format(now) : "--/--/--";
+
+  return (
+    <div className=" pt-20  px-6 py-20 grid  grid-cols-4 lg:grid-cols-12 bg-white h-screen  ">
+      <div
+        className="
+      col-start-2  col-span-3
+      lg:col-start-4 lg:col-span-4 flex flex-col gap-4 mr-1.5 lg:mb-0"
+      >
+        <div>
+          <h1 className="text-[1rem] font-bold opacity-50 ">Office</h1>
+          <Paragraph
+            delay={0.5}
+            stagger={0.05}
+            text="Studio G6, Gate 1, Victoria Junction, Prestwich St, Greenpoint, Cape Town"
+            isLines
+          />
+        </div>
+
+        <div>+(993) 61 0608 03</div>
+
+        <div className="flex flex-row gap-3 items-baseline mt-5">
+          <div className="font-medium text-xs">{time} GTM+5</div>
+          <div className="  text-xs">{date}</div>
+        </div>
+      </div>
+
+      <div
+        className=" mt-7
+      col-start-2  col-span-3
+      lg:col-span-4 lg:col-start-8 lg:mt-0 "
+      >
+        <ContactForm />
+      </div>
     </div>
-  )
+  );
 }
 
-export default Contact
+export default Contact;

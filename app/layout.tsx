@@ -10,6 +10,7 @@ import ScrollCounter from "./components/ScrollCounter";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
  import { Toaster } from "sonner";    
+import SmoothScroll from "./components/SmoothScroll";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -38,8 +39,8 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={cn("m-0 p-0", "font-sans", geist.variable)} >
-      <body className={`${ibmPlexSans.className} relative p-0 m-0 min-h-screen bg-black text-ce-text`} >
-       
+      <body className={`${ibmPlexSans.className} relative p-0 m-0 min-h-screen bg-white text-black`} >
+        <SmoothScroll />
          <Toaster richColors position="top-right" /> 
          <Header />
         <NavBar />

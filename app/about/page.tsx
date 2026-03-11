@@ -26,7 +26,7 @@ function About() {
               />
         </div>
 
-        <div className="text-ce-text lg:col-span-1 lg:row-span-1  lg:col-start-2 lg:row-start-2  text-sm lg:text-md">
+        <div className=" lg:col-span-1 lg:row-span-1  lg:col-start-2 lg:row-start-2  text-sm lg:text-md">
           <div>
             <h1 className="text-[1rem] font-bold opacity-50 mb-1.5">
               Selected Clients

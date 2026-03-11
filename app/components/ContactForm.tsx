@@ -47,6 +47,11 @@ const contactFormSchema = z.object({
 });
 
 export function ContactForm() {
+  const formCardRef = React.useRef<HTMLDivElement | null>(null);
+  const clearErrorsTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+
   const form = useForm<z.infer<typeof contactFormSchema>>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -58,24 +63,71 @@ export function ContactForm() {
     mode: "onSubmit",
   });
 
+  const scheduleErrorsClear = React.useCallback(() => {
+    if (clearErrorsTimeoutRef.current) {
+      clearTimeout(clearErrorsTimeoutRef.current);
+    }
+
+    clearErrorsTimeoutRef.current = setTimeout(() => {
+      form.clearErrors();
+    }, 4000);
+  }, [form]);
+
+  React.useEffect(() => {
+    if (Object.keys(form.formState.errors).length > 0) {
+      scheduleErrorsClear();
+    }
+  }, [form.formState.errors, scheduleErrorsClear]);
+
+  React.useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const cardNode = formCardRef.current;
+
+      if (!cardNode || cardNode.contains(event.target as Node)) {
+        return;
+      }
+
+      if (clearErrorsTimeoutRef.current) {
+        clearTimeout(clearErrorsTimeoutRef.current);
+      }
+
+      form.clearErrors();
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+
+      if (clearErrorsTimeoutRef.current) {
+        clearTimeout(clearErrorsTimeoutRef.current);
+      }
+    };
+  }, [form]);
+
   function onSubmit(data: z.infer<typeof contactFormSchema>) {
     toast("The form has been submitted successfully ", {
       description: " We will respond to you message soon , Thanks",
       position: "top-right",
     });
+
+    form.reset();
   }
 
   return (
     // Classic shadcn card surface (token-driven colors)
-    <Card className="ring-1 lg:w-full sm:max-w-md bg-card text-card-foreground  shadow-sm rounded-[0.2rem] ">
-      <CardContent>
+    <Card
+      ref={formCardRef}
+      className=" ring-0 lg:w-full sm:max-w-md bg-card text-card-foreground shadow-none rounded-[0.2rem] gap-0 py-0"
+    >
+      <CardContent className="px-0">
         <form id="main-contact-form" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
               name="firstName"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field data-invalid={fieldState.invalid} >
                   <FieldLabel className="text-xs " htmlFor="form-first-name">
                     First Name
                   </FieldLabel>
@@ -87,9 +139,10 @@ export function ContactForm() {
                     // More standard contact-form placeholder
                     placeholder="John"
                     autoComplete="off"
+                  
                   />
                   {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+                    <FieldError className="text-xs" errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
@@ -113,7 +166,7 @@ export function ContactForm() {
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+                    <FieldError className="text-xs" errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
@@ -138,7 +191,7 @@ export function ContactForm() {
                     autoComplete="off"
                   />
                   {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+                    <FieldError className="text-xs" errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
@@ -165,15 +218,10 @@ export function ContactForm() {
                       className="text-xs max-h-14 resize-none   focus-visible:ring-1 focus-visible:border-0 aria-invalid:border-0 aria-invalid:ring-0 "
                       aria-invalid={fieldState.invalid}
                     />
-                    <InputGroupAddon align="block-end">
-                      <InputGroupText className=" text-xs">
-                        {field.value.length}/250 characters
-                      </InputGroupText>
-                    </InputGroupAddon>
-                  </InputGroup>
+                                  </InputGroup>
 
                   {fieldState.invalid && (
-                    <FieldError
+                    <FieldError 
                       className="text-xs opacity-50 text-black "
                       errors={[fieldState.error]}
                     />
@@ -184,17 +232,13 @@ export function ContactForm() {
           </FieldGroup>
         </form>
       </CardContent>
-      {/* Classic shadcn footer actions with balanced spacing */}
-      <CardFooter className="justify-end gap-2 bg-card border-t-0">
-        <Field orientation="horizontal">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
-            Reset
-          </Button>
-          {/* Filled primary action to match default shadcn style */}
-          <Button type="submit" form="main-contact-form">
+     
+      <CardFooter className=" gap-2 bg-card border-t-0 p-0 pt-4">
+       
+           <Button type="submit" variant="outline" form="main-contact-form"  className="text-xs p-2 rounded-[0.2rem]">
             Submit
           </Button>
-        </Field>
+       
       </CardFooter>
     </Card>
   );

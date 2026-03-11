@@ -1,7 +1,6 @@
 "use client";
 import { useRef } from "react";
 import ScrollCounter from "./components/ScrollCounter";
-import { useMediaQuery } from "react-responsive";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,7 +13,6 @@ gsap.registerPlugin(useGSAP);
 export default function Home() {
   const video1Ref = useRef<HTMLVideoElement | null>(null);
   const sectionRef = useRef<HTMLDivElement | null>(null);
-  const isMobile = useMediaQuery({ maxWidth: 767 });
   
 
   useGSAP(() => {
@@ -23,60 +21,68 @@ export default function Home() {
 
     if (!video || !section) return;
 
-    const startValueForVideo1 = isMobile ? "top 50%" : "top bottom";
-    const endValueForVide1 = isMobile ? "120% top" : "bottom top";
+    const mm = gsap.matchMedia();
 
-    let tl: gsap.core.Timeline | null = null;
+    const createVideoScrub = (start: string, end: string) => {
+      let tl: gsap.core.Timeline | null = null;
 
-    const init = () => {
-      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+      const init = () => {
+        if (!Number.isFinite(video.duration) || video.duration <= 0) return;
 
-      const proxy = { time: 0 };
+        const proxy = { time: 0 };
+        tl?.kill();
 
-      tl?.kill();
+        tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start,
+            end,
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
 
-      tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: startValueForVideo1,
-          end: endValueForVide1,
-          scrub: true,
-        },
-      });
+        tl.to(proxy, {
+          time: video.duration - 0.05,
+          ease: "none",
+          onUpdate: () => {
+            if (Number.isFinite(proxy.time)) {
+              video.currentTime = proxy.time;
+            }
+          },
+        });
 
-      tl.to(proxy, {
-        time: video.duration - 0.05,
-        ease: "none",
-        onUpdate: () => {
-          if (Number.isFinite(proxy.time)) {
-            video.currentTime = proxy.time;
-          }
-        },
-      });
+        ScrollTrigger.refresh();
+      };
 
-      ScrollTrigger.refresh();
+      if (video.readyState >= 1 && Number.isFinite(video.duration)) {
+        init();
+      } else {
+        video.addEventListener("loadedmetadata", init, { once: true });
+      }
+
+      return () => {
+        video.removeEventListener("loadedmetadata", init);
+        tl?.kill();
+      };
     };
 
-    if (video.readyState >= 1 && Number.isFinite(video.duration)) {
-      init();
-    } else {
-      video.addEventListener("loadedmetadata", init, { once: true });
-    }
+    mm.add("(max-width: 767px)", () => createVideoScrub("top 50%", "120% top"));
+    mm.add("(min-width: 768px)", () => createVideoScrub("top bottom", "bottom top"));
 
     return () => {
-      video.removeEventListener("loadedmetadata", init);
-      tl?.kill();
+      mm.revert();
     };
-  }, [isMobile]);
+  }, []);
 
   return (
     <div className="m-1">
       <ScrollCounter />
-      <div className="w-full h-screen bg-black"></div>
+      <div className="w-full h-screen  rounded-2xl"></div>
 
-      <div ref={sectionRef} className="video bg-blue-500 h-screen">
+      <div ref={sectionRef} className="video ">
         <video
-          className="w-full object-bottom object-cover"
+          className="w-full min-h-screen object-bottom object-cover"
           ref={video1Ref}
           src="/video/output.mp4"
           muted
@@ -87,9 +93,9 @@ export default function Home() {
         
 
 
-      <div className="w-full min-h-screen bg-black">
+      <div className="w-full min-h-screen">
       </div>
-      <div className="w-full min-h-screen bg-black"></div>
+      <div className="w-full min-h-screen"></div>
 
     </div>
   );
