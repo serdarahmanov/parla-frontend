@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ViewTransitionLink from "./ViewTransitionLink";
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
@@ -61,7 +61,7 @@ function Header() {
   return (
     <header className="fixed top-3 left-0 w-full z-50 m-0 p-0 text-center pointer-events-none">
       <div className="p-0 m-0">
-        <Link
+        <ViewTransitionLink
           href="/"
           className="leading-none inline-block pointer-events-auto "
         >
@@ -72,7 +72,7 @@ function Header() {
             height={16}
             className="block h-auto w-[50px]"
           />
-        </Link>
+        </ViewTransitionLink>
       </div>
     </header>
   );

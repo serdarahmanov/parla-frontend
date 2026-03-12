@@ -5,7 +5,6 @@ import "./globals.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import NavBar from "./components/NavBar";
-import PageTransition from "./components/PageTransition/PageTransition";
 import ScrollCounter from "./components/ScrollCounter";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
@@ -44,12 +43,10 @@ export default function RootLayout({
          <Toaster richColors position="top-right" /> 
          <Header />
         <NavBar />
-        <PageTransition>
         <main className="p-0 m-0 min-h-full w-full relative">
           
           {children}
         </main>
-        </PageTransition>
          
         <Footer />
         <GoogleTagManager gtmId="GTM-MM9N6562"/>

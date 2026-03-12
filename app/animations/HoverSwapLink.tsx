@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import ViewTransitionLink from "../components/ViewTransitionLink";
 
 gsap.registerPlugin(useGSAP);
 
@@ -62,7 +62,7 @@ export default function HoverSwapLink({
   );
 
   return (
-    <Link
+    <ViewTransitionLink
       
       href={href}
       ref={rootRef}
@@ -77,6 +77,6 @@ export default function HoverSwapLink({
           {text}
         </span>
       </span>
-    </Link>
+    </ViewTransitionLink>
   );
 }
