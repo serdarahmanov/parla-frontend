@@ -76,7 +76,7 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Pr
     return (
 
    
-      <p ref={paragraphRef} className='overflow-hidden'>{text}</p>
+      <p ref={paragraphRef} >{text}</p>
     
   )
 }

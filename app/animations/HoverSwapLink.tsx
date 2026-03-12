@@ -66,14 +66,14 @@ export default function HoverSwapLink({
       
       href={href}
       ref={rootRef}
-      className={`relative   ${className}`}
+      className={`relative text-inherit ${className}`}
     >
-      <span className="relative block  overflow-hidden">
-        <span ref={topRef} className="block">
+      <span className="relative block overflow-hidden">
+        <span ref={topRef} className="block text-inherit">
           {text}
         </span>
 
-        <span ref={bottomRef} className="absolute left-0 top-full block opacity-50">
+        <span ref={bottomRef} className="absolute left-0 top-full block text-inherit opacity-65">
           {text}
         </span>
       </span>

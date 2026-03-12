@@ -23,14 +23,6 @@ a{
 
 
 
-.nav-bar__outer {
-  position: fixed;
-  top: 50%;
-  left: 1.5em;
-  z-index: 99;
-  transform: translateY(-50%);
-}
-
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
