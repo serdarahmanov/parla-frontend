@@ -5,7 +5,7 @@ import "./globals.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import NavBar from "./components/NavBar";
-import PageTransition from "./components/PageTransition";
+import PageTransition from "./components/PageTransition/PageTransition";
 import ScrollCounter from "./components/ScrollCounter";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
