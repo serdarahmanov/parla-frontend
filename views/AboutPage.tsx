@@ -1,5 +1,6 @@
 import React from "react";
 import Paragraph from "../animations/Paragraph";
+import MaskTextAnimation from "@/animations/MaskTextAnimation";
 
 
 function About() {
@@ -50,7 +51,7 @@ function About() {
              <div className="text-md font-bold opacity-50"><Paragraph text="Turkmenistan" /></div>
            
 
-            
+            <MaskTextAnimation text={"DENEME"} ></MaskTextAnimation>
             
             
           </div>

@@ -22,6 +22,7 @@ const PageTransition = ({ children, introDone }: Props) => {
   const opacity = {
     initial: {
       opacity: 0,
+      
     },
     enter: {
       opacity: 1,
@@ -34,12 +35,15 @@ const PageTransition = ({ children, introDone }: Props) => {
   const slide = {
     initial: {
       top: "100vh",
+      scale: 0.7,
     },
     enter: {
       top: "100vh",
+      scale: 0.7,
     },
     exit: {
       top: "0",
+      scale: 1,
       transition: {
         duration: 1,
         ease: [0.76, 0, 0.24, 1],
@@ -61,7 +65,7 @@ const PageTransition = ({ children, introDone }: Props) => {
     exit: {
       y: -100,
       scale: 0.9,
-      opacity: 0.5,
+      opacity: 0.2,
       transition: {
         duration: 1.2,
         ease: [0.76, 0, 0.24, 1],
@@ -78,8 +82,9 @@ const PageTransition = ({ children, introDone }: Props) => {
         <motion.div {...anim(opacity)}>
           <Header />
           <NavBar />
-          <Footer />
+         
           {children}
+           <Footer />
         </motion.div>
       </motion.div>
     </div>

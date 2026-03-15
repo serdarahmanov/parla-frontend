@@ -9,7 +9,7 @@ import SmoothScroll from "../components/SmoothScroll";
 import { AnimatePresence } from "framer-motion";
 import PageTransition from "@/components/PageTransition/PageTransition";
 import LandingIntro from "@/components/LandingIntro";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -20,7 +20,16 @@ const ibmPlexSans = IBM_Plex_Sans({
 });
 
 export default function App({ Component, pageProps, router }: AppProps) {
-  const [introDone, setIntroDone] = useState(false);
+  const [pageReady, setPageReady] = useState(false);
+  const [introVisible, setIntroVisible] = useState(true);
+
+  const handleRevealStart = useCallback(() => {
+    setPageReady(true);
+  }, []);
+
+  const handleIntroComplete = useCallback(() => {
+    setIntroVisible(false);
+  }, []);
 
   return (
     <div className={cn("m-0 p-0", "font-sans", geist.variable)}>
@@ -30,9 +39,14 @@ export default function App({ Component, pageProps, router }: AppProps) {
         <SmoothScroll />
         <Toaster richColors position="top-right" />
         <main className="p-0 m-0 min-h-full w-full relative">
-          {!introDone && <LandingIntro onComplete={() => setIntroDone(true)} />}
+          {introVisible && (
+            <LandingIntro
+              onRevealStart={handleRevealStart}
+              onComplete={handleIntroComplete}
+            />
+          )}
           <AnimatePresence mode="wait">
-            <PageTransition key={router.asPath} introDone={introDone}>
+            <PageTransition key={router.asPath} introDone={pageReady}>
               <Component {...pageProps} />
             </PageTransition>
           </AnimatePresence>

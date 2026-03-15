@@ -12,18 +12,18 @@ gsap.registerPlugin(useGSAP);
 function Header() {
   
   return (
-    <header className="fixed top-3 left-0 w-full z-50 m-0 p-0 text-center pointer-events-none">
+    <header className="fixed top-3 left-0 w-full z-60 m-0 p-0 text-center pointer-events-none">
       <div className="p-0 m-0">
         <Link
           href="/"
           className="leading-none inline-block pointer-events-auto "
         >
+         
           <img
-            src="/assets/logo.svg"
+            src="/landingTransition/Asset-5.svg"
             alt="Parla"
-            width={50}
-            height={16}
-            className="block h-auto w-[50px]"
+            
+            className="w-15 mt-1"
           />
         </Link>
       </div>

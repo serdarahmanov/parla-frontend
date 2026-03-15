@@ -1,16 +1,18 @@
 .inner{
     background-color: black;
-    .page{
+}
+
+.page{
         background-color: white;
+        height: 100vh;
+        width: 100%;
     }
-    .slide{
+.slide{
         position: fixed;
-        top:0;
+        top: 100vh;
         left:0;
         background-color: white;
         width: 100%;
         height: 100vh;
         z-index: 1000;
     }
-
-}

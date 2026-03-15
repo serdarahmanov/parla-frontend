@@ -33,19 +33,16 @@ function Footer() {
   return (
     <div
       ref={footerRef}
-      className="m-0 fixed bottom-6 left-0 w-full z-50 grid grid-cols-4 px-6 
+      className="fixed bottom-6 left-0 top-auto w-full z-55 grid grid-cols-4 px-6 
     
-    text-[0.6em] font-bold text-white [mix-blend-mode:difference]
-    lg:text-xs lg:font-medium items-end
-    max-[480px]:bottom-3 max-[480px]:rounded-full max-[480px]:bg-[rgba(251,251,251,0.9)] max-[480px]:py-2 max-[480px]:text-black max-[480px]:[mix-blend-mode:normal] max-[480px]:[backdrop-filter:blur(2px)]
-    
-    "
+    text-[0.6em] font-medium text-white [mix-blend-mode:difference]
+    lg:text-xs lg:font-medium items-end"
     >
       <div className=" col-span-1 ">PARLA® ©2024</div>
 
       <div className="col-span-1">
         <HoverSwapLink
-          className="text-inherit opacity-80 hover:opacity-100"
+          className="text-inherit opacity-80 hover:opacity-100 "
           href="/cookie"
           text="Cookie Policy"
         />

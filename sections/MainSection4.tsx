@@ -11,39 +11,34 @@ const cardsData = [
   {
     id: "card-1",
     src: "/Section-4/_DSF1863.webp",
-    caption: "FRAME 01",
+    caption: "STRATEGY & PLANNING",
     description: "Brand identity set in motion with clean, cinematic framing.",
   },
   {
     id: "card-2",
     src: "/Section-4/_DSF1938.webp",
-    caption: "FRAME 02",
+    caption: "PRE-PRODUCTION",
     description: "Story-first composition that keeps focus on the product mood.",
   },
   {
     id: "card-3",
     src: "/Section-4/1F5A8270.webp",
-    caption: "FRAME 03",
+    caption: "PRODUCTION",
     description: "Dynamic visual rhythm designed for social-first attention.",
   },
   {
     id: "card-4",
     src: "/Section-4/1F5A0676.webp",
-    caption: "FRAME 04",
+    caption: "POST-PRODUCTION",
     description: "Balanced lighting and texture to elevate the brand tone.",
   },
   {
     id: "card-5",
     src: "/Section-4/1F5A7357.webp",
-    caption: "FRAME 05",
+    caption: "LAUNCH & DELIVERY",
     description: "Editorial angle crafted for premium campaign storytelling.",
   },
-  {
-    id: "card-6",
-    src: "/Section-4/_DSF1986.webp",
-    caption: "FRAME 06",
-    description: "Final hero frame built to anchor the full visual narrative.",
-  },
+
 ];
 
 const MainSection4 = () => {
@@ -306,7 +301,7 @@ const MainSection4 = () => {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: () => `+=${getDistance()}`,
+          end: () => `+=${getDistance()* 0.5} `,
           scrub: 1,
           pin: true,
           invalidateOnRefresh: true,
@@ -351,8 +346,9 @@ const MainSection4 = () => {
 
   return (
     <div
+      id="section-4"
       ref={containerRef}
-      className="main-container  relative overflow-hidden overflow-x-hidden w-full h-screen  "
+      className="main-container relative z-40 overflow-hidden overflow-x-hidden w-full h-screen  bg-black text-ce-text "
     >
       <div ref={introRef} className="absolute left-0 top-0 w-full h-[80vh]">
       <section
@@ -361,7 +357,7 @@ const MainSection4 = () => {
       >
         {cardsData.map((card, index) => (
           <div
-            className="card w-120 flex-none overflow-hidden"
+            className="card w-[70vw] flex-none overflow-hidden"
             id={card.id}
             key={card.id}
           >
@@ -383,7 +379,7 @@ const MainSection4 = () => {
             key={card.id}
             className="clock-text-item absolute left-1/2 top-4 -translate-x-1/2"
           >
-            <h1 className="clock-caption text-md font-semibold tracking-[0.35em]">
+            <h1 className="clock-caption text-4xl tracking-tighter font-light tracking-[0.35em]">
               {card.caption}
             </h1>
             <p className="clock-description  text-xs font-medium  opacity-80">
@@ -392,6 +388,10 @@ const MainSection4 = () => {
           </div>
         ))}
       </div>
+
+     
+        
+  
     </div>
   );
 };

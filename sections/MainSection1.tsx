@@ -1,48 +1,55 @@
-import React from 'react'
-import Paragraph from '../animations/Paragraph'
+"use client";
+import React, { useEffect, useRef } from "react";
+
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import ParagraphSticky from "@/animations/ParagraphSticky";
+import MaskTextAnimation from "@/animations/MaskTextAnimation";
+gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(useGSAP);
+
+type Props= {
+  arkaRenk?: string,
+  text?: string,
+  textColor?:string,
+  direction?:number,
+  
+}
+
+const MainSection1 = ({arkaRenk,text= "Yazmaly birzatlar",textColor, direction=1}:Props) => {
+
+const scopeRef = useRef<HTMLDivElement | null> (null);
 
 
 
 
-const MainSection1 = () => {
+
 
 
   return (
-    <div>
-
-
-
-      <div className='h-[80vh] text-5xl font-meduim  items-center grid grid-cols-6'>
-       
-        <div  className='col-span-4 col-start-2'>
-         <Paragraph delay={0.2} stagger={0.09}
-                text={
-    <>
-      WE HANDLE THE FULL PRODUCTION CYCLE — <br />
-      FROM IDEA AND CONCEPT DEVELOPMENT TO FILMING,<br />
-      EDITING,<br />
-      DESIGN,<br />
-      AND FINAL DELIVERY</>
-   }
-                isLines
-              />
-
-              <div className='text-lg justify-items-end'>
-              <Paragraph delay={0.2} stagger={0.05}
-                text="Designed to engage Built to connect"
-                
-              />
-</div>
-
-
-
-              </div>
-      </div>
-
-
+    <div  ref={scopeRef} className={`scticky h-screen top-0 z-11 w-full  bg-black justify-center  items-center ${arkaRenk}  ${textColor} text-[2rem] leading-8 font-normal     tracking-tighter`}>
+     
+        
+            <video
+              className="relative h-full w-full object-contain  opacity-100"
+              muted
+              loop
+              autoPlay
+              playsInline
+              preload="auto"
+              src="/video/TasVegias.mp4"
+            >
+            </video>
+           
       
+     
+  
+         {/* <div className="relative z-10 flex h-screen w-full items-center justify-center text-6xl font-medium tracking-tighter text-ce-text">
+            <MaskTextAnimation text={text}></MaskTextAnimation>
+          </div> */}
     </div>
-  )
-}
+  );
+};
 
-export default MainSection1
+export default MainSection1;

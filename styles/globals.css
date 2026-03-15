@@ -145,3 +145,7 @@ a{
     @apply font-sans;
   }
 }
+
+.blend-video {
+  mix-blend-mode: screen;
+}

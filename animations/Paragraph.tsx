@@ -22,6 +22,7 @@ type Props ={
 const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Props) => {
 
     const paragraphRef = useRef<HTMLParagraphElement | null>(null);
+    const outerRef =useRef<HTMLDivElement | null> (null);
 
   useGSAP(() => {
     const el = paragraphRef.current;
@@ -51,15 +52,25 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Pr
           ease: "expo.out",
           stagger,
           delay,
+          scrollTrigger:{
+
+            trigger: split.lines,
+    start: "top 80%"
+          }
         });
       } else {
         gsap.from(split.chars, {
           autoAlpha: 0,
-          yPercent: 10,
+          yPercent: 25,
           duration,
           ease: "expo.out",
           stagger,
           delay,
+          scrollTrigger:{
+
+            trigger: paragraphRef.current,
+    start: "top 80%"
+          }
         });
       }
     };
@@ -75,8 +86,8 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Pr
 
     return (
 
-   
-      <p ref={paragraphRef} >{text}</p>
+      <p  ref={paragraphRef}>{text}</p>
+
     
   )
 }

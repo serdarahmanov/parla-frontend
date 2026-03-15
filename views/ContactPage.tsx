@@ -32,7 +32,7 @@ function Contact() {
   
   
   return (
-    <div className=" pt-50  px-6 py-20 grid  grid-cols-4 lg:grid-cols-12 bg-white h-screen   ">
+    <div className=" pt-50  px-6 py-20 grid  grid-cols-4 lg:grid-cols-12 bg-white h-screen ">
       <div
         className="
         col-start-2  col-span-3
