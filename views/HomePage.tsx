@@ -16,9 +16,7 @@ export default function Home() {
 
   return (
     <div className="relative bg-black">
-     
-        <MainSection2 videoLinks={["/video/TasVegias.mp4"]} maskText={"Deneme"}  />
-      
+      <MainSection2 videoLinks={["/video/TasVegias.mp4"]} maskText={"Deneme"} />
 
       <MainSection6
         videoLinks={mainSection2VideoLinks}

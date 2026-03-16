@@ -35,7 +35,7 @@ const MainSection5 = () => {
       className="relative z-50 h-screen w-full bg-black  flex flex-col    "
     >
       {/* Takes 30vh of vertical space inside this h-screen section. */}
-      <div className="absolute top-[15vh] w-full overflow-hidden  flex items-end justify-centerbg-black ">
+      <div className="absolute top-[25vh] w-full overflow-hidden  flex items-end justify-centerbg-black ">
         <div className="clients-fade-left pointer-events-none absolute inset-y-0 left-0 z-10 w-70" />
         <div className="clients-fade-right pointer-events-none absolute inset-y-0 right-0 z-10 w-70" />
         <div className="clients-marquee-track">
@@ -54,12 +54,8 @@ const MainSection5 = () => {
       {/* h-full here is another 100vh inside the same h-screen section.
           Combined with the 30vh block above + gap-20, total content exceeds viewport height. */}
 
-      <div className="w-full  bg-black flex flex-col items-center top-[50vh]  absolute opacity-85 gap-8 ">
-        <div className="text-start w-[60vw] text-3xl text-ce-text  mb-10 grid grid-cols-3 ">
-          <span className="col-span-1 leading-7">
-            Got a vision? We&apos;ve got caffeine and emotional availability
-          </span>
-        </div>
+      <div className="w-full  bg-black flex flex-col items-center top-[60vh]  absolute opacity-85 gap-10 ">
+       
         <div className="  grid grid-cols-3 gap-3 w-[60vw] h-auto text-white  bg-black">
           <div className="col-span-1">
             <div className="h-[1px] w-full bg-white  mt-3"></div>

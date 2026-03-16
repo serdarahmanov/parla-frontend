@@ -50,7 +50,7 @@ function Footer() {
       <div className="col-span-1">
         <HoverSwapLink
           className="text-inherit opacity-80 hover:opacity-100"
-          href="/gdpr"
+          href="/privacy-policy"
           text="Privacy Policy"
         />
       </div>
