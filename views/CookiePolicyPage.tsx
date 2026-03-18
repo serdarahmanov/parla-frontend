@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import React, { use, useLayoutEffect, useRef, useState } from "react";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import SplitText from "gsap/SplitText";
+import CookieSettingsButton from "@/components/cookie/CookieSettingsButton";
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
@@ -138,6 +139,8 @@ const CookiePolicyPage = () => {
                 <p className="text-[0.7rem]">
                   Saturday, 7 March 2026 at 00:45:09 GMT
                 </p>
+
+                <CookieSettingsButton />
               </div>
             </div>
           </div>

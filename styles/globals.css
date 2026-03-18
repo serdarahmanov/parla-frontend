@@ -149,3 +149,57 @@ a{
 .blend-video {
   mix-blend-mode: screen;
 }
+
+
+
+#klaro {
+  font-family: Arial, sans-serif;
+}
+
+.klaro .cookie-notice,
+.klaro .cookie-modal {
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14);
+}
+
+.klaro .cookie-notice {
+  max-width: 520px;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+}
+
+.klaro .cm-btn,
+.klaro .cn-buttons button {
+  border-radius: 12px !important;
+}
+
+.klaro .cm-btn-success,
+.klaro .cn-ok {
+  background: #111 !important;
+  color: #fff !important;
+}
+
+.klaro .cm-btn-info,
+.klaro .cm-btn-accept,
+.klaro .cn-decline,
+.klaro .cm-btn-danger {
+  border: 1px solid #111 !important;
+}
+
+
+.cookie-btn {
+  appearance: none;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.cookie-btn.secondary {
+  background: #fff;
+  color: #111;
+}
