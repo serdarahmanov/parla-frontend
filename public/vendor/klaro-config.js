@@ -2,13 +2,15 @@ window.klaroConfig = {
   version: 1,
   elementID: "klaro",
   storageMethod: "cookie",
-  storageName: "klaro",
+  storageName: "cookies",
+  cookiePath: "/",
   default: false,
   mustConsent: false,
   acceptAll: true,
   hideDeclineAll: false,
   hideLearnMore: false,
   htmlTexts: true,
+
 
   translations: {
     zz: {

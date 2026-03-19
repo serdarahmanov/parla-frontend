@@ -3,7 +3,7 @@ import MaskTextAnimation from "@/animations/MaskTextAnimation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import React, { use, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import SplitText from "gsap/SplitText";
 import CookieSettingsButton from "@/components/cookie/CookieSettingsButton";
@@ -19,7 +19,97 @@ const CookiePolicyPage = () => {
   const wrapperRef = useRef(null);
   const sideBarRef = useRef(null);
 
-  const [activeCookie, setAvtiveCookie] = useState(1);
+  const [activeCookie, setActiveCookie] = useState(1);
+  const [consentState, setConsentState] = useState({
+    necessary: true,
+    analytics: false,
+    marketing: false,
+  });
+  const [hasConsentDecision, setHasConsentDecision] = useState(false);
+  const [consentId, setConsentId] = useState("N/A");
+  const [consentDate, setConsentDate] = useState("Not available");
+
+  const readCookieValue = (name: string) => {
+    if (typeof document === "undefined") return null;
+    const parts = document.cookie ? document.cookie.split("; ") : [];
+    for (let i = 0; i < parts.length; i += 1) {
+      const pair = parts[i].split("=");
+      const key = pair.shift();
+      if (key === name) {
+        return pair.join("=");
+      }
+    }
+    return null;
+  };
+
+  const parseConsentCookie = (raw: string | null) => {
+    if (!raw) {
+      return { necessary: true, analytics: false, marketing: false };
+    }
+
+    try {
+      const decoded = decodeURIComponent(raw);
+      const parsed = JSON.parse(decoded) as {
+        necessary?: boolean;
+        analytics?: boolean;
+        marketing?: boolean;
+      };
+
+      return {
+        necessary: parsed.necessary !== false,
+        analytics: !!parsed.analytics,
+        marketing: !!parsed.marketing,
+      };
+    } catch {
+      return { necessary: true, analytics: false, marketing: false };
+    }
+  };
+
+  useEffect(() => {
+    const syncConsentMeta = () => {
+      const raw = readCookieValue("cookies");
+      const rawUpdatedAt = readCookieValue("cookie-updated-at");
+      const hasDecision = !!raw;
+      const parsed = parseConsentCookie(raw);
+
+      setHasConsentDecision(hasDecision);
+      setConsentState(parsed);
+      if (!hasDecision) {
+        setConsentId("N/A");
+        setConsentDate("Not available");
+      } else {
+        setConsentId(
+          btoa(
+            `consent:${parsed.necessary}-analytics:${parsed.analytics}-marketing:${parsed.marketing}`
+          )
+        );
+        if (rawUpdatedAt) {
+          try {
+            const decodedUpdatedAt = decodeURIComponent(rawUpdatedAt);
+            const parsedDate = new Date(Number(decodedUpdatedAt));
+            setConsentDate(
+              Number.isNaN(parsedDate.getTime())
+                ? "Not available"
+                : parsedDate.toUTCString()
+            );
+          } catch {
+            setConsentDate("Not available");
+          }
+        } else {
+          setConsentDate("Not available");
+        }
+      }
+    };
+
+    syncConsentMeta();
+    const interval = window.setInterval(syncConsentMeta, 1000);
+    window.addEventListener("consent-reset", syncConsentMeta);
+
+    return () => {
+      window.removeEventListener("consent-reset", syncConsentMeta);
+      window.clearInterval(interval);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     if (!wrapperRef.current || !consentRef.current || !overviewRef.current)
@@ -38,16 +128,16 @@ const CookiePolicyPage = () => {
         trigger: overviewRef.current,
         start: "top top+=20%",
 
-        onEnter: () => setAvtiveCookie(1),
-        onEnterBack: () => setAvtiveCookie(1),
+        onEnter: () => setActiveCookie(1),
+        onEnterBack: () => setActiveCookie(1),
       });
 
       ScrollTrigger.create({
         trigger: consentRef.current,
         start: "top top+=20%",
 
-        onEnter: () => setAvtiveCookie(2),
-        onEnterBack: () => setAvtiveCookie(2),
+        onEnter: () => setActiveCookie(2),
+        onEnterBack: () => setActiveCookie(2),
       });
     }, wrapperRef);
 
@@ -110,10 +200,10 @@ const CookiePolicyPage = () => {
               </p>
               <p>
                 Learn more about how we process personal data in our Privacy
-                Policy and POPI Policy.
+                Policy and GDPR Policy.
               </p>
               <p>
-                Your consent applies to the following domains: www.parla.com
+                Your consent applies to the following domains: parla.com
               </p>
             </div>
 
@@ -126,20 +216,27 @@ const CookiePolicyPage = () => {
               </h2>
               <div className="flex flex-row items-baseline ">
                 <h2 className="text-xs font-bold ">Your current state:</h2>
-                <p className="text-[0.7rem]">Declined.</p>
+                <p className="text-[0.7rem]">
+                  {!hasConsentDecision
+                    ? "Not defined yet"
+                    : consentState.analytics && consentState.marketing
+                    ? "Accepted."
+                    : !consentState.analytics && !consentState.marketing
+                      ? "Declined."
+                      : "Custom."}
+                </p>
               </div>
               <div className="flex flex-row items-baseline">
                 <h2 className="text-xs font-bold ">Your consent ID:</h2>
-                <p className="text-[0.7rem]">
-                  Y29uc2VudDpmYWxzZS1hbmFseXRpY3M6ZmFsc2UtbWFya2V0aW5nOmZhbHNl
-                </p>
+                <p className="text-[0.7rem]">{consentId}</p>
               </div>
               <div className="flex flex-row items-baseline">
                 <h2 className="text-xs font-bold ">Consent date:</h2>
-                <p className="text-[0.7rem]">
-                  Saturday, 7 March 2026 at 00:45:09 GMT
-                </p>
+                <p className="text-[0.7rem]">{consentDate}</p>
 
+                
+              </div>
+              <div>
                 <CookieSettingsButton />
               </div>
             </div>

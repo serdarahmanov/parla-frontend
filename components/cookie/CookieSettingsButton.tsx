@@ -11,7 +11,7 @@ export default function CookieSettingsButton() {
       const manager = window.klaro?.getManager(window.klaroConfig);
       manager?.resetConsents();
       window.__consentBridge?.clearStored();
-      window.location.reload();
+      window.dispatchEvent(new Event("consent-reset"));
     } catch (e) {
       console.error("Failed to reset consent", e);
     }

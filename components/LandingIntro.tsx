@@ -118,7 +118,7 @@ export default function LandingIntro({
 
         <div className=" text-center z-[10000] w-full h-screen flex flex-col justify-center items-center">
           
-          <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2   w-20">
+          <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2   w-15">
             <img
               ref={logo1Ref}
               src="/landingTransition/Asset-1.svg"
@@ -149,7 +149,7 @@ export default function LandingIntro({
             src="/landingTransition/Asset-5.svg"
             alt="Parla"
             ref={logo5Ref}
-            className="w-20 mt-1"
+            className="w-15 mt-1"
           />
         </div>
       </div>
