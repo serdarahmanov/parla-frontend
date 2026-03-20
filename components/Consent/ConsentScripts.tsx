@@ -12,6 +12,23 @@ export default function ConsentScripts() {
       <Script src="/vendor/klaro-config.js" strategy="beforeInteractive" />
       <GoogleTagManager gtmId={GTM_ID} />
       <Script src="/vendor/klaro.js" strategy="afterInteractive" />
+      <Script id="klaro-css-override" strategy="afterInteractive">
+        {`(function () {
+          function removeInjectedKlaroStyles() {
+            var styles = document.querySelectorAll('style[data-context="klaro-styles"]');
+            for (var i = 0; i < styles.length; i++) {
+              var node = styles[i];
+              if (node && node.parentNode) {
+                node.parentNode.removeChild(node);
+              }
+            }
+          }
+
+          removeInjectedKlaroStyles();
+          var observer = new MutationObserver(removeInjectedKlaroStyles);
+          observer.observe(document.documentElement, { childList: true, subtree: true });
+        })();`}
+      </Script>
     </>
   );
 }

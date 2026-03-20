@@ -57,11 +57,11 @@ const ParagraphSticky = ({
 
       ScrollTrigger.create({
         trigger: triggerEl,
-        start: "top 90%",
-        end: "top top",
-        onEnter: () => onActiveChange?.(index),
-        onEnterBack: () => onActiveChange?.(index),
-      });
+        start: "top top+=90%",
+        end: "bottom top+=5%",
+        onEnter: () => onActiveChange?.(index),       
+        onLeaveBack: () => onActiveChange?.(Math.max(1, index - 1)),
+        });
 
       gsap.fromTo(
         paragraphEl,
@@ -120,7 +120,7 @@ const ParagraphSticky = ({
           }
         }}
         style={{ opacity }}
-        className={`tracking-tighter absolute px-20 h-[3vh] text-2xl  w-[30vw] transition-opacity duration-300 ${textColor}  flex flex-row items-center pointer-events-auto cursor-pointer`}
+        className={`tracking-tighter absolute px-20 h-[3vh] text-2xl  font-sans w-[30vw] transition-opacity duration-300 ${textColor}  flex flex-row items-center pointer-events-auto cursor-pointer`}
       >
          <p  >
         {text}

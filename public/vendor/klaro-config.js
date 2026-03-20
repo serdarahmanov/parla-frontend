@@ -10,6 +10,25 @@ window.klaroConfig = {
   hideDeclineAll: false,
   hideLearnMore: false,
   htmlTexts: true,
+  styling: {
+    "font-family": "var(--font-sans)",
+    "title-font-family": "var(--font-sans)",
+    "font-size": "14px",
+    "border-radius": "4px",
+    "border-style": "none",
+    // "border-width": "0px",
+    "dark1": "#ffffff",
+    "dark2": "#111827",
+    "light1": "#111827",
+    "light2": "#e5e7eb",
+    "light3": "#6b7280",
+    "button-text-color": "#f9fafb",
+    "green1": "#111827",
+    "green2": "#111827",
+    "green3": "#374151",
+    "blue1": "#111827",
+    "blue2": "#374151"
+  },
 
 
   translations: {
@@ -17,9 +36,11 @@ window.klaroConfig = {
       privacyPolicyUrl: "/cookie"
     },
     en: {
+      ok: "Accept All",
       consentNotice: {
+        learnMore: "Manage",
         description:
-          "We use essential technologies to run this site and optional analytics and marketing technologies to measure traffic and improve campaigns. You can accept all, reject optional use, or customize your choices."
+         "We use cookies"
       },
       consentModal: {
         title: "Cookie settings",
@@ -107,3 +128,5 @@ window.klaroConfig = {
     }
   }
 };
+
+

@@ -379,7 +379,7 @@ const MainSection4 = () => {
             key={card.id}
             className="clock-text-item absolute left-1/2 top-4 -translate-x-1/2"
           >
-            <h1 className="clock-caption text-4xl tracking-tighter font-light tracking-[0.35em]">
+            <h1 className="clock-caption text-4xl tracking-tighter font-light font-sans tracking-[0.35em]">
               {card.caption}
             </h1>
             <p className="clock-description  text-xs font-medium  opacity-80">

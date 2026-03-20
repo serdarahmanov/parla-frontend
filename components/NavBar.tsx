@@ -4,8 +4,6 @@ import { useRouter } from "next/router";
 import HoverSwapLink from "../animations/HoverSwapLink";
 import gsap from 'gsap'
 
-
-
 const navItems = [
    { label: "WORK", href: "/work" ,},
   { label: "INFO", href: "/about" },
@@ -34,6 +32,7 @@ useLayoutEffect(() => {
           stagger: 0.08,
           ease: 'power3.out',
           delay: 0.2,
+          clearProps: "opacity",
         }
       )
     }, rootRef)
@@ -57,9 +56,7 @@ useLayoutEffect(() => {
             key={item.href}
             href={item.href}
             text={item.label}
-            className={`text-inherit text-[0.8rem] transition-opacity ${
-              pathname === item.href ? "font-semibold opacity-100" : "font-medium opacity-65 hover:opacity-100"
-            }`}
+            className={`text-inherit text-[0.8rem] font-medium ${pathname === item.href ? "opacity-100" : "opacity-65 hover:opacity-100"}`}
           />
         ))}
       </nav>

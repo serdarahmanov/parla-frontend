@@ -1,3 +1,4 @@
+import HoverSwapLink from "@/animations/HoverSwapLink";
 import React from "react";
 
 const clients = [
@@ -65,23 +66,12 @@ const MainSection5 = () => {
               </h1>
             </div>
 
-            <div className="mt-6 flex flex-col leading-[1.2rem] text-md tracking-tighter">
-              <a
-                className="inline"
-                href="mailto:info@parla.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                info@parla.com
-              </a>
-              <a
-                className="inline"
-                href="tel:+447778870307"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                + 44 777 88 70307
-              </a>
+            <div className="mt-6 flex flex-col leading-[1.2rem] text-sm font-sans tracking-tighter">
+             
+            <HoverSwapLink href={"mailto:info@parla.com"} text={"info@parla.com"}/>
+            <HoverSwapLink href={"tel:+447778870307"} text={"+ 44 777 88 70307"}/>
+
+              
             </div>
           </div>
 
@@ -91,23 +81,11 @@ const MainSection5 = () => {
               <h1 className="font-medium opacity-65   text-sm">SOCIALS</h1>
             </div>
 
-            <div className="mt-6 flex flex-col  leading-[1.2rem] text-md tracking-tighter">
-              <a
-                className="inline"
-                href="https://instagram.com/parla"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Instagram
-              </a>
-              <a
-                className="inline"
-                href="https://t.me/parla"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Telegram
-              </a>
+            <div className="mt-6 flex flex-col  font-sans leading-[1.2rem] text-sm tracking-tighter">
+              <HoverSwapLink href={"https://instagram.com/parla"} text={"INSTAGRAM"}/>
+             <HoverSwapLink href={"https://t.me/parla"} text={"TELEGRAM"}/>
+             
+            
             </div>
           </div>
 

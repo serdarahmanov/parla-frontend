@@ -26,6 +26,7 @@ const PageTransition = ({ children, introDone }: Props) => {
     },
     enter: {
       opacity: 1,
+      
     },
     exit: {
       opacity: 1,
@@ -79,7 +80,9 @@ const PageTransition = ({ children, introDone }: Props) => {
     <div className="inner">
       <motion.div {...anim(slide)} className="slide"></motion.div>
       <motion.div {...anim(perspective)} className="page">
-        <motion.div {...anim(opacity)}>
+        <motion.div 
+        {...anim(opacity)}
+        >
           <Header />
           <NavBar />
          

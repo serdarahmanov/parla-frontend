@@ -27,14 +27,15 @@ export default function LandingIntro({
         onComplete,
       });
 
-      tl.to(flairRef.current, {
-        onStart: () => {
-          if (!hasPlayed.current) {
-            flairRef.current?.play();
-            hasPlayed.current = true;
-          }
-        },
-      })
+      tl
+      // .to(flairRef.current, {
+      //   onStart: () => {
+      //     if (!hasPlayed.current) {
+      //       flairRef.current?.play();
+      //       hasPlayed.current = true;
+      //     }
+      //   },
+      // })
 
         .from(logo1Ref.current, {
           y: -5,
@@ -103,7 +104,7 @@ export default function LandingIntro({
 
 
 
-        
+{/*         
         <video
           ref={flairRef}
           className="blend-video absolute left-0 right-0 w-full h-full overflow-hidden"
@@ -111,14 +112,14 @@ export default function LandingIntro({
           playsInline
         >
           <source src="/flairs/1-flair.mp4" />
-        </video>
+        </video> */}
 
 
 
 
         <div className=" text-center z-[10000] w-full h-screen flex flex-col justify-center items-center">
           
-          <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2   w-15">
+          <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2   w-10">
             <img
               ref={logo1Ref}
               src="/landingTransition/Asset-1.svg"
@@ -149,7 +150,7 @@ export default function LandingIntro({
             src="/landingTransition/Asset-5.svg"
             alt="Parla"
             ref={logo5Ref}
-            className="w-15 mt-1"
+            className="w-10 mt-1"
           />
         </div>
       </div>
