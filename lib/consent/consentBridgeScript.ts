@@ -1,7 +1,9 @@
 export const consentBridgeScript = `(function () {
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function () {
-    window.dataLayer.push(arguments);
+
+  window.__consentState = window.__consentState || {
+    analytics: false,
+    marketing: false
   };
 
   window.__consentBridge = {
@@ -25,12 +27,6 @@ export const consentBridgeScript = `(function () {
       }
     },
 
-    deleteCookie: function (name) {
-      try {
-        document.cookie = name + "=; path=/; max-age=0; SameSite=Lax";
-      } catch (e) {}
-    },
-
     writeCookie: function (name, value, maxAgeSeconds) {
       try {
         document.cookie =
@@ -40,6 +36,12 @@ export const consentBridgeScript = `(function () {
           "; path=/; max-age=" +
           maxAgeSeconds +
           "; SameSite=Lax";
+      } catch (e) {}
+    },
+
+    deleteCookie: function (name) {
+      try {
+        document.cookie = name + "=; path=/; max-age=0; SameSite=Lax";
       } catch (e) {}
     },
 
@@ -60,6 +62,7 @@ export const consentBridgeScript = `(function () {
     readStored: function () {
       try {
         var raw = this.readCookie(this.STORAGE_KEY);
+
         if (!raw) {
           return { analytics: false, marketing: false };
         }
@@ -82,29 +85,6 @@ export const consentBridgeScript = `(function () {
       }
     },
 
-    writeStored: function (consents) {
-      return consents;
-    },
-
-    clearStored: function () {
-      try {
-        this.deleteCookie(this.STORAGE_KEY);
-        this.deleteCookie(this.UPDATED_AT_KEY);
-      } catch (e) {}
-    },
-
-    toGoogleConsent: function (consents) {
-      return {
-        analytics_storage: consents.analytics ? "granted" : "denied",
-        ad_storage: consents.marketing ? "granted" : "denied",
-        ad_user_data: consents.marketing ? "granted" : "denied",
-        ad_personalization: consents.marketing ? "granted" : "denied",
-        functionality_storage: "granted",
-        security_storage: "granted",
-        personalization_storage: "denied"
-      };
-    },
-
     isSameConsents: function (a, b) {
       return (
         !!a &&
@@ -114,12 +94,20 @@ export const consentBridgeScript = `(function () {
       );
     },
 
+    setGlobalState: function (consents) {
+      var normalized = {
+        analytics: !!consents.analytics,
+        marketing: !!consents.marketing
+      };
+
+      window.__consentState = normalized;
+      return normalized;
+    },
+
     pushEvent: function (eventName, payload) {
       window.dataLayer.push(
         Object.assign(
-          {
-            event: eventName
-          },
+          { event: eventName },
           payload || {}
         )
       );
@@ -127,28 +115,19 @@ export const consentBridgeScript = `(function () {
 
     applyDefault: function () {
       var consents = this.readStored();
-      var googleConsent = this.toGoogleConsent(consents);
-      this.lastApplied = {
-        analytics: !!consents.analytics,
-        marketing: !!consents.marketing
-      };
+      var normalized = this.setGlobalState(consents);
 
-      window.gtag("consent", "default", googleConsent);
-      window.gtag("set", "ads_data_redaction", true);
+      this.lastApplied = normalized;
 
-      this.pushEvent("consent_default_applied", {
+      this.pushEvent("consent_state_ready", {
         consent_source: "klaro_cookie",
-        consent_analytics: consents.analytics,
-        consent_marketing: consents.marketing,
-        google_consent: googleConsent
+        consent_analytics: normalized.analytics,
+        consent_marketing: normalized.marketing
       });
     },
 
     applyUpdate: function (consents, reason) {
-      var normalized = {
-        analytics: !!consents.analytics,
-        marketing: !!consents.marketing
-      };
+      var normalized = this.setGlobalState(consents);
       var previous = this.lastApplied || this.readStored();
       var isUserAction =
         typeof reason === "string" &&
@@ -166,10 +145,8 @@ export const consentBridgeScript = `(function () {
         return;
       }
 
-      var googleConsent = this.toGoogleConsent(consents);
-
-      window.gtag("consent", "update", googleConsent);
       this.lastApplied = normalized;
+
       this.writeCookie(
         this.UPDATED_AT_KEY,
         String(Date.now()),
@@ -179,8 +156,7 @@ export const consentBridgeScript = `(function () {
       this.pushEvent("consent_updated", {
         consent_reason: reason || "unknown",
         consent_analytics: normalized.analytics,
-        consent_marketing: normalized.marketing,
-        google_consent: googleConsent
+        consent_marketing: normalized.marketing
       });
 
       if (normalized.analytics) {
@@ -189,23 +165,34 @@ export const consentBridgeScript = `(function () {
         this.pushEvent("klaro-analytics-declined");
       }
 
-      if (normalized.marketing) {
-        this.pushEvent("klaro-marketing-accepted");
-      } else {
-        this.pushEvent("klaro-marketing-declined");
-      }
+    },
+
+    clearStored: function () {
+      var cleared = { analytics: false, marketing: false };
+      this.deleteCookie(this.STORAGE_KEY);
+      this.deleteCookie(this.UPDATED_AT_KEY);
+      this.lastApplied = cleared;
+      this.setGlobalState(cleared);
+      this.pushEvent("consent_updated", {
+        consent_reason: "clear_stored",
+        consent_analytics: false,
+        consent_marketing: false
+      });
     },
 
     syncFromKlaro: function (reason) {
       try {
         if (!window.klaro || !window.klaroConfig) return;
         if (typeof window.klaro.getManager !== "function") return;
+
         var manager = window.klaro.getManager(window.klaroConfig);
         if (!manager || typeof manager.getConsent !== "function") return;
+
         var consents = {
           analytics: !!manager.getConsent("analytics"),
           marketing: !!manager.getConsent("marketing")
         };
+
         this.applyUpdate(consents, reason || "klaro_sync");
       } catch (e) {
         this.pushEvent("consent_sync_error", {
