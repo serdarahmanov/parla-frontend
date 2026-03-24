@@ -73,7 +73,7 @@ function Header() {
   }, []);
 
   return (
-    <header className="fixed top-3 left-0 w-full z-60 m-0 p-0 text-center pointer-events-none">
+    <header className="fixed top-1 left-0 w-full z-60 m-0 p-0 text-center pointer-events-none">
       <div className="p-0 m-0">
         <Link
           href="/"

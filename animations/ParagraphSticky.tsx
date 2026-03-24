@@ -98,7 +98,7 @@ const ParagraphSticky = ({
 
   const depth = Math.max(0, activeIndex - index);
   const isActive = activeIndex === index;
-  const opacity = isActive ? 1 : Math.max(0.35, 0.8 - depth * 0.15);
+  const opacity = isActive ? 1 : Math.max(0.15, 0.8 - depth * 0.20);
   const handleClick = () => {
     if (!triggerSelector) return;
     const target = document.querySelector(triggerSelector);
@@ -120,7 +120,7 @@ const ParagraphSticky = ({
           }
         }}
         style={{ opacity }}
-        className={`tracking-tighter absolute px-20 h-[3vh] text-2xl  font-sans w-[30vw] transition-opacity duration-300 ${textColor}  flex flex-row items-center pointer-events-auto cursor-pointer`}
+        className={`tracking-tighter absolute px-6 h-[2.5] text-md  font-semibold font-sans w-[30vw] transition-opacity duration-300 ${textColor}  flex flex-row items-center pointer-events-auto cursor-pointer`}
       >
          <p  >
         {text}

@@ -154,7 +154,7 @@ const CookiePolicyPage = () => {
         <div ref={sideBarRef} className="col-span-3 flex flex-col  gap-4 ">
           <MaskTextAnimation
             text={"COOKIE POLICY"}
-            className=" leading-7"
+            className=" leading-7 text-2xl font-semibold"
           ></MaskTextAnimation>
           <div className="text-xs  font-bold  flex flex-col gap-1">
             <h2

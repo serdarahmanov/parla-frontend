@@ -1,256 +1,192 @@
+"use client";
+
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import React, { useRef } from "react";
 
-gsap.registerPlugin(ScrollTrigger);
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+const services = [
+  {
+    id: 1,
+    title: "BRAND IDENTITY",
+    description:
+      "Creating a unique visual and emotional image of the brand, including logo, colors, typography, and overall style",
+    href: "/Section-3/Section-3-1.png",
+  },
+  {
+    id: 2,
+    title: "BRAND GUIDELINES",
+    description:
+      "A clear set of rules on how to use the brand consistently across all platforms and materials",
+    href: "/Section-3/Section-3-2.png",
+  },
+  {
+    id: 3,
+    title: "PRODUCT DESIGN",
+    description:
+      "Designing the look, feel, and functionality of a product to align with the brand and user needs",
+    href: "/Section-3/Section-3-3.png",
+  },
+  {
+    id: 4,
+    title: "CONCEPT DEVELOPMENT",
+    description:
+      "Creating the idea and visual direction for packaging that attracts attention and reflects the brand",
+    href: "/Section-3/Section-3-1.png",
+  },
+];
 
 const MainSection3 = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const textRef = useRef<HTMLDivElement | null>(null);
-  const photoCardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const photoImgRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const titleRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const photoSources = [
-    "/Section-3/Section-3-1.png",
-    "/Section-3/Section-3-2.png",
-    "/Section-3/Section-3-3.png",
-    "/Section-3/Section-3-1.png",
-    "/Section-3/Section-3-2.png",
-    "/Section-3/Section-3-3.png",
-    "/Section-3/Section-3-1.png",
-    "/Section-3/Section-3-2.png",
-  ];
 
   useGSAP(
     () => {
-      const section = sectionRef.current;
-      const text = textRef.current;
-      const cards = photoCardRefs.current.filter(Boolean) as HTMLDivElement[];
-      const images = photoImgRefs.current.filter(Boolean) as HTMLImageElement[];
-      const hoverCleanups: Array<() => void> = [];
+          if(!itemRefs.current || !cardRefs.current || !titleRefs.current || !sectionRef.current) return
 
-      if (!section || !text || cards.length === 0 || images.length === 0) return;
+            gsap.from(cardRefs.current,{
+              y:100,
+               
+              opacity:0,
+              duration: 0.3,
+              stagger: 0.1,
+              ease: "power3.Out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 85%"
+                
+              }
 
-      const entryFrom = [
-        { xPercent: -140, yPercent: -60, rotation: -6, scale: 0.92 },
-        { xPercent: 0, yPercent: -130, rotation: 4, scale: 0.9 },
-        { xPercent: 120, yPercent: -40, rotation: 7, scale: 0.94 },
-        { xPercent: -120, yPercent: 40, rotation: -5, scale: 0.9 },
-        { xPercent: 130, yPercent: 30, rotation: 5, scale: 0.92 },
-        { xPercent: -80, yPercent: 120, rotation: 8, scale: 0.93 },
-        { xPercent: 20, yPercent: 140, rotation: -7, scale: 0.91 },
-        { xPercent: 140, yPercent: 90, rotation: 6, scale: 0.9 },
-      ];
+            })
 
-      cards.forEach((card, index) => {
-        const from = entryFrom[index] ?? {
-          xPercent: 0,
-          yPercent: 120,
-          rotation: 0,
-          scale: 0.92,
-        };
 
-        gsap.fromTo(
-          card,
-          { autoAlpha: 0, ...from },
-          {
-            autoAlpha: 1,
-            xPercent: 0,
-            yPercent: 0,
-            rotation: 0,
-            scale: 1,
-            duration: 1,
-            ease: "power4.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 42%",
-              toggleActions: "play none none reverse",
-            },
-            delay: index * 0.04,
-          }
-        );
-      });
 
-      gsap.fromTo(
-        text,
-        { autoAlpha: 0, y: 24 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.65,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 75%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      );
 
-      const offsets = [-12, 9, -10, 7, -9, 11, -8, 10];
-      images.forEach((image, index) => {
-        const offset = offsets[index] ?? 8;
-        gsap.fromTo(
-          image,
-          { yPercent: offset * -1 },
-          {
-            yPercent: offset,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          }
-        );
-      });
+          gsap.from(titleRefs.current,{
+              xPercent: -100,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.15,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 40%",
+          end: "center 40%",
+          toggleActions: "play none none none",
+          scrub: true,
+        },
 
-      cards.forEach((card, index) => {
-        const image = images[index];
-        if (!image) return;
+          })
 
-        const cardXTo = gsap.quickTo(card, "x", {
-          duration: 0.35,
-          ease: "power3.out",
-        });
-        const cardYTo = gsap.quickTo(card, "y", {
-          duration: 0.35,
-          ease: "power3.out",
-        });
-        const cardScaleTo = gsap.quickTo(card, "scale", {
-          duration: 0.35,
-          ease: "power3.out",
-        });
+          const items = itemRefs.current;
 
-        const imageXTo = gsap.quickTo(image, "x", {
-          duration: 0.35,
-          ease: "power3.out",
-        });
-        const imageYTo = gsap.quickTo(image, "y", {
-          duration: 0.35,
-          ease: "power3.out",
-        });
-        const imageScaleTo = gsap.quickTo(image, "scale", {
-          duration: 0.35,
-          ease: "power3.out",
-        });
+          items.forEach((el,index)=>{
+            if(!el)return;
+            const title = titleRefs.current[index];
+            const card = cardRefs.current[index];
+            const description = el.querySelector(".desc");
 
-        const handleMove = (event: PointerEvent) => {
-          const rect = card.getBoundingClientRect();
-          const px = (event.clientX - rect.left) / rect.width - 0.5;
-          const py = (event.clientY - rect.top) / rect.height - 0.5;
-          const cardShift = 6;
-          const imageShift = 14;
-          cardXTo(px * cardShift);
-          cardYTo(py * cardShift);
-          imageXTo(px * imageShift);
-          imageYTo(py * imageShift);
-        };
 
-        const handleEnter = () => {
-          cardScaleTo(1.03);
-          imageScaleTo(1.08);
-        };
+            const tl  = gsap.timeline({paused:true});
 
-        const handleLeave = () => {
-          cardXTo(0);
-          cardYTo(0);
-          cardScaleTo(1);
-          imageXTo(0);
-          imageYTo(0);
-          imageScaleTo(1);
-        };
+            tl.to(title,{
+              opacity: 1,
+              // y: -2,
+              scale:1.001,
+              duration: 0.3,
+              ease: "power2.out"
 
-        card.addEventListener("pointermove", handleMove);
-        card.addEventListener("pointerenter", handleEnter);
-        card.addEventListener("pointerleave", handleLeave);
+            }).to(el,{
+              
 
-        hoverCleanups.push(() => {
-          card.removeEventListener("pointermove", handleMove);
-          card.removeEventListener("pointerenter", handleEnter);
-          card.removeEventListener("pointerleave", handleLeave);
-        });
-      });
 
-      return () => {
-        hoverCleanups.forEach((cleanup) => cleanup());
-      };
+
+            },"<")
+
+            tl.to(description,{
+              opacity: 1,
+            },0)
+
+
+
+            const onEnter = ()=>tl.restart();
+            const onLeave = ()=> tl.revert();
+
+            el.addEventListener("mouseenter", onEnter);
+            el.addEventListener("mouseleave", onLeave);
+ return()=>{
+  el.removeEventListener("mouseenter", onEnter);
+  el.removeEventListener("mouseleave", onLeave);
+  tl.kill();
+ }
+
+          })
+
+
+
+
+
+
+
+
+
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
 
-  const renderPhoto = (
-    index: number,
-    cardClassName: string,
-    imageClassName: string,
-    allowOverflow = false
-  ) => (
-    <div
-      ref={(el) => {
-        photoCardRefs.current[index] = el;
-      }}
-      className={`relative ${allowOverflow ? "overflow-visible" : "overflow-hidden"} will-change-transform ${cardClassName}`}
-    >
-      <img
-        ref={(el) => {
-          photoImgRefs.current[index] = el;
-        }}
-        className={`absolute h-[132%] w-[115%] object-cover will-change-transform ${imageClassName}`}
-        src={photoSources[index]}
-        alt={`section-3-photo-${index + 1}`}
-      />
-    </div>
-  );
+
+
 
   return (
     <section
       id="section-3"
       ref={sectionRef}
-      className=" relative z-30  h-screen bg-[#0F0F0F] flex items-center justify-center overflow-hidden"
+      className="relative z-30 h-screen bg-[#fefefe] overflow-hidden shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]"
     >
-      <div className="h-[60vh] w-[60vw] flex flex-col gap-0">
-        <div className="flex flex-1 gap-0 items-end">
-          {renderPhoto(
-            0,
-            "basis-[19%] h-[108%]",
-            "-left-[6%] -top-[34%] h-[170%] w-[108%]",
-            true
-          )}
-          {renderPhoto(1, "basis-[46%] h-[72%]", "-left-[6%] -top-[10%]")}
-          {renderPhoto(2, "basis-[32%] h-[90%]", "-left-[12%] -top-[20%]")}
-        </div>
-
-        <div className="flex flex-1 gap-0 items-center">
-          {renderPhoto(
-            3,
-            "basis-[24%] h-[92%]",
-            "-left-[3%] -top-[20%] h-[142%] w-[103%]"
-          )}
-          <div
-            ref={textRef}
-            className="relative z-30 basis-[40%] h-[92%] flex flex-col items-start justify-center px-6 text-left text-ce-text"
-          >
-            <p className="mt-3 max-w-[40ch] text-sm md:text-base ">
-              Branding is a key part of any business, big or small. We help companies build
-              clear and recognizable identities that people understand and remember.
-              
-            </p>
+      <div
+      
+        className="relative grid grid-cols-4 grid-rows-2 h-screen w-full gap-2 px-26 pt-26 pb-5"
+      >
+        {services.map((item,index) => (
+          <div  
+          ref={ (el)=>{cardRefs.current[index]= el;}}
+          key={item.id}
+          className="relative col-span-1 row-span-1">
+            <div className="card-inner relative h-full w-full bg-amber-100 overflow-hidden text-white ">
+              <img
+                src={item.href}
+                alt=""
+                className="object-cover absolute inset-0 w-full h-full"
+              />
+            </div>
           </div>
-          {renderPhoto(4, "basis-[30%] h-[92%]", "-left-[2%] -top-[18%] h-[138%] w-[102%]")}
-        </div>
+        ))}
 
-        <div className="flex flex-1 gap-0 items-start pt-2">
-          {renderPhoto(5, "basis-[36%] h-[78%]", "-left-[11%] -top-[14%]")}
-          {renderPhoto(
-            6,
-            "basis-[20%] h-[102%]",
-            "-left-[4%] -top-[20%] h-[148%] w-[104%]",
-            true
-          )}
-          {renderPhoto(7, "basis-[40%] h-[86%]", "-left-[9%] -top-[12%]")}
+        <div  className="relative col-span-4 row-span-1 row-start-2  grid grid-rows-4 gap-2 mt-10">
+          {services.map((item,index) => (
+            <div ref={ (el)=>{
+              itemRefs.current[index]= el;
+            }}
+              key={item.id}
+              className=" relative row-span-1 flex flex-row justify-between border-b-2 border-[#eeeeee] items-end"
+            >
+              <div 
+              ref = {(el)=>{
+                titleRefs.current[index]=el;
+              }}
+              className="title text-2xl font-medium tracking-tight opacity-30 font-sans mb-2">
+                {item.title}
+              </div>
+              <div className="desc card-description  mx-2 text-xs font-sans w-[30vw]  text-right  opacity-30 mb-2">
+                {item.description}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

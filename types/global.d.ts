@@ -3,6 +3,11 @@ export {};
 declare global {
   interface Window {
     dataLayer: Array<Record<string, unknown> | IArguments>;
+    __pageContext?: {
+      currentPageLocation: string;
+      currentPageReferrer: string;
+      currentPageTitle: string;
+    };
 
     klaro?: {
       show: (config?: unknown, modal?: boolean) => void;

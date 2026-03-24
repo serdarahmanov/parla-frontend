@@ -43,6 +43,7 @@ const sections = [
 const Page = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
 
   useGSAP(
     () => {
@@ -72,27 +73,68 @@ const Page = () => {
         });
       });
 
+      imageRefs.current.forEach((img, index) => {
+        if (!img) return;
+
+        gsap.fromTo(
+          img,
+          {
+            clipPath: "inset(50% 0% 50% 0% )",
+            scale: 1,
+          },
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration: 0.7,
+            ease: [0.76, 0, 0.24, 1],
+            scale: 1.25,
+            delay: 0.4,
+          },
+        );
+
+        gsap.fromTo(
+          img,
+          {
+            yPercent: -25,
+          },
+          {
+            yPercent: 25,
+            ease: "none",
+            scrollTrigger: {
+              trigger: `.image-section-${index}`,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          },
+        );
+      });
+
       ScrollTrigger.refresh();
     },
     { scope: rootRef },
   );
 
   return (
-    <div ref={rootRef} className="mx-auto w-full px-6 ">
+    <div ref={rootRef} className="relative mx-auto w-full px-6 ">
       <ScrollCounter />
-      <div className=" grid grid-cols-12">
+      <div className="relative grid grid-cols-12">
         {/* Left column */}
-        <div className="relative     col-start-2 col-span-8">
+        <div className="relative  col-start-2 col-span-8 flex flex-col gap-2 pt-25 pb-15">
           {sections.map((section, index) => (
             <section
               key={section.id}
-              className={`image-section-${index} flex min-h-screen items-center`}
+              className={`image-section-${index} flex h-[80vh] w-full items-center relative `}
             >
-              <img
-                src={section.image}
-                alt={section.title}
-                className=" h-[98vh] w-full  object-contain"
-              />
+              <div className="relative h-full w-full py-4 overflow-hidden">
+                <img
+                  ref={(el) => {
+                    imageRefs.current[index] = el;
+                  }}
+                  src={section.image}
+                  alt={section.title}
+                  className=" w-full h-full scale-125 object-cover"
+                />
+              </div>
             </section>
           ))}
         </div>
@@ -107,12 +149,12 @@ const Page = () => {
                   ref={(el) => {
                     textRefs.current[index] = el;
                   }}
-                  className=" flex flex-col justify-center absolute"
+                  className=" flex flex-row justify-center absolute gap-4"
                 >
-                  <h2 className=" text-xs font-semibold">{section.title}</h2>
-                  <p className=" max-w-md text-xs text-neutral-600">
-                    {section.text}
+                  <p className=" text-xs font-semibold text-neutral-400">
+                    CLIENT
                   </p>
+                  <h2 className=" text-xs font-semibold">{section.title}</h2>
                 </div>
               ))}
             </div>

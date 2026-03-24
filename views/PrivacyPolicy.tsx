@@ -51,7 +51,7 @@ const PrivacyPolicy = () => {
         >
           <MaskTextAnimation
             text={"PRIVACY POLICY"}
-            className=" leading-7"
+            className=" leading-7 text-2xl font-semibold"
           ></MaskTextAnimation>
 
           <div className="gap-1 text-xs font-bold  flex flex-col">

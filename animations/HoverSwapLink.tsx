@@ -11,14 +11,18 @@ type HoverSwapLinkProps = {
   href: string;
   text: string;
   className?: string;
+  "data-analytics": string;
 };
 
 export default function HoverSwapLink({
   href,
   text,
   className = "",
+  "data-analytics": dataAnalytics,
 }: HoverSwapLinkProps) {
   const router = useRouter();
+  const isInternal = href.startsWith("/");
+  const isHttpExternal = /^https?:\/\//i.test(href);
   const rootRef = useRef<HTMLAnchorElement | null>(null);
   const topRef = useRef<HTMLSpanElement | null>(null);
   const bottomRef = useRef<HTMLSpanElement | null>(null);
@@ -31,16 +35,16 @@ export default function HoverSwapLink({
 
       tl.to(topRef.current, {
         yPercent: -100,
-        duration: 0.35,
+        duration: 0.45,
         ease: "power3.out",
-        delay:0.1
+        delay:0.3
       }).to(
         bottomRef.current,
         {
           yPercent: -100,
-          duration: 0.35,
+          duration: 0.45,
           ease: "power3.out",
-          delay:0.1
+          delay:0.3
         },
         0
       );
@@ -61,15 +65,41 @@ export default function HoverSwapLink({
     },
     { scope: rootRef }
   );
-// relative text-inherit
-// href={href}
-      // ref={rootRef}
+
+  const pushOutboundClick = () => {
+    if (typeof window === "undefined") return;
+
+    window.dataLayer = window.dataLayer || [];
+
+    const anchor = rootRef.current;
+    const pageContext = window.__pageContext;
+
+    window.dataLayer.push({
+      event: "outbound_click",
+      outbound: true,
+      link_url: anchor?.href || href,
+      link_text: (anchor?.textContent || text || "").trim(),
+      link_id: anchor?.dataset.track || "",
+      page_location: pageContext?.currentPageLocation || window.location.href,
+      page_title: document.title,
+      page_referrer: pageContext?.currentPageReferrer || document.referrer || "",
+    });
+  };
+
   return (
     <a
       href={href}
       ref={rootRef}
+      data-track={dataAnalytics}
       className={`relative ${className}`}
+      target={isHttpExternal ? "_blank" : undefined}
+      rel={isHttpExternal ? "noopener noreferrer" : undefined}
       onClick={(e) => {
+        if (!isInternal) {
+          pushOutboundClick();
+          return;
+        }
+
         if (
           e.metaKey ||
           e.ctrlKey ||
@@ -94,7 +124,7 @@ export default function HoverSwapLink({
           {text}
         </span>
 
-        <span ref={bottomRef} className="absolute left-0 top-full block text-inherit opacity-65">
+        <span ref={bottomRef} className="absolute left-0 top-full block text-inherit ">
           {text}
         </span>
       </span>

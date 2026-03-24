@@ -142,13 +142,6 @@ const MainSection4 = () => {
       gsap.set(captionItems[0], { y: 0, rotationX: 0 });
 
       // ==========================================
-      // Animation 6: Scroll-based Card Scale (subtle depth)
-      // Why: Start cards slightly smaller and scale to full size near viewport center
-      // so horizontal motion feels more alive without changing layout logic.
-      // ==========================================
-      gsap.set(cards, { transformOrigin: "center center" });
-
-      // ==========================================
       // Animation 7: Inner Image Parallax (subtle depth)
       // Why: Move image content a few pixels opposite card travel direction to add
       // depth while preserving the card layout and hover behaviors.
@@ -268,14 +261,6 @@ const MainSection4 = () => {
         cards.forEach((_, index) => {
           const cardCenterX = cardCenters[index];
           const distance = cardDistances[index];
-          const clampedDistance = Math.min(distance, maxDistance);
-          const proximity = 1 - clampedDistance / maxDistance;
-          const approachScale = 0.90 + proximity * 0.10;
-          // Keep cards at full scale after they pass viewport center to the left.
-          // They shrink back only when scrolling up and moving to the right side again.
-          const scrollScale = cardCenterX <= viewportCenter ? 1 : approachScale;
-          gsap.set(cards[index], { scale: scrollScale });
-
           const normalizedOffset = gsap.utils.clamp(
             -1,
             1,
@@ -301,7 +286,7 @@ const MainSection4 = () => {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: () => `+=${getDistance()* 0.5} `,
+          end: () => `+=${getDistance()}`,
           scrub: 1,
           pin: true,
           invalidateOnRefresh: true,
@@ -325,8 +310,6 @@ const MainSection4 = () => {
       return () => {
         // Cleanup for Animation 2/3 (caption tweens).
         gsap.killTweensOf([...textItems, ...captionItems, ...descriptionItems]);
-        // Cleanup for Animation 6 (card scale tweens/sets).
-        gsap.killTweensOf(cards);
         // Cleanup for Animation 7 (inner image parallax tweens/sets).
         gsap.killTweensOf(images.filter(Boolean));
         // Reset inline animation styles so route re-entry starts clean.
@@ -348,7 +331,7 @@ const MainSection4 = () => {
     <div
       id="section-4"
       ref={containerRef}
-      className="main-container relative z-40 overflow-hidden overflow-x-hidden w-full h-screen  bg-black text-ce-text "
+      className="main-container relative z-40 overflow-hidden overflow-x-hidden w-full h-screen bg-[#fefefe] text-black shadow-[0_12px_20px_-10px_rgba(0,0,0,0.25)]"
     >
       <div ref={introRef} className="absolute left-0 top-0 w-full h-[80vh]">
       <section
@@ -357,7 +340,7 @@ const MainSection4 = () => {
       >
         {cardsData.map((card, index) => (
           <div
-            className="card w-[70vw] flex-none overflow-hidden"
+            className="relative card w-[40vw] flex-none overflow-hidden"
             id={card.id}
             key={card.id}
           >
@@ -379,12 +362,11 @@ const MainSection4 = () => {
             key={card.id}
             className="clock-text-item absolute left-1/2 top-4 -translate-x-1/2"
           >
-            <h1 className="clock-caption text-4xl tracking-tighter font-light font-sans tracking-[0.35em]">
+            <h1 className="clock-caption text-sm tracking-tigh font-bold font-sans">
               {card.caption}
             </h1>
-            <p className="clock-description  text-xs font-medium  opacity-80">
-              {card.description}
-            </p>
+            <p className="opacity-50 font-sans tracking-tighter text-sm">{card.description}</p>
+            
           </div>
         ))}
       </div>

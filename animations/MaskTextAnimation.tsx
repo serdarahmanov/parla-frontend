@@ -35,7 +35,7 @@ const MaskTextAnimation = ({ text, className }: Props) => {
           duration: 0.5,
           ease: "expo.out",
           stagger: 0.04,
-          delay: 0.8,
+          delay: 0.5,
         });
       };
 
@@ -50,11 +50,11 @@ const MaskTextAnimation = ({ text, className }: Props) => {
 
   return (
     <span
-      className={`relative block overflow-hidden  w-[60vw]  ${className ?? ""}`}
+      className={`relative block overflow-hidden    ${className ?? ""}`}
     >
       <span
         ref={topRef}
-        className="block text-inherit tracking-[-0.05em]   text-[2rem] font-medium "
+        className="block "
       >
         {text}
       </span>

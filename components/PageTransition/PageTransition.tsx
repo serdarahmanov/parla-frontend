@@ -1,8 +1,9 @@
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, Variants } from "framer-motion";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import NavBar from "@/components/NavBar";
+import { usePathname } from "next/navigation";
 
 type Props = {
   children: ReactNode;
@@ -10,6 +11,32 @@ type Props = {
 };
 
 const PageTransition = ({ children, introDone }: Props) => {
+      const pathname = usePathname();
+      const [ready,setReady]= useState(false);
+
+  useEffect(()=>{
+    if("scrollRestoration" in window.history){
+      window.history.scrollRestoration="manual";
+    }
+  });
+
+  useLayoutEffect(()=>{
+
+    setReady(false);
+    window.scrollTo(0,0);
+
+    const id = requestAnimationFrame(()=>{
+      setReady(true);
+    })
+    return()=> cancelAnimationFrame(id)
+
+  },[pathname])
+
+
+
+
+
+
   const anim = (variants: Variants) => {
     return {
       initial: "initial",
@@ -25,7 +52,7 @@ const PageTransition = ({ children, introDone }: Props) => {
       
     },
     enter: {
-      opacity: 1,
+      opacity: ready ? 1:0,
       
     },
     exit: {

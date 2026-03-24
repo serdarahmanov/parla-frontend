@@ -15,8 +15,10 @@ export default function Home() {
   const mainSection2MaskText = "WE BUILD BRANDS";
 
   return (
-    <div className="relative bg-black">
-      <MainSection2 videoLinks={["/video/TasVegias.mp4"]} maskText={"Deneme"} />
+    <div className="relative bg-[#fefefe]">
+ 
+
+      <MainSection2 videoLinks={["/video/TasVegias.mp4"]} maskText={"WE MAKE IT"} />
 
       <MainSection6
         videoLinks={mainSection2VideoLinks}
@@ -32,9 +34,9 @@ export default function Home() {
         onActiveChange={setActiveIndex}
         text={"SERVICES"}
         triggerSelector="#section-3"
-        startTop="100vh"
+        startTop="110vh"
         topStay="2vh"
-        textColor="text-ce-text"
+        textColor="text-black"
         bgColor="bg-black"
       />
       <MainSection4></MainSection4>
@@ -46,10 +48,10 @@ export default function Home() {
         text={"PROCESS"}
         secondText="Our Process "
         triggerSelector="#section-4"
-        textColor="text-ce-text"
+        textColor="text-black"
         bgColor="bg-black"
         startTop="150vh"
-        topStay="5vh"
+        topStay="3.5vh"
       />
       <MainSection5></MainSection5>
 
@@ -60,10 +62,10 @@ export default function Home() {
         text={"CLIENTS"}
         secondText="Our Process "
         triggerSelector="#section-5"
-        textColor="text-ce-text"
+        textColor="text-black"
         bgColor="bg-black"
         startTop="200vh"
-        topStay="8vh"
+        topStay="5vh"
       />
     </div>
   );

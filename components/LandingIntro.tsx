@@ -100,7 +100,7 @@ export default function LandingIntro({
       ref={rootRef}
       className="z-[9999] w-full fixed h-screen flex items-center justify-center  text-white overflow-hidden"
     >
-      <div className="intro-overlay fixed inset-0   bg-black object-cover">
+      <div className="intro-overlay fixed inset-0   bg-[#fefefe] object-cover">
 
 
 

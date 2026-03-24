@@ -28,7 +28,7 @@ const scopeRef = useRef<HTMLDivElement | null> (null);
 
 
   return (
-    <div  ref={scopeRef} className={`scticky h-screen top-0 z-11 w-full  bg-black justify-center  items-center ${arkaRenk}  ${textColor} text-[2rem] leading-8 font-normal     tracking-tighter`}>
+    <div  ref={scopeRef} className={`scticky h-screen top-0 z-11 w-full  bg-whitejustify-center  items-center ${arkaRenk}  ${textColor} text-[2rem] leading-8 font-normal     tracking-tighter`}>
      
         
             <video
@@ -45,9 +45,9 @@ const scopeRef = useRef<HTMLDivElement | null> (null);
       
      
   
-         {/* <div className="relative z-10 flex h-screen w-full items-center justify-center text-6xl font-medium tracking-tighter text-ce-text">
+         <div className="relative z-12 flex h-screen w-full items-center justify-center text-6xl font-medium tracking-tighter text-black">
             <MaskTextAnimation text={text}></MaskTextAnimation>
-          </div> */}
+          </div>
     </div>
   );
 };

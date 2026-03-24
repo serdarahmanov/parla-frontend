@@ -158,13 +158,6 @@ export const consentBridgeScript = `(function () {
         consent_analytics: normalized.analytics,
         consent_marketing: normalized.marketing
       });
-
-      if (normalized.analytics) {
-        this.pushEvent("klaro-analytics-accepted");
-      } else {
-        this.pushEvent("klaro-analytics-declined");
-      }
-
     },
 
     clearStored: function () {

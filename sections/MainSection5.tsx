@@ -1,4 +1,5 @@
 import HoverSwapLink from "@/animations/HoverSwapLink";
+import LiveClock from "@/components/LiveClock";
 import React from "react";
 
 const clients = [
@@ -33,7 +34,7 @@ const MainSection5 = () => {
   return (
     <section
       id="section-5"
-      className="relative z-50 h-screen w-full bg-black  flex flex-col    "
+      className="relative z-39 h-screen w-full bg-[#fefefe] flex flex-col    "
     >
       {/* Takes 30vh of vertical space inside this h-screen section. */}
       <div className="absolute top-[25vh] w-full overflow-hidden  flex items-end justify-centerbg-black ">
@@ -55,56 +56,73 @@ const MainSection5 = () => {
       {/* h-full here is another 100vh inside the same h-screen section.
           Combined with the 30vh block above + gap-20, total content exceeds viewport height. */}
 
-      <div className="w-full  bg-black flex flex-col items-center top-[60vh]  absolute opacity-85 gap-10 ">
+      <div className="w-full  bg-[#fefefe] flex flex-col items-center top-[60vh]  absolute opacity-85 gap-10 ">
        
-        <div className="  grid grid-cols-3 gap-3 w-[60vw] h-auto text-white  bg-black">
+        <div className="  grid grid-cols-3 gap-3 w-[60vw] h-auto text-black  bg-[#fefefe]">
           <div className="col-span-1">
-            <div className="h-[1px] w-full bg-white  mt-3"></div>
+            <div className="h-[1px] w-full bg-black  mt-3"></div>
             <div className="mt-10">
-              <h1 className="font-medium opacity-65 mt-10  text-sm">
+              <h1 className="font-medium opacity-65 mt-10 font-sans text-sm">
                 BUSINESS ENQUIRIES
               </h1>
             </div>
 
-            <div className="mt-6 flex flex-col leading-[1.2rem] text-sm font-sans tracking-tighter">
+            <div className="mt-6 flex flex-col leading-[1.2rem] text-xs font-sans font-medium tracking-tight  gap-0">
              
-            <HoverSwapLink href={"mailto:info@parla.com"} text={"info@parla.com"}/>
-            <HoverSwapLink href={"tel:+447778870307"} text={"+ 44 777 88 70307"}/>
+            <HoverSwapLink
+              href={"mailto:info@parla.com"}
+              text={"info@parla.com"}
+              data-analytics="contact-email"
+            />
+            <HoverSwapLink
+              href={"tel:+447778870307"}
+              text={"+ 44 777 88 70307"}
+              data-analytics="contact-phone"
+            />
 
               
             </div>
           </div>
 
           <div className="col-span-1  ">
-            <div className="h-[1px] w-full bg-white  mt-3"> </div>
+            <div className="h-[1px] w-full bg-black  mt-3"> </div>
             <div className="mt-10">
-              <h1 className="font-medium opacity-65   text-sm">SOCIALS</h1>
+              <h1 className="font-medium opacity-65 font-sans  text-sm">SOCIALS</h1>
             </div>
 
-            <div className="mt-6 flex flex-col  font-sans leading-[1.2rem] text-sm tracking-tighter">
-              <HoverSwapLink href={"https://instagram.com/parla"} text={"INSTAGRAM"}/>
-             <HoverSwapLink href={"https://t.me/parla"} text={"TELEGRAM"}/>
+            <div className="mt-6 flex flex-col  font-sans leading-[1.2rem] text-xs font-sans font-medium tracking-tight  gap-0">
+              <HoverSwapLink
+                href={"https://instagram.com/parla"}
+                text={"INSTAGRAM"}
+                data-analytics="social-instagram"
+              />
+             <HoverSwapLink
+               href={"https://t.me/parla"}
+               text={"TELEGRAM"}
+               data-analytics="social-telegram"
+             />
              
             
             </div>
           </div>
 
           <div className="col-span-1">
-            <div className="h-[1px] w-full bg-white  mt-3"> </div>
+            <div className="h-[1px] w-full bg-black  mt-3"> </div>
             <div className=" mt-10">
-              <h1 className="font-medium opacity-65  text-sm">
+              <h1 className="font-medium opacity-65  font-sans text-sm">
                 {" "}
                 WORKING HOURS
               </h1>
             </div>
 
-            <div className="mt-6 flex flex-col  leading-[1.2rem] text-md tracking-tighter">
+            <div className="mt-6 flex flex-col  leading-[1.2rem] text-xs font-sans font-medium tracking-tight gap-0">
               <p> Monday to Friday</p>
               <p>08:00 AM - 18:00 PM</p>
+              <LiveClock className={" "}/>
             </div>
           </div>
         </div>
-        <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2  w-10 mt-auto">
+        <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2  w-4 mt-auto">
           <img
             src="/landingTransition/Asset-1.svg"
             alt="Parla"
@@ -139,16 +157,16 @@ const MainSection5 = () => {
         .clients-fade-left {
           background: linear-gradient(
             to right,
-            rgba(0, 0, 0, 1) 0%,
-            rgba(0, 0, 0, 0) 100%
+            rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0) 100%
           );
         }
 
         .clients-fade-right {
           background: linear-gradient(
             to left,
-            rgba(0, 0, 0, 1) 0%,
-            rgba(0, 0, 0, 0) 100%
+            rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0) 100%
           );
         }
 

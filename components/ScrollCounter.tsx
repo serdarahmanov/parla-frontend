@@ -18,17 +18,17 @@ export default function ScrollCounter() {
   const [count, setCount] = useState(0);
 
                                     useMotionValueEvent(value, "change", (latest) => {
-                                        setCount(Math.floor(latest));
+                                        setCount(Math.round(latest));
                                     });
   return (
-    <div className=" text-xs font-medium overflow-hidden">
+    <div className=" font-medium overflow-hidden">
 
-      <motion.div style={{ y }} className="overflow-hidden font-medium text-xs bottom-0 right-0 px-6 m-0 p-0 fixed h-screen">
+      <motion.div style={{ y }} className="overflow-hidden font-medium bottom-0 right-0 px-6 m-0 p-0 fixed h-screen">
  
        
 
 
-      <motion.span className="overflow-hidden font-medium text-xs">
+      <motion.span className="overflow-hidden text-[0.6rem] font-sans">
        {count}%
       </motion.span>
       </motion.div>
