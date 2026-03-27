@@ -7,6 +7,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import SplitText from "gsap/SplitText";
 import CookieSettingsButton from "@/components/cookie/CookieSettingsButton";
+import PortfolioVideoPlayer from "@/components/VideoPlayer";
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
@@ -147,7 +148,7 @@ const CookiePolicyPage = () => {
   }, []);
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} className="h-[200vh]">
       <div className=" relative grid grid-cols-12 pt-25 px-6  pb-[80vh]">
         <div className="col-span-3"></div>
 
@@ -245,6 +246,7 @@ const CookiePolicyPage = () => {
 
         <div className="col-span-2"></div>
       </div>
+     
     </div>
   );
 };

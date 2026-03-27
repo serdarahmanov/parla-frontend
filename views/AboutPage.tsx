@@ -1,5 +1,6 @@
 import React from "react";
 import Paragraph from "../animations/Paragraph";
+import PortfolioVideoPlayer from "@/components/VideoPlayer";
 
 const images = [
   { id: 1, href: "/info-photos/business-people-shaking-hands-agreement_53876-30721.jpg" },
@@ -70,6 +71,7 @@ function About() {
           </div>
         </div>
       </div>
+        
     </div>
   );
 }

@@ -1,0 +1,603 @@
+=== components/VideoPlayer.tsx ===
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+function formatTime(time: number) {
+  if (!isFinite(time)) return "00:00";
+  const mins = Math.floor(time / 60);
+  const secs = Math.floor(time % 60);
+  return `${mins}:${String(secs).padStart(2, "0")}`;
+}
+
+type PortfolioVideoPlayerProps = {
+  src: string;
+  poster?: string;
+  title?: string;
+  videoName?: string;
+  clientName?: string;
+};
+
+export default function PortfolioVideoPlayer({
+  src,
+  poster,
+  title = "Project video",
+  videoName = "Video Name",
+  clientName = "Client",
+}: PortfolioVideoPlayerProps) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const progressRef = useRef<HTMLProgressElement | null>(null);
+  const seekInputRef = useRef<HTMLInputElement | null>(null);
+  const timeLabelRef = useRef<HTMLSpanElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [duration, setDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isHover, setIsHover] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isActivated, setIsActivated] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const drawProgress = () => {
+    const video = videoRef.current;
+    if (!video || !isFinite(video.duration) || video.duration <= 0) return;
+
+    const current = video.currentTime;
+    const total = video.duration;
+    const ratio = Math.min(Math.max(current / total, 0), 1);
+    const percent = ratio * 100;
+    if (progressRef.current) {
+      progressRef.current.max = total;
+      progressRef.current.value = current;
+    }
+
+    if (seekInputRef.current) {
+      seekInputRef.current.max = String(total);
+      seekInputRef.current.value = String(current);
+    }
+
+    if (timeLabelRef.current) {
+      const trackWidth = seekInputRef.current?.clientWidth ?? 0;
+      const thumbX = ratio * trackWidth;
+      timeLabelRef.current.style.left = `${thumbX}px`;
+      timeLabelRef.current.style.transform = "translateX(-50%)";
+      timeLabelRef.current.textContent = formatTime(current);
+    }
+  };
+
+  const stopProgressLoop = () => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  };
+
+  const clearInactivityTimer = () => {
+    if (inactivityTimerRef.current !== null) {
+      clearTimeout(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
+  };
+
+  const scheduleInactivityHide = () => {
+    clearInactivityTimer();
+    inactivityTimerRef.current = setTimeout(() => {
+      setIsHover(false);
+    }, 3000);
+  };
+
+  const startProgressLoop = () => {
+    const update = () => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      drawProgress();
+
+      if (!video.paused && !video.ended) {
+        rafRef.current = requestAnimationFrame(update);
+      }
+    };
+
+    stopProgressLoop();
+    rafRef.current = requestAnimationFrame(update);
+  };
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    setIsLoaded(false);
+    setDuration(0);
+
+    const onLoadedMetadata = () => {
+      const nextDuration = isFinite(video.duration) ? video.duration : 0;
+      setDuration(nextDuration);
+      setIsLoaded(true);
+      setIsMuted(video.muted);
+      drawProgress();
+    };
+
+    const onPlay = () => {
+      setIsPlaying(true);
+      setIsActivated(true);
+      setIsHover(true);
+      startProgressLoop();
+      scheduleInactivityHide();
+    };
+
+    const onPause = () => {
+      setIsPlaying(false);
+      clearInactivityTimer();
+      setIsHover(true);
+      drawProgress();
+      stopProgressLoop();
+    };
+
+    const onEnded = () => {
+      setIsPlaying(false);
+      clearInactivityTimer();
+      setIsHover(true);
+      drawProgress();
+      stopProgressLoop();
+    };
+
+    const onTimeUpdate = () => {
+      if (video.paused) drawProgress();
+    };
+
+    video.addEventListener("loadedmetadata", onLoadedMetadata);
+    video.addEventListener("play", onPlay);
+    video.addEventListener("pause", onPause);
+    video.addEventListener("ended", onEnded);
+    video.addEventListener("timeupdate", onTimeUpdate);
+
+    return () => {
+      clearInactivityTimer();
+      stopProgressLoop();
+      video.removeEventListener("loadedmetadata", onLoadedMetadata);
+      video.removeEventListener("play", onPlay);
+      video.removeEventListener("pause", onPause);
+      video.removeEventListener("ended", onEnded);
+      video.removeEventListener("timeupdate", onTimeUpdate);
+    };
+  }, [src]);
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      const wrapper = wrapperRef.current;
+      const current = document.fullscreenElement;
+      if (!wrapper || !current) {
+        setIsFullscreen(false);
+        return;
+      }
+      setIsFullscreen(wrapper === current || wrapper.contains(current));
+    };
+
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+    };
+  }, []);
+
+  const togglePlay = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    setIsActivated(true);
+    setIsHover(true);
+
+    try {
+      if (video.paused) {
+        await video.play();
+      } else {
+        video.pause();
+      }
+    } catch {
+      // Ignore play() rejection from browser autoplay policies.
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = !video.muted;
+    setIsMuted(video.muted);
+  };
+
+  const toggleFullscreen = async () => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await wrapper.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch {
+      // Ignore fullscreen API rejection.
+    }
+  };
+
+  const handleClose = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        return;
+      }
+    } catch {
+      // Ignore fullscreen API rejection.
+    }
+
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "/work";
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const nextTime = Number(e.target.value);
+    video.currentTime = nextTime;
+    setIsActivated(true);
+    drawProgress();
+  };
+
+  const handlePointerEnter = () => {
+    setIsHover(true);
+    if (isPlaying) scheduleInactivityHide();
+  };
+
+  const handlePointerMove = () => {
+    if (!isHover) setIsHover(true);
+    if (isPlaying) scheduleInactivityHide();
+  };
+
+  const handlePointerLeave = () => {
+    clearInactivityTimer();
+    setIsHover(false);
+  };
+
+  return (
+    <section className="z-[100] flex h-screen w-full items-center justify-center bg-black">
+      <div
+        ref={wrapperRef}
+        className="video_player_wrap relative h-screen w-screen overflow-hidden bg-black"
+        data-vimeo-playing={String(isPlaying)}
+        data-vimeo-muted={String(isMuted)}
+        data-vimeo-hover={String(isHover)}
+        data-vimeo-activated={String(isActivated)}
+        data-vimeo-loaded={String(isLoaded)}
+        data-vimeo-fullscreen={String(isFullscreen)}
+        data-vimeo-update-size="cover"
+        onMouseEnter={handlePointerEnter}
+        onMouseMove={handlePointerMove}
+        onMouseLeave={handlePointerLeave}
+      >
+        <video
+          ref={videoRef}
+          className="video_player_iframe h-full w-full object-contain"
+          src={src}
+          poster={poster}
+          playsInline
+          preload="metadata"
+          aria-label={title}
+        />
+
+        <div className="video_player_overlay absolute inset-0 z-10 bg-black/50 transition-opacity duration-300" />
+
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute left-6 top-3 z-40 border-0 bg-transparent p-0 text-xs font-semibold uppercase text-white opacity-90 transition-opacity duration-300 ease-in-out hover:opacity-100"
+        >
+          Close
+        </button>
+
+        <div
+          data-vimeo-control="play"
+          className="video_player_play absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2"
+          onClick={togglePlay}
+          role="button"
+          aria-label="Play video"
+        >
+          <div className="h-0 w-0 border-y-[12px] border-y-transparent border-l-[20px] border-l-white" />
+        </div>
+
+        <div
+          data-vimeo-control="pause"
+          className="video_player_pause absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2"
+          onClick={togglePlay}
+          role="button"
+          aria-label="Pause video"
+        >
+          <div className="flex gap-1">
+            <span className="block h-6 w-1.5 bg-white" />
+            <span className="block h-6 w-1.5 bg-white" />
+          </div>
+        </div>
+
+        <div className="video_player_interface absolute inset-x-0 bottom-0 z-20 py-4 lg:bottom-[30vh] font-sans">
+          <div className="video_player_interface_layout mx-6 grid grid-cols-5 items-center gap-6">
+
+            <div
+              className={`video_player_content_col col-span-1 justify-self-start text-left text-white transition-opacity duration-150 ${
+                isPlaying ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              <h1 className="m-0 p-0 text-2xl font-medium uppercase tracking-tighter">{videoName}</h1>
+              <p className="m-0 p-0 text-md font-medium tracking-tight">{clientName}</p>
+            </div>
+
+            <div className="video_player_timeline_component relative col-span-3 h-10 w-full min-w-0 justify-self-center overflow-visible">
+              <progress
+                ref={progressRef}
+                max={duration || 0}
+                className="video_player_timeline_progress absolute left-0 top-1/2 h-[0.1em] w-full -translate-y-1/2"
+              />
+              <input
+                ref={seekInputRef}
+                type="range"
+                min={0}
+                max={duration || 0}
+                step={0.001}
+                defaultValue={0}
+                onChange={handleSeek}
+                className="video_player_timeline_input absolute left-0 top-1/2 h-6 w-full -translate-y-1/2"
+                aria-label="Seek video"
+              />
+              <div className="video_player_timeline_duration pointer-events-none absolute top-[80%] left-0 w-full">
+                <span
+                  ref={timeLabelRef}
+                  className="video_player_timeline_text absolute left-0 whitespace-nowrap text-xs tabular-nums text-white"
+                  style={{ transform: "translateX(-50%)" }}
+                >
+                  00:00
+                </span>
+              </div>
+            </div>
+
+            <div className="video_player_control_wrap col-span-1 justify-self-end grid grid-cols-[4.5rem_auto] items-center gap-3 text-xs font-semibold text-white">
+              <div
+                data-vimeo-control="mute"
+                className="video_player_sound_wrap flex w-full items-center gap-2"
+                onClick={toggleMute}
+                role="button"
+                aria-label={isMuted ? "Unmute video" : "Mute video"}
+              >
+                <div className="video_player_sound_mute flex h-6 w-6 items-center justify-center">
+                  <img src="/player/sound-on.svg" alt="" className="video_player_vol_up_svg h-5 w-5" />
+                  <img src="/player/sound-off.svg" alt="" className="video_player_vol_mute_svg h-5 w-5" />
+                </div>
+                <div className="video_player_sound_stat_wrap">
+                  <p className="video_player_sound_stat_text">On</p>
+                </div>
+              </div>
+
+              <button type="button" onClick={toggleFullscreen} className="video_player_screen_text">
+                {isFullscreen ? "Normal" : "Full Screen"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+=== styles/globals.css (Video Player block) ===
+/* Video Player - state-attribute architecture */
+.video_player_wrap {
+  --timeline-rounded-corners: 0;
+  --timeline-dot-height: 1em;
+  --timeline-dot-width: 1.5px;
+  --timeline-dot-color: #f7f7f7;
+  --progress-bg: rgb(255 255 255 / 0.1);
+  --progress-fill-bg: #f7f7f7;
+  --progress-height: 0.2em;
+}
+
+.video_player_wrap .video_player_overlay {
+  opacity: 0;
+}
+
+.video_player_wrap[data-vimeo-loaded="true"] .video_player_overlay {
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .video_player_wrap[data-vimeo-hover="true"] .video_player_overlay {
+    opacity: 1;
+  }
+}
+
+.video_player_wrap .video_player_play {
+  opacity: 1;
+}
+
+.video_player_wrap[data-vimeo-playing="true"] .video_player_play {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video_player_wrap .video_player_pause {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"][data-vimeo-hover="true"]:hover .video_player_pause {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"] .video_player_pause {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+}
+
+.video_player_wrap .video_player_interface {
+  opacity: 0;
+  transition: opacity 0.3s var(--quart-out, ease);
+}
+
+.video_player_wrap[data-vimeo-activated="false"][data-vimeo-playing="false"] .video_player_interface,
+.video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="false"] .video_player_interface,
+.video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"][data-vimeo-hover="true"]:hover .video_player_interface {
+  opacity: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"] .video_player_interface {
+    opacity: 0 !important;
+  }
+}
+
+.video_player_wrap .video_player_interface * {
+  pointer-events: all;
+}
+
+.video_player_wrap .video_player_timeline_progress {
+  appearance: none;
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background-color: var(--progress-bg);
+}
+
+.video_player_wrap .video_player_timeline_progress::-webkit-progress-bar {
+  border-radius: var(--timeline-rounded-corners);
+  background-color: var(--progress-bg);
+}
+
+.video_player_wrap .video_player_timeline_progress::-webkit-progress-value {
+  background: var(--progress-fill-bg);
+}
+
+.video_player_wrap .video_player_timeline_progress::-moz-progress-bar {
+  border-radius: var(--timeline-rounded-corners);
+  background: var(--progress-fill-bg);
+}
+
+.video_player_wrap .video_player_timeline_input {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.video_player_wrap .video_player_timeline_input:focus {
+  outline: none;
+}
+
+.video_player_wrap .video_player_timeline_input::-webkit-slider-runnable-track {
+  width: var(--timeline-dot-width);
+  height: var(--progress-height);
+  border-color: transparent;
+  background: transparent;
+  color: transparent;
+}
+
+.video_player_wrap .video_player_timeline_input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--timeline-dot-width);
+  height: var(--timeline-dot-height);
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background: var(--timeline-dot-color);
+  margin-top: calc((var(--progress-height) / 5) - (var(--timeline-dot-height) / 5));
+}
+
+.video_player_wrap .video_player_timeline_input::-moz-range-track {
+  width: var(--timeline-dot-width);
+  height: var(--progress-height);
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background: transparent;
+}
+
+.video_player_wrap .video_player_timeline_input::-moz-range-thumb {
+  width: var(--timeline-dot-width);
+  height: var(--timeline-dot-height);
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background: var(--timeline-dot-color);
+}
+
+.video_player_wrap .video_player_sound_mute .video_player_vol_mute_svg,
+.video_player_wrap[data-vimeo-muted="true"] .video_player_sound_mute .video_player_vol_up_svg {
+  display: none;
+}
+
+.video_player_wrap .video_player_sound_mute .video_player_vol_up_svg,
+.video_player_wrap[data-vimeo-muted="true"] .video_player_sound_mute .video_player_vol_mute_svg {
+  display: block;
+}
+
+.video_player_wrap[data-vimeo-muted="true"] .video_player_sound_stat_text::before {
+  content: "Off";
+}
+
+.video_player_wrap[data-vimeo-muted="false"] .video_player_sound_stat_text::before {
+  content: "On";
+}
+
+.video_player_sound_stat_text {
+  font-size: 0;
+}
+
+.video_player_sound_stat_text::before {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.video_player_sound_wrap {
+  flex: 0 0 4.5rem;
+  min-width: 4.5rem;
+}
+
+.video_player_sound_stat_wrap {
+  width: 2.2ch;
+  text-align: left;
+}
+
+
+=== public/player/sound-on.svg ===
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3 16V8H6L11 4V20L6 16H3Z" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M13 9C13 9 15 9.5 15 12C15 14.5 13 15 13 15" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M15 7C15 7 18 7.83333 18 12C18 16.1667 15 17 15 17" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17 5C17 5 21 6.16667 21 12C21 17.8333 17 19 17 19" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+
+=== public/player/sound-off.svg ===
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3 16V8H6L11 4V20L6 16H3Z" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M14.5 15L20.5 9" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M14.5 9L20.5 15" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+
+=== pages/work/1st-client.tsx (usage) ===
+import PortfolioVideoPlayer from '@/components/VideoPlayer'
+import React from 'react'
+
+const ClientOne = () => {
+  return (
+    <div>
+       <PortfolioVideoPlayer src={"/video/TasVegias.mp4"} />
+    </div>
+  )
+}
+
+export default ClientOne
+

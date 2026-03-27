@@ -8,6 +8,7 @@ import MainSection3 from "../sections/MainSection3";
 import MainSection4 from "../sections/MainSection4";
 import MainSection5 from "../sections/MainSection5";
 import MainSection2 from "@/sections/MainSection2";
+import PortfolioVideoPlayer from "@/components/VideoPlayer";
 
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -67,6 +68,7 @@ export default function Home() {
         startTop="200vh"
         topStay="5vh"
       />
+    
     </div>
   );
 }

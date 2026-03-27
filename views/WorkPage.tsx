@@ -1,44 +1,13 @@
 "use client";
+import Link from "next/link";
 import { useRef } from "react";
 import gsap from "gsap";
 import React from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import ScrollCounter from "../components/ScrollCounter";
+import { works } from "@/components/data/works";
 gsap.registerPlugin(ScrollTrigger);
-
-const sections = [
-  {
-    id: 1,
-    image: "/assets/LH_01344.webp",
-    title: "Image one",
-    text: "Text for the first image",
-  },
-  {
-    id: 2,
-    image: "/assets/LH_01344.webp",
-    title: "Cotki Zatlar",
-    text: "Text for the first image",
-  },
-  {
-    id: 3,
-    image: "/assets/LH_01344.webp",
-    title: "Edemen Yakinda",
-    text: "Text for the first image",
-  },
-  {
-    id: 4,
-    image: "/assets/LH_01344.webp",
-    title: "Image four",
-    text: "Text for the first image",
-  },
-  {
-    id: 5,
-    image: "/assets/LH_01344.webp",
-    title: "Ast Ast a",
-    text: "Text for the first image",
-  },
-];
 
 const Page = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -63,7 +32,7 @@ const Page = () => {
         });
       };
 
-      sections.forEach((_, index) => {
+      works.forEach((_, index) => {
         ScrollTrigger.create({
           trigger: `.image-section-${index}`,
           start: "top center",
@@ -87,7 +56,7 @@ const Page = () => {
             duration: 0.7,
             ease: [0.76, 0, 0.24, 1],
             scale: 1.25,
-            delay: 0.4,
+            delay: 0.2,
           },
         );
 
@@ -120,9 +89,11 @@ const Page = () => {
       <div className="relative grid grid-cols-12">
         {/* Left column */}
         <div className="relative  col-start-2 col-span-8 flex flex-col gap-2 pt-25 pb-15">
-          {sections.map((section, index) => (
-            <section
-              key={section.id}
+          {works.map((work, index) => (
+            <Link
+              key={work.slug}
+              href={`/work/${work.slug}`}
+              aria-label={`${work.clientName} ${work.videoName}`}
               className={`image-section-${index} flex h-[80vh] w-full items-center relative `}
             >
               <div className="relative h-full w-full py-4 overflow-hidden">
@@ -130,12 +101,12 @@ const Page = () => {
                   ref={(el) => {
                     imageRefs.current[index] = el;
                   }}
-                  src={section.image}
-                  alt={section.title}
-                  className=" w-full h-full scale-125 object-cover"
+                  src={work.coverImage}
+                  alt={`${work.clientName} - ${work.videoName}`}
+                  className=" w-full h-full scale-125 object-contain  "
                 />
               </div>
-            </section>
+            </Link>
           ))}
         </div>
 
@@ -143,9 +114,9 @@ const Page = () => {
         <div className="relative col-start-10 col-span-3">
           <div className="sticky top-0 flex h-screen justify-center items-center">
             <div className="relative w-full h-[220px] flex justify-center items-center">
-              {sections.map((section, index) => (
+              {works.map((work, index) => (
                 <div
-                  key={section.id}
+                  key={work.slug}
                   ref={(el) => {
                     textRefs.current[index] = el;
                   }}
@@ -154,7 +125,9 @@ const Page = () => {
                   <p className=" text-xs font-semibold text-neutral-400">
                     CLIENT
                   </p>
-                  <h2 className=" text-xs font-semibold">{section.title}</h2>
+                  <h2 className=" text-xs font-semibold">
+                    {work.clientName} / {work.videoName}
+                  </h2>
                 </div>
               ))}
             </div>

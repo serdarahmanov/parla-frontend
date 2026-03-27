@@ -116,7 +116,7 @@ export default function HoverSwapLink({
           return;
         }
 
-        void router.push(href);
+        void router.push(href, undefined, {scroll:false});
       }}
     >
       <span className="relative block overflow-hidden">

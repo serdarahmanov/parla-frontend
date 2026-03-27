@@ -11,31 +11,25 @@ type Props = {
 };
 
 const PageTransition = ({ children, introDone }: Props) => {
-      const pathname = usePathname();
-      const [ready,setReady]= useState(false);
+  const pathname = usePathname();
+  const [ready, setReady] = useState(false);
+  const hideFooter = pathname?.startsWith("/work/");
 
-  useEffect(()=>{
-    if("scrollRestoration" in window.history){
-      window.history.scrollRestoration="manual";
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
     }
   });
 
-  useLayoutEffect(()=>{
-
+  useLayoutEffect(() => {
     setReady(false);
-    window.scrollTo(0,0);
+    // window.scrollTo(0,0);
 
-    const id = requestAnimationFrame(()=>{
+    const id = requestAnimationFrame(() => {
       setReady(true);
-    })
-    return()=> cancelAnimationFrame(id)
-
-  },[pathname])
-
-
-
-
-
+    });
+    return () => cancelAnimationFrame(id);
+  }, [pathname]);
 
   const anim = (variants: Variants) => {
     return {
@@ -49,11 +43,9 @@ const PageTransition = ({ children, introDone }: Props) => {
   const opacity = {
     initial: {
       opacity: 0,
-      
     },
     enter: {
-      opacity: ready ? 1:0,
-      
+      opacity: ready ? 1 : 0,
     },
     exit: {
       opacity: 1,
@@ -63,15 +55,13 @@ const PageTransition = ({ children, introDone }: Props) => {
   const slide = {
     initial: {
       top: "100vh",
-      scale: 0.7,
     },
     enter: {
       top: "100vh",
-      scale: 0.7,
     },
     exit: {
       top: "0",
-      scale: 1,
+      // scale: 1,
       transition: {
         duration: 1,
         ease: [0.76, 0, 0.24, 1],
@@ -81,19 +71,20 @@ const PageTransition = ({ children, introDone }: Props) => {
 
   const perspective = {
     initial: {
-      y: 0,
-      scale: 1,
+      // y: 0,
+      // scale: 1,
       opacity: 1,
     },
     enter: {
-      y: 0,
-      scale: 1,
+      // y: 0,
+      // scale: 1,
       opacity: 1,
     },
     exit: {
-      y: -100,
-      scale: 0.9,
+      // y: -100,
+      // scale: 0.9,
       opacity: 0.2,
+      clipPath: "inset(100px 300px 100px 300px)",
       transition: {
         duration: 1.2,
         ease: [0.76, 0, 0.24, 1],
@@ -107,14 +98,12 @@ const PageTransition = ({ children, introDone }: Props) => {
     <div className="inner">
       <motion.div {...anim(slide)} className="slide"></motion.div>
       <motion.div {...anim(perspective)} className="page">
-        <motion.div 
-        {...anim(opacity)}
-        >
+        <motion.div {...anim(opacity)}>
           <Header />
           <NavBar />
-         
+
           {children}
-           <Footer />
+          {!hideFooter && <Footer />}
         </motion.div>
       </motion.div>
     </div>

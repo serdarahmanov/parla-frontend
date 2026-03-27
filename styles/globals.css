@@ -177,3 +177,177 @@ a{
   background: #0000001b;
   color: #111;
 }
+
+/* Video Player - state-attribute architecture */
+.video_player_wrap {
+  --timeline-rounded-corners: 0;
+  --timeline-dot-height: 1em;
+  --timeline-dot-width: 1.5px;
+  --timeline-dot-color: #f7f7f7;
+  --progress-bg: rgb(255 255 255 / 0.1);
+  --progress-fill-bg: #f7f7f7;
+  --progress-height: 0.2em;
+}
+
+.video_player_wrap .video_player_overlay {
+  opacity: 0.3;
+}
+
+.video_player_wrap[data-vimeo-loaded="true"] .video_player_overlay {
+  opacity: 0.3;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .video_player_wrap[data-vimeo-hover="true"] .video_player_overlay {
+    opacity: 0.7;
+  }
+}
+
+.video_player_wrap .video_player_play {
+  opacity: 0.7;
+}
+
+.video_player_wrap[data-vimeo-playing="true"] .video_player_play {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video_player_wrap .video_player_pause {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"][data-vimeo-hover="true"]:hover .video_player_pause {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"] .video_player_pause {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+}
+
+.video_player_wrap .video_player_interface {
+  opacity: 0;
+  transition: opacity 0.3s var(--quart-out, ease);
+}
+
+.video_player_wrap[data-vimeo-activated="false"][data-vimeo-playing="false"] .video_player_interface,
+.video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="false"] .video_player_interface,
+.video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"][data-vimeo-hover="true"]:hover .video_player_interface {
+  opacity: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .video_player_wrap[data-vimeo-activated="true"][data-vimeo-playing="true"] .video_player_interface {
+    opacity: 0 !important;
+  }
+}
+
+.video_player_wrap .video_player_interface * {
+  pointer-events: all;
+}
+
+.video_player_wrap .video_player_timeline_progress {
+  appearance: none;
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background-color: var(--progress-bg);
+}
+
+.video_player_wrap .video_player_timeline_progress::-webkit-progress-bar {
+  border-radius: var(--timeline-rounded-corners);
+  background-color: var(--progress-bg);
+}
+
+.video_player_wrap .video_player_timeline_progress::-webkit-progress-value {
+  background: var(--progress-fill-bg);
+}
+
+.video_player_wrap .video_player_timeline_progress::-moz-progress-bar {
+  border-radius: var(--timeline-rounded-corners);
+  background: var(--progress-fill-bg);
+}
+
+.video_player_wrap .video_player_timeline_input {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.video_player_wrap .video_player_timeline_input:focus {
+  outline: none;
+}
+
+.video_player_wrap .video_player_timeline_input::-webkit-slider-runnable-track {
+  width: var(--timeline-dot-width);
+  height: var(--progress-height);
+  border-color: transparent;
+  background: transparent;
+  color: transparent;
+}
+
+.video_player_wrap .video_player_timeline_input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--timeline-dot-width);
+  height: var(--timeline-dot-height);
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background: var(--timeline-dot-color);
+  margin-top: calc((var(--progress-height) / 5) - (var(--timeline-dot-height) / 5));
+}
+
+.video_player_wrap .video_player_timeline_input::-moz-range-track {
+  width: var(--timeline-dot-width);
+  height: var(--progress-height);
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background: transparent;
+}
+
+.video_player_wrap .video_player_timeline_input::-moz-range-thumb {
+  width: var(--timeline-dot-width);
+  height: var(--timeline-dot-height);
+  border: 0;
+  border-radius: var(--timeline-rounded-corners);
+  background: var(--timeline-dot-color);
+}
+
+.video_player_wrap .video_player_sound_mute .video_player_vol_mute_svg,
+.video_player_wrap[data-vimeo-muted="true"] .video_player_sound_mute .video_player_vol_up_svg {
+  display: none;
+}
+
+.video_player_wrap .video_player_sound_mute .video_player_vol_up_svg,
+.video_player_wrap[data-vimeo-muted="true"] .video_player_sound_mute .video_player_vol_mute_svg {
+  display: block;
+}
+
+.video_player_wrap[data-vimeo-muted="true"] .video_player_sound_stat_text::before {
+  content: "Off";
+}
+
+.video_player_wrap[data-vimeo-muted="false"] .video_player_sound_stat_text::before {
+  content: "On";
+}
+
+.video_player_sound_stat_text {
+  font-size: 0;
+}
+
+.video_player_sound_stat_text::before {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.video_player_sound_wrap {
+  flex: 0 0 4.5rem;
+  min-width: 4.5rem;
+}
+
+.video_player_sound_stat_wrap {
+  width: 2.2ch;
+  text-align: left;
+}

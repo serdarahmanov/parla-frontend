@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Work from "../views/WorkPage";
+import Work from "@/views/WorkPage";
 
 const WorkPage: NextPage = () => (
   <>

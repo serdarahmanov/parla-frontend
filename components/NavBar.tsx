@@ -13,6 +13,8 @@ const navItems = [
 function NavBar() {
   const { pathname } = useRouter();
   const rootRef = useRef< HTMLDivElement | null>(null);
+  const isActiveRoute = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
 
 useLayoutEffect(() => {
     
@@ -57,7 +59,7 @@ useLayoutEffect(() => {
             href={item.href}
             text={item.label}
             data-analytics={item.analytics}
-            className={` text-[0.6em]  lg:text-xs font-sans font-medium ${pathname === item.href ? "opacity-100" : "opacity-40"}`}
+            className={` text-[0.6em]  lg:text-xs font-sans font-medium ${isActiveRoute(item.href) ? "opacity-100" : "opacity-40"}`}
           />
         ))}
       </nav>

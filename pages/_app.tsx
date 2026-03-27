@@ -11,6 +11,9 @@ import PageTransition from "@/components/PageTransition/PageTransition";
 import LandingIntro from "@/components/LandingIntro";
 import { useCallback, useEffect, useState } from "react";
 import ConsentScripts from "@/components/Consent/ConsentScripts";
+import { useEngagementTracking } from "@/components/analytics/useEngagementTracking";
+import { useScrollTacking } from "@/components/analytics/useScrollTracking";
+import { usePageViewTracking } from "@/components/analytics/usePageViewTracking";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -20,28 +23,17 @@ const ibmPlexSans = IBM_Plex_Sans({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const PAGE_TITLES: Record<string, string> = {
-  "/": "Parla",
-  "/about": "About | Parla",
-  "/work": "Work | Parla",
-  "/cookie": "Cookie Policy | Parla",
-  "/privacy-policy": "Privacy Policy | Parla",
-  "/by-rahmanov": "By Rahmanov | Parla",
-};
 
-const resolvePageTitle = (urlOrPath: string) => {
-  let path = urlOrPath;
-  try {
-    path = new URL(urlOrPath, "http://dummy.local").pathname;
-  } catch {
-    path = urlOrPath.split("?")[0].split("#")[0];
-  }
-  return PAGE_TITLES[path] || "Parla";
-};
 
 export default function App({ Component, pageProps, router }: AppProps) {
   const [pageReady, setPageReady] = useState(false);
   const [introVisible, setIntroVisible] = useState(true);
+  const enableScrollTracking = router.pathname ==="/"|| router.pathname==="/work";
+  const engagement = useEngagementTracking();
+  usePageViewTracking(router);
+
+  
+  useScrollTacking({enabled:enableScrollTracking, getEngagementTimeMs:engagement.getEngagementTimeMs });
 
   useEffect(() => {
     document.body.classList.add(geist.variable, ibmPlexSans.variable);
@@ -50,46 +42,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
     };
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    window.dataLayer = window.dataLayer || [];
-    window.__pageContext = {
-      currentPageLocation: window.location.href,
-      currentPageReferrer: document.referrer || "",
-      currentPageTitle: resolvePageTitle(window.location.pathname),
-    };
-
-    const pushPageView = () => {
-      window.dataLayer.push({
-        event: "page_view",
-        page_location: window.__pageContext?.currentPageLocation || window.location.href,
-        page_referrer: window.__pageContext?.currentPageReferrer || document.referrer || "",
-        page_title:
-          window.__pageContext?.currentPageTitle ||
-          resolvePageTitle(window.location.pathname),
-      });
-    };
-
-    pushPageView();
-
-    const handleRouteChangeComplete = () => {
-      const previousLocation =
-        window.__pageContext?.currentPageLocation || window.location.href;
-      window.__pageContext = {
-        currentPageLocation: window.location.href,
-        currentPageReferrer: previousLocation,
-        currentPageTitle: resolvePageTitle(window.location.pathname),
-      };
-      pushPageView();
-    };
-
-    router.events.on("routeChangeComplete", handleRouteChangeComplete);
-
-    return () => {
-      router.events.off("routeChangeComplete", handleRouteChangeComplete);
-    };
-  }, [router.events]);
+  
 
   const handleRevealStart = useCallback(() => {
     setPageReady(true);
@@ -100,8 +53,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   }, []);
 
   return (
-    <div className={cn("m-0 p-0", "font-sans","bg-[#fefefe]", geist.variable)}>
-     
+    <div className={cn("m-0 p-0", "font-sans", "bg-[#fefefe]", geist.variable)}>
       <ConsentScripts />
       <div
         className={`${ibmPlexSans.className} relative p-0 m-0 min-h-screen bg-[#fefefe] text-black`}
@@ -115,7 +67,11 @@ export default function App({ Component, pageProps, router }: AppProps) {
               onComplete={handleIntroComplete}
             />
           )}
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait"
+          onExitComplete={() => {                                                                                                                                                                                                           
+              window.scrollTo({ top: 0, left: 0, behavior: "auto" });                                                                                                                                                                         
+    }}
+    >
             <PageTransition key={router.asPath} introDone={pageReady}>
               <Component {...pageProps} />
             </PageTransition>
