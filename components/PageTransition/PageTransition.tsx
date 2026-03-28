@@ -96,11 +96,12 @@ const PageTransition = ({ children, introDone }: Props) => {
 
   return (
     <div className="inner">
+      <Header />
+          <NavBar />
       <motion.div {...anim(slide)} className="slide"></motion.div>
       <motion.div {...anim(perspective)} className="page">
         <motion.div {...anim(opacity)}>
-          <Header />
-          <NavBar />
+          
 
           {children}
           {!hideFooter && <Footer />}

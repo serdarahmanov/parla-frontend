@@ -5,8 +5,8 @@ import HoverSwapLink from "../animations/HoverSwapLink";
 import gsap from 'gsap'
 
 const navItems = [
-   { label: "WORK", href: "/work", analytics: "nav-work" },
-  { label: "INFO", href: "/about", analytics: "nav-info" },
+   { label: "Work", href: "/work", analytics: "nav-work" },
+  { label: "Information", href: "/about", analytics: "nav-info" },
 
   
 ];

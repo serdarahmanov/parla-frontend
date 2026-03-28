@@ -19,12 +19,12 @@ function Header() {
 
     const entranceAnimation = gsap.timeline();
 
-    entranceAnimation.from(topRef.current, {
-      x: -100,
-      ease: "power3.out",
+    // entranceAnimation.from(topRef.current, {
+    //   x: -100,
+    //   ease: "power3.out",
 
-      delay: 1,
-    });
+    //   delay: 1,
+    // });
 
     const tl = gsap.timeline({ paused: true });
     const el = rootRef.current;
@@ -73,9 +73,10 @@ function Header() {
   }, []);
 
   return (
-    <header className="fixed top-1 left-0 w-full z-60 m-0 p-0 text-center pointer-events-none">
+    <header className="fixed top-1 left-0 w-full z-150 m-0 p-0 text-center pointer-events-none">
       <div className="p-0 m-0">
         <Link
+        scroll={false}
           href="/"
           className="leading-none inline-block pointer-events-auto  "
         >
@@ -87,14 +88,14 @@ function Header() {
               ref={topRef}
               src="/landingTransition/Asset-5.svg"
               alt="Parla"
-              className="w-15 mt-1 block"
+              className="w-10 mt-1 block"
             />
 
             <img
               ref={bottomRef}
               src="/landingTransition/rectangular-part-of-logo-inside-parla.svg"
               alt="Parla"
-              className="w-15 mt-1 absolute left-0 top-0 block"
+              className="w-10 mt-1 absolute left-0 top-0 block"
             />
           </div>
         </Link>

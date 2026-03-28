@@ -20,38 +20,7 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
   const backTextRef = useRef<HTMLDivElement | null>(null);
   useGSAP(
     () => {
-      if (
-        !wrapperRef.current ||
-        !scrollRef.current ||
-        !introRef.current ||
-        !backTextRef.current
-      )
-        return;
-
-      const weListen = backTextRef.current.querySelector(".weListen");
-      const weCraft = backTextRef.current.querySelector(".weCraft");
-      const weDeliver = backTextRef.current.querySelector(".weDeliver");
-
-
-      if (!weListen|| !weCraft || !weDeliver) return;
-      const textAnimationTl = gsap.timeline(); 
-      
-      textAnimationTl.from(
-        [weListen,weCraft,weDeliver],
-        {
-         opacity:0,
-        stagger: 0.6,
-          scrollTrigger: {
-            trigger: wrapperRef.current,
-           start: "top top-=40%",
-      end: "bottom top+=35%",
-            scrub: true,
-            markers: true,
-          },
-
-        },
-       
-      )
+     
 
       // Intro animation ONLY on introRef
       const introTween = gsap.fromTo(
@@ -68,27 +37,29 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
           duration: 0.6,
           delay: 0.3,
           ease: [0.76, 0, 0.24, 1],
-          clearProps: "clipPath",
+         clearProps: "transform,clipPath",
         },
       );
 
       // Scroll animation ONLY on scrollRef
       const scrollTween = gsap.to(scrollRef.current, {
         scale: 0.8,
-        yPercent: 40,
+        yPercent: 10,
         ease: "none",
         scrollTrigger: {
           trigger: wrapperRef.current,
-          start: "top top-=10vh",
-          end: "bottom center+=10vh",
+         start: "top top",
+end: "bottom top",
           scrub: true,
         },
       });
 
+
+      
       return () => {
         introTween.kill();
         scrollTween.kill();
-        textAnimationTl.kill();
+     
       };
     },
     { scope: wrapperRef },
@@ -100,14 +71,7 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
       ref={wrapperRef}
       className="sticky top-0 h-screen w-full z-20 overflow-hidden bg-[#fefefe]"
     >
-      <div
-        ref={backTextRef}
-        className="absolute text-lg font-medium  text-black font-sans inset-0 left-1/2 -translate-x-1/2 top-[25%] text-center"
-      >
-        <span className="weListen inline-block">WE LISTEN,</span> 
-        <span className="weCraft inline-block">WE CRAFT,</span> 
-        <span className="weDeliver inline-block">WE DELIVER</span>
-      </div>
+     
       {/* Scroll layer */}
       <div ref={scrollRef} className="relative h-full w-full">
         {/* Intro layer */}

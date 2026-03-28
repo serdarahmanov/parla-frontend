@@ -1,127 +1,96 @@
-import HoverSwapLink from "@/animations/HoverSwapLink";
-import LiveClock from "@/components/LiveClock";
-import React from "react";
+"use client";
+import Paragraph from "@/animations/Paragraph";
+
+import React, { useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const clients = [
-  { id: "1", brandName: "Aytac", logo: "/clients/tas-logo-white.png" },
-  { id: "2", brandName: "Hyundai", logo: "/clients/tas-logo-white.png" },
-  { id: "3", brandName: "Kids Expo", logo: "/clients/tas-logo-white.png" },
-
-  { id: "4", brandName: "Gandaş", logo: "/clients/tas-logo-white.png" },
-
-  { id: "5", brandName: "Tör", logo: "/clients/tas-logo-white.png" },
-
-  { id: "6", brandName: "Real", logo: "/clients/tas-logo-white.png" },
-
-  { id: "7", brandName: "Bold", logo: "/clients/tas-logo-white.png" },
-
-  { id: "8", brandName: "Softea", logo: "/clients/tas-logo-white.png" },
-
-  { id: "9", brandName: "Rahat", logo: "/clients/tas-logo-white.png" },
-
-  { id: "10", brandName: "Tachil", logo: "/clients/tas-logo-white.png" },
-
-  { id: "11", brandName: "Gatnaşyk", logo: "/clients/tas-logo-white.png" },
-
-  { id: "12", brandName: "TMCeli", logo: "/clients/tas-logo-white.png" },
-
-  { id: "13", brandName: "Panasian", logo: "/clients/tas-logo-white.png" },
-
-  { id: "14", brandName: "Depe", logo: "/clients/tas-logo-white.png" },
+  { id: "1", brandName: "Aytac", logo: "/clients/tas-logo-black.png" },
+  { id: "2", brandName: "Hyundai", logo: "/clients/tas-logo-black.png" },
+  { id: "3", brandName: "Kids Expo", logo: "/clients/tas-logo-black.png" },
+  { id: "4", brandName: "Gandaş", logo: "/clients/tas-logo-black.png" },
+  { id: "5", brandName: "Tör", logo: "/clients/tas-logo-black.png" },
+  { id: "6", brandName: "Real", logo: "/clients/tas-logo-black.png" },
+  { id: "7", brandName: "Bold", logo: "/clients/tas-logo-black.png" },
+  { id: "8", brandName: "Softea", logo: "/clients/tas-logo-black.png" },
+  { id: "9", brandName: "Rahat", logo: "/clients/tas-logo-black.png" },
+  { id: "10", brandName: "Tachil", logo: "/clients/tas-logo-black.png" },
+  { id: "11", brandName: "Gatnaşyk", logo: "/clients/tas-logo-black.png" },
+  { id: "12", brandName: "TMCeli", logo: "/clients/tas-logo-black.png" },
+  { id: "13", brandName: "Panasian", logo: "/clients/tas-logo-black.png" },
+  { id: "14", brandName: "Depe", logo: "/clients/tas-logo-black.png" },
+   { id: "15", brandName: "Birzatlar", logo: "/clients/tas-logo-black.png" },
 ];
 
 const MainSection5 = () => {
+  const clientsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  useGSAP(
+    () => {
+      if (!sectionRef.current || !clientsRef.current[0]) return;
+
+     
+      const clients = clientsRef.current;
+     gsap.from(clients, {
+        scale: 1.2,
+        y: 50,
+        opacity: 0,
+        ease: [0.76, 0, 0.24, 1],
+        stagger: 0.03,
+        duration: 0.2,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 40%",
+          toggleActions: "play none none none",
+          once: true,
+          // markers:true
+        },
+      });
+
+     
+    },
+    { scope: sectionRef },
+  );
+
   return (
     <section
+      ref={sectionRef}
       id="section-5"
-      className="relative z-39 h-screen w-full bg-[#fefefe] flex flex-col    "
+      className="relative z-39 h-screen w-full bg-[#fefefe] flex flex-col  items-center  pt-25  gap-y-20 "
     >
-      {/* Takes 30vh of vertical space inside this h-screen section. */}
-      <div className="absolute top-[25vh] w-full overflow-hidden  flex items-end justify-centerbg-black ">
-        <div className="clients-fade-left pointer-events-none absolute inset-y-0 left-0 z-10 w-70" />
-        <div className="clients-fade-right pointer-events-none absolute inset-y-0 right-0 z-10 w-70" />
-        <div className="clients-marquee-track">
-          {[...clients, ...clients].map((client, index) => (
-            <div key={`${client.id}-${index}`} className="h-15 shrink-0 px-16">
-              <img
-                src={client.logo}
-                alt={client.brandName}
-                className="h-full w-auto object-contain opacity-80"
-              />
-            </div>
-          ))}
-        </div>
+      <div className="font-sans font-normal text-2xl tracking-tight opacity-30">
+        <Paragraph isLines text={"Brands We’ve Worked With"}></Paragraph>
       </div>
 
-      {/* h-full here is another 100vh inside the same h-screen section.
-          Combined with the 30vh block above + gap-20, total content exceeds viewport height. */}
-
-      <div className="w-full  bg-[#fefefe] flex flex-col items-center top-[60vh]  absolute opacity-85 gap-10 ">
-       
-        <div className="  grid grid-cols-3 gap-3 w-[60vw] h-auto text-black  bg-[#fefefe]">
-          <div className="col-span-1">
-            <div className="h-[1px] w-full bg-black  mt-3"></div>
-            <div className="mt-10">
-              <h1 className="font-medium opacity-65 mt-10 font-sans text-sm">
-                BUSINESS ENQUIRIES
-              </h1>
-            </div>
-
-            <div className="mt-6 flex flex-col leading-[1.2rem] text-xs font-sans font-medium tracking-tight  gap-0">
-             
-            <HoverSwapLink
-              href={"mailto:info@parla.com"}
-              text={"info@parla.com"}
-              data-analytics="contact-email"
+      <div className=" flex flex-wrap 
+      lg:grid lg:grid-cols-5 lg:grid-rows-3 lg:gap-10  lg:w-[60vw] 
+      
+      
+      w-full  gap-y-10 gap-x-5  justify-center ">
+        {clients.map((client, index) => (
+          <div
+            key={index}
+            ref={(el) => {
+              clientsRef.current[index] = el;
+            }}
+            className="lg:col-span-1 lg:row-span-1 flex  items-center"
+          >
+            <img
+              src={client.logo}
+              alt={client.brandName}
+              className="h-auto w-full object-contain p-3"
             />
-            <HoverSwapLink
-              href={"tel:+447778870307"}
-              text={"+ 44 777 88 70307"}
-              data-analytics="contact-phone"
-            />
-
-              
-            </div>
-          </div>
-
-          <div className="col-span-1  ">
-            <div className="h-[1px] w-full bg-black  mt-3"> </div>
-            <div className="mt-10">
-              <h1 className="font-medium opacity-65 font-sans  text-sm">SOCIALS</h1>
-            </div>
-
-            <div className="mt-6 flex flex-col  font-sans leading-[1.2rem] text-xs font-sans font-medium tracking-tight  gap-0">
-              <HoverSwapLink
-                href={"https://instagram.com/parla"}
-                text={"INSTAGRAM"}
-                data-analytics="social-instagram"
-              />
-             <HoverSwapLink
-               href={"https://t.me/parla"}
-               text={"TELEGRAM"}
-               data-analytics="social-telegram"
-             />
-             
             
-            </div>
           </div>
+        ))}
+      </div>
 
-          <div className="col-span-1">
-            <div className="h-[1px] w-full bg-black  mt-3"> </div>
-            <div className=" mt-10">
-              <h1 className="font-medium opacity-65  font-sans text-sm">
-                {" "}
-                WORKING HOURS
-              </h1>
-            </div>
-
-            <div className="mt-6 flex flex-col  leading-[1.2rem] text-xs font-sans font-medium tracking-tight gap-0">
-              <p> Monday to Friday</p>
-              <p>08:00 AM - 18:00 PM</p>
-              <LiveClock className={" "}/>
-            </div>
-          </div>
-        </div>
+      <div className=" relative w-full  bg-[#fefefe] flex flex-col items-center ">
         <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2  w-4 mt-auto">
           <img
             src="/landingTransition/Asset-1.svg"
@@ -145,40 +114,6 @@ const MainSection5 = () => {
           />
         </div>
       </div>
-
-      <style jsx>{`
-        .clients-marquee-track {
-          display: flex;
-          width: max-content;
-          animation: clients-loop-right 70s linear infinite;
-          will-change: transform;
-        }
-
-        .clients-fade-left {
-          background: linear-gradient(
-            to right,
-            rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0) 100%
-          );
-        }
-
-        .clients-fade-right {
-          background: linear-gradient(
-            to left,
-            rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0) 100%
-          );
-        }
-
-        @keyframes clients-loop-right {
-          from {
-            transform: translateX(-50%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
     </section>
   );
 };

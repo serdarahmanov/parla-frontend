@@ -29,9 +29,9 @@ const MainSection6 = ({
     () => {
       if (!wrapperRef.current || !videoRef.current) return;
 
-      gsap.set(wrapperRef.current,{
-        scale:0.98,
-      })
+      // gsap.set(wrapperRef.current,{
+      //   scale:0.98,
+      // })
 
      const tl  = gsap.timeline();
 
@@ -48,19 +48,7 @@ const MainSection6 = ({
           scrub: true,
           
         },
-      }).to(wrapperRef.current, {
-        scale: 0.8,
-        opacity:1,
-        yPercent:40,
-      
-        ease: "none",
-        scrollTrigger: {
-          trigger: wrapperRef.current,
-          start: "top top",
-          end: "bottom center+=10vh",
-          scrub: true,
-
-      },},0);
+      })
     },
     { scope: wrapperRef },
   );
@@ -69,7 +57,7 @@ const MainSection6 = ({
     <section
       ref={wrapperRef}
       id={sectionId}
-      className={`sticky top-0 h-screen overflow-hidden bg-[#fefefe] ${zIndexClassName}`}
+      className={`sticky top-0 h-screen overflow-hidden bg-[#fefefe] ${zIndexClassName} shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]`}
     > 
    
       

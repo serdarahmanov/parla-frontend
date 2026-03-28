@@ -14,12 +14,13 @@ type Props ={
     delay?: number
     stagger?:number
     duration?: number
+    revealImmediately?: boolean
        
 }
 
 
 
-const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Props) => {
+const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1, revealImmediately = false}: Props) => {
 
     const paragraphRef = useRef<HTMLParagraphElement | null>(null);
     const outerRef =useRef<HTMLDivElement | null> (null);
@@ -43,7 +44,7 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Pr
       });
 
       if (isLines) {
-        gsap.from(split.lines, {
+        const lineAnimationConfig = {
           autoAlpha: 0,
           yPercent: 10,
           xPercent: 5,
@@ -52,26 +53,38 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Pr
           ease: "expo.out",
           stagger,
           delay,
-          scrollTrigger:{
+        };
 
-            trigger: split.lines,
-    start: "top 80%"
-          }
-        });
+        gsap.from(split.lines, revealImmediately
+          ? lineAnimationConfig
+          : {
+              ...lineAnimationConfig,
+              scrollTrigger: {
+                trigger: paragraphRef.current,
+                start: "top 80%",
+              },
+            },
+        );
       } else {
-        gsap.from(split.chars, {
+        const charAnimationConfig = {
           autoAlpha: 0,
           yPercent: 25,
           duration,
           ease: "expo.out",
           stagger,
           delay,
-          scrollTrigger:{
+        };
 
-            trigger: paragraphRef.current,
-    start: "top 80%"
-          }
-        });
+        gsap.from(split.chars, revealImmediately
+          ? charAnimationConfig
+          : {
+              ...charAnimationConfig,
+              scrollTrigger: {
+                trigger: paragraphRef.current,
+                start: "top 80%",
+              },
+            },
+        );
       }
     };
 
@@ -81,7 +94,7 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1}: Pr
       cancelled = true;
       split?.revert();
     };
-  }, [text, isLines, delay, stagger, duration]); // if we leave the dependency section empty , it runs only once when page load
+  }, [text, isLines, delay, stagger, duration, revealImmediately]); // if we leave the dependency section empty , it runs only once when page load
 
 
     return (
