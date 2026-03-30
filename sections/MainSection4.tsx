@@ -97,10 +97,10 @@ const MainSection4 = () => {
       const entryTween = introLayer
         ? gsap.fromTo(
             introLayer,
-            { x: 150, y: 150, autoAlpha: 0 },
+            { x: 150,  autoAlpha: 0 },
             {
               x: 0,
-              y: 0,
+              
               autoAlpha: 1,
               duration: 0.8,
               ease: "power3.out",
@@ -331,21 +331,37 @@ const MainSection4 = () => {
     <div
       id="section-4"
       ref={containerRef}
-      className="main-container relative z-40 overflow-hidden overflow-x-hidden w-full h-screen bg-[#fefefe] text-black shadow-[0_12px_20px_-10px_rgba(0,0,0,0.25)]"
+      className="main-container relative z-40 overflow-hidden overflow-x-hidden w-full h-screen bg-[#fefefe] text-black shadow-[0_12px_20px_-10px_rgba(0,0,0,0.25)]
+      md:relative md:z-40 md:overflow-hidden md:overflow-x-hidden md:w-full md:h-screen md:bg-[#fefefe] md:text-black md:shadow-[0_12px_20px_-10px_rgba(0,0,0,0.25)]
+      lg:relative lg:z-40 lg:overflow-hidden lg:overflow-x-hidden lg:w-full lg:h-screen lg:bg-[#fefefe] lg:text-black lg:shadow-[0_12px_20px_-10px_rgba(0,0,0,0.25)]"
     >
-      <div ref={introRef} className="absolute left-0 top-0 w-full h-[80vh]">
+
+        {/* inner photo wrapper */}
+      <div
+        ref={introRef}
+        className=" absolute left-0 top-0 w-full h-[80vh]
+        md:absolute md:left-0 md:top-0 md:w-full md:h-[80vh]
+        lg:absolute lg:left-0 lg:top-0 lg:w-full lg:h-[80vh]"
+      >
+        {/*  */}
       <section
         ref={trackRef}
-        className="wrapper left-0 top-0 absolute w-max h-[80vh] overflow-hidden flex gap-2 p-20"
+        className="bg-violet-400 wrapper left-0 top-0 absolute w-max h-[80vh] overflow-hidden flex gap-1  p-20
+        md:left-0 md:top-0 md:absolute md:w-max md:h-[80vh] md:overflow-hidden md:flex md:gap-1.5 md:p-20
+        lg:left-0 lg:top-0 lg:absolute lg:w-max lg:h-[80vh] lg:overflow-hidden lg:flex lg:gap-2 lg:p-20"
       >
         {cardsData.map((card, index) => (
           <div
-            className="relative card w-[40vw] flex-none overflow-hidden"
+            className="bg-amber-200 relative card w-[90vw] flex-none overflow-hidden
+            md:relative md:w-[60vw] md:flex-none md:overflow-hidden
+            lg:relative lg:w-[40vw] lg:flex-none lg:overflow-hidden"
             id={card.id}
             key={card.id}
           >
             <img
-              className=" object-fill will-change-transform"
+              className=" object-fill will-change-transform md:object-fill
+              md:will-change-transform
+              lg:object-fill lg:will-change-transform"
               src={card.src}
               alt=""
               loading={index < 3 ? "eager" : "lazy"}
@@ -355,17 +371,22 @@ const MainSection4 = () => {
           </div>
           ))}
       </section>
+
       </div>
-      <div className="text-section absolute top-[80vh] w-full h-[20vh] text-center pointer-events-none">
+
+
+
+
+      <div className="text-section absolute top-[80vh] w-full h-[20vh] text-center pointer-events-none md:absolute md:top-[80vh] md:w-full md:h-[20vh] md:text-center md:pointer-events-none lg:absolute lg:top-[80vh] lg:w-full lg:h-[20vh] lg:text-center lg:pointer-events-none">
         {cardsData.map((card) => (
           <div
             key={card.id}
-            className="clock-text-item absolute left-1/2 top-4 -translate-x-1/2"
+            className="clock-text-item absolute left-1/2 top-4 -translate-x-1/2 md:absolute md:left-1/2 md:top-4 md:-translate-x-1/2 lg:absolute lg:left-1/2 lg:top-4 lg:-translate-x-1/2"
           >
-            <h1 className="clock-caption text-sm tracking-tigh font-bold font-sans">
+            <h1 className="clock-caption text-sm tracking-tigh font-bold font-sans md:text-sm md:tracking-tigh md:font-bold md:font-sans lg:text-sm lg:tracking-tigh lg:font-bold lg:font-sans">
               {card.caption}
             </h1>
-            <p className="opacity-50 font-sans tracking-tighter text-sm">{card.description}</p>
+            <p className="opacity-50 font-sans tracking-tighter text-sm md:opacity-50 md:font-sans md:tracking-tighter md:text-sm lg:opacity-50 lg:font-sans lg:tracking-tighter lg:text-sm">{card.description}</p>
             
           </div>
         ))}

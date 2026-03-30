@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import React, { useRef } from "react";
+import useScreenFlag from "@/lib/utils/useScreenFlag";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -44,103 +45,101 @@ const MainSection3 = () => {
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const titleRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  const {isSmall, isMedium, isLarge}= useScreenFlag();
 
   useGSAP(
     () => {
-          if(!itemRefs.current || !cardRefs.current || !titleRefs.current || !sectionRef.current) return
-
-            gsap.from(cardRefs.current,{
-              y:100,
-               
-              opacity:0,
-              duration: 0.3,
-              stagger: 0.1,
-              ease: "power3.Out",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top 85%"
-                
-              }
-
-            })
+      if (
+        !itemRefs.current.length ||
+        !cardRefs.current.length ||
+        !titleRefs.current.length ||
+        !sectionRef.current
+      )
+        return;
 
 
+        const cleanups: (()=>void)[]=[];
 
 
-          gsap.from(titleRefs.current,{
-              xPercent: -100,
+       const cardTl = gsap.from(cardRefs.current, {
+        y: 100,
+
+        opacity: 0,
+        duration: 0.3,
+        stagger: 0.1,
+        ease: "power3.Out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+        },
+      });
+
+      
+
+       const titlesTl =  gsap.from(titleRefs.current, {
+        xPercent: isLarge?-100:isMedium?-100:-120,
         opacity: 1,
         duration: 0.8,
-        ease: "power3.out",
+        // ease: "power3.out",
         stagger: 0.15,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 40%",
-          end: "center 40%",
-          toggleActions: "play none none none",
+          start: isLarge?"top 40%":isMedium?"top 40%":"top 40%",
+          end: isLarge?"center 40%":isMedium?"center 40%":"center center",
+          // toggleActions: "play none none none",
           scrub: true,
+          markers:true,
         },
+      });
 
-          })
+      
 
-          const items = itemRefs.current;
+      const items = itemRefs.current;
 
-          items.forEach((el,index)=>{
-            if(!el)return;
-            const title = titleRefs.current[index];
-            const card = cardRefs.current[index];
-            const description = el.querySelector(".desc");
+      items.forEach((el, index) => {
+        if (!el) return;
+        const title = titleRefs.current[index];
+        const card = cardRefs.current[index];
+        const description = el.querySelector(".desc");
 
+        const tl = gsap.timeline({ paused: true });
 
-            const tl  = gsap.timeline({paused:true});
+        tl.to(title, {
+          opacity: 1,
+          // y: -2,
+          scale: 1.001,
+          duration: 0.3,
+          ease: "power2.out",
+        });
 
-            tl.to(title,{
-              opacity: 1,
-              // y: -2,
-              scale:1.001,
-              duration: 0.3,
-              ease: "power2.out"
+        tl.to(
+          description,
+          {
+            opacity: 1,
+          },
+          0,
+        );
 
-            }).to(el,{
-              
+        const onEnter = () => tl.play();
+        const onLeave = () => tl.reverse();
 
+        el.addEventListener("mouseenter", onEnter);
+        el.addEventListener("mouseleave", onLeave);
 
-
-            },"<")
-
-            tl.to(description,{
-              opacity: 1,
-            },0)
-
-
-
-            const onEnter = ()=>tl.restart();
-            const onLeave = ()=> tl.revert();
-
-            el.addEventListener("mouseenter", onEnter);
-            el.addEventListener("mouseleave", onLeave);
- return()=>{
+      cleanups.push(() => {
   el.removeEventListener("mouseenter", onEnter);
   el.removeEventListener("mouseleave", onLeave);
-  tl.kill();
- }
-
-          })
+});
+      });
 
 
-
-
-
-
-
-
+      return ()=>{
+        cleanups.forEach((fn)=>fn());
+      }
 
     },
-    { scope: sectionRef },
+    { scope: sectionRef , dependencies: [isSmall, isMedium, isLarge], revertOnUpdate: true,},
   );
-
-
-
 
   return (
     <section
@@ -148,15 +147,15 @@ const MainSection3 = () => {
       ref={sectionRef}
       className="relative z-30 h-screen bg-[#fefefe] overflow-hidden shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]"
     >
-      <div
-      
-        className="relative grid grid-cols-4 grid-rows-2 h-screen w-full gap-2 px-26 pt-26 pb-5"
-      >
-        {services.map((item,index) => (
-          <div  
-          ref={ (el)=>{cardRefs.current[index]= el;}}
-          key={item.id}
-          className="relative col-span-1 row-span-1">
+      <div className="relative grid grid-cols-4 grid-rows-2 h-screen w-full gap-1 md:gap-2 lg:gap-2 px-6 pt-20 pb-5  md:px-26 md:pt-26 md:pb-5  lg:px-26 lg:pt-26 lg:pb-5">
+        {services.map((item, index) => (
+          <div
+            ref={(el) => {
+              cardRefs.current[index] = el;
+            }}
+            key={item.id}
+            className="relative col-span-1 row-span-1"
+          >
             <div className="card-inner relative h-full w-full bg-amber-100 overflow-hidden text-white ">
               <img
                 src={item.href}
@@ -167,22 +166,24 @@ const MainSection3 = () => {
           </div>
         ))}
 
-        <div  className="relative col-span-4 row-span-1 row-start-2  grid grid-rows-4 gap-2 mt-10">
-          {services.map((item,index) => (
-            <div ref={ (el)=>{
-              itemRefs.current[index]= el;
-            }}
+        <div className="relative col-span-4 row-span-1 row-start-2  grid grid-rows-4 gap-2 mt-10">
+          {services.map((item, index) => (
+            <div
+              ref={(el) => {
+                itemRefs.current[index] = el;
+              }}
               key={item.id}
               className=" relative row-span-1 flex flex-row justify-between border-b-2 border-[#eeeeee] items-end"
             >
-              <div 
-              ref = {(el)=>{
-                titleRefs.current[index]=el;
-              }}
-              className="title text-2xl font-medium tracking-tight opacity-30 font-sans mb-2">
+              <div
+                ref={(el) => {
+                  titleRefs.current[index] = el;
+                }}
+                className="title text-[1.2rem] leading-[1.2rem] md:text-2xl  lg:text-2xl  font-medium tracking-tight opacity-30 font-sans mb-2"
+              >
                 {item.title}
               </div>
-              <div className="desc card-description  mx-2 text-xs font-sans w-[30vw]  text-right  opacity-30 mb-2">
+              <div className="desc card-description  mx-2 text-[0.7rem] leading-[0.8rem]  md:text-xs lg:text-xs  font-sans w-50 md:w-[30vw]  lg:w-[30vw]  text-right  opacity-30 mb-2">
                 {item.description}
               </div>
             </div>

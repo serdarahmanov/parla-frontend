@@ -37,7 +37,7 @@ function Footer() {
       ref={footerRef}
       className="absolute bottom-3 left-0 top-auto w-full z-55 grid grid-cols-4 px-6  
         font-sans
-    text-[0.6em] font-medium text-black
+    text-[0.6rem] font-semibold text-black md:text-[0.7rem]
     lg:text-xs lg:font-semibold items-end overflow-hidden"
     >
       <div className=" col-span-1  ">

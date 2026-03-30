@@ -23,7 +23,7 @@ const clients = [
   { id: "12", brandName: "TMCeli", logo: "/clients/tas-logo-black.png" },
   { id: "13", brandName: "Panasian", logo: "/clients/tas-logo-black.png" },
   { id: "14", brandName: "Depe", logo: "/clients/tas-logo-black.png" },
-   { id: "15", brandName: "Birzatlar", logo: "/clients/tas-logo-black.png" },
+  { id: "15", brandName: "Birzatlar", logo: "/clients/tas-logo-black.png" },
 ];
 
 const MainSection5 = () => {
@@ -34,9 +34,8 @@ const MainSection5 = () => {
     () => {
       if (!sectionRef.current || !clientsRef.current[0]) return;
 
-     
       const clients = clientsRef.current;
-     gsap.from(clients, {
+      gsap.from(clients, {
         scale: 1.2,
         y: 50,
         opacity: 0,
@@ -51,8 +50,6 @@ const MainSection5 = () => {
           // markers:true
         },
       });
-
-     
     },
     { scope: sectionRef },
   );
@@ -61,56 +58,76 @@ const MainSection5 = () => {
     <section
       ref={sectionRef}
       id="section-5"
-      className="relative z-39 h-screen w-full bg-[#fefefe] flex flex-col  items-center  pt-25  gap-y-20 "
+      className="relative z-39 h-screen w-full bg-[#fefefe] flex flex-col  items-center  pt-[20vh]  gap-y-20
+      md:relative md:z-39 md:h-screen md:w-full md:bg-[#fefefe] md:flex md:flex-col md:items-center md:pt-auto md:gap-y-20  
+      lg:relative lg:z-39 lg:h-screen lg:w-full lg:bg-[#fefefe] lg:flex lg:flex-col lg:items-center lg:pt-25 lg:gap-y-20 "
     >
-      <div className="font-sans font-normal text-2xl tracking-tight opacity-30">
+      {/* Brands We've Worked With */}
+      <div
+        className="font-sans font-normal text-2xl tracking-tight opacity-30
+      md:font-sans md:font-normal md:text-2xl md:tracking-tight md:opacity-30
+      lg:font-sans lg:font-normal lg:text-2xl lg:tracking-tight lg:opacity-30"
+      >
         <Paragraph isLines text={"Brands We’ve Worked With"}></Paragraph>
       </div>
 
-      <div className=" flex flex-wrap 
+      {/* Logos */}
+
+      <div
+        className=" grid grid-cols-3 w-[80vw] gap-y-4 gap-x-2  
+      md:grid md:grid-cols-5 md:w-[80vw]  md:gap-y-10 md:gap-x-5
       lg:grid lg:grid-cols-5 lg:grid-rows-3 lg:gap-10  lg:w-[60vw] 
       
       
-      w-full  gap-y-10 gap-x-5  justify-center ">
+         "
+      >
         {clients.map((client, index) => (
           <div
             key={index}
             ref={(el) => {
               clientsRef.current[index] = el;
             }}
-            className="lg:col-span-1 lg:row-span-1 flex  items-center"
+            className="flex  items-center md:flex md:items-center lg:col-span-1 lg:row-span-1 lg:flex lg:items-center"
           >
             <img
               src={client.logo}
               alt={client.brandName}
-              className="h-auto w-full object-contain p-3"
+              className="h-auto w-full object-contain p-2 md:h-auto md:w-full md:object-contain md:p-3 lg:h-auto lg:w-full lg:object-contain lg:p-3"
             />
-            
           </div>
         ))}
       </div>
 
-      <div className=" relative w-full  bg-[#fefefe] flex flex-col items-center ">
-        <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2  w-4 mt-auto">
+      {/* Logo */}
+      <div
+        className=" relative w-full  bg-[#fefefe] flex flex-col items-center
+      md:relative md:w-full md:bg-[#fefefe] md:flex md:flex-col md:items-center
+      lg:relative lg:w-full lg:bg-[#fefefe] lg:flex lg:flex-col lg:items-center "
+      >
+        <div
+          className=" gap-[0.05rem] grid grid-cols-2 grid-rows-2  w-4 
+        md:gap-[0.05rem] md:grid md:grid-cols-2 md:grid-rows-2 md:w-6
+        lg:gap-[0.05rem] lg:grid lg:grid-cols-2 lg:grid-rows-2 lg:w-4 "
+        >
           <img
             src="/landingTransition/Asset-1.svg"
             alt="Parla"
-            className="row-start-1 col-start-1 row-span-1 col-span-1 "
+            className="row-start-1 col-start-1 row-span-1 col-span-1 md:row-start-1 md:col-start-1 md:row-span-1 md:col-span-1 lg:row-start-1 lg:col-start-1 lg:row-span-1 lg:col-span-1 "
           />
           <img
             src="/landingTransition/Asset-2.svg"
             alt="Parla"
-            className="row-start-1 col-start-2  row-span-1 col-span-1"
+            className="row-start-1 col-start-2  row-span-1 col-span-1 md:row-start-1 md:col-start-2 md:row-span-1 md:col-span-1 lg:row-start-1 lg:col-start-2 lg:row-span-1 lg:col-span-1"
           />
           <img
             src="/landingTransition/Asset-3.svg"
             alt="Parla"
-            className="row-start-2 col-start-1   row-span-1 col-span-1"
+            className="row-start-2 col-start-1   row-span-1 col-span-1 md:row-start-2 md:col-start-1 md:row-span-1 md:col-span-1 lg:row-start-2 lg:col-start-1 lg:row-span-1 lg:col-span-1"
           />
           <img
             src="/landingTransition/Asset-4.svg"
             alt="Parla"
-            className=" row-start-2 col-start-2   row-span-1 col-span-1 "
+            className=" row-start-2 col-start-2   row-span-1 col-span-1 md:row-start-2 md:col-start-2 md:row-span-1 md:col-span-1 lg:row-start-2 lg:col-start-2 lg:row-span-1 lg:col-span-1 "
           />
         </div>
       </div>

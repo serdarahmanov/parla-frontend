@@ -59,7 +59,7 @@ useLayoutEffect(() => {
             href={item.href}
             text={item.label}
             data-analytics={item.analytics}
-            className={` text-[0.6em]  lg:text-xs font-sans font-medium ${isActiveRoute(item.href) ? "opacity-100" : "opacity-40"}`}
+            className={` text-[0.6em] md:text-[0.7rem]  lg:text-xs font-sans font-medium ${isActiveRoute(item.href) ? "opacity-100" : "opacity-40"}`}
           />
         ))}
       </nav>

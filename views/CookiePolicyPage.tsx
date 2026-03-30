@@ -8,6 +8,7 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import SplitText from "gsap/SplitText";
 import CookieSettingsButton from "@/components/cookie/CookieSettingsButton";
 import PortfolioVideoPlayer from "@/components/VideoPlayer";
+import useScreenFlag from "@/lib/utils/useScreenFlag";
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
@@ -19,6 +20,8 @@ const CookiePolicyPage = () => {
   const consentRef = useRef(null);
   const wrapperRef = useRef(null);
   const sideBarRef = useRef(null);
+
+  const {isSmall, isMedium, isLarge}= useScreenFlag();
 
   const [activeCookie, setActiveCookie] = useState(1);
   const [consentState, setConsentState] = useState({
@@ -127,15 +130,15 @@ const CookiePolicyPage = () => {
 
       ScrollTrigger.create({
         trigger: overviewRef.current,
-        start: "top top+=20%",
-
+        start: isSmall ?"top top+=20%":isMedium? "top top+=30%" :"top top+=30%",
+       
         onEnter: () => setActiveCookie(1),
         onEnterBack: () => setActiveCookie(1),
       });
 
       ScrollTrigger.create({
         trigger: consentRef.current,
-        start: "top top+=20%",
+        start: isSmall ?"top top+=20%":isMedium? "top top+=30%" : "top top+=30%",
 
         onEnter: () => setActiveCookie(2),
         onEnterBack: () => setActiveCookie(2),
@@ -145,38 +148,64 @@ const CookiePolicyPage = () => {
     return () => {
       context.revert();
     };
-  }, []);
+  }, [isLarge,isSmall,isMedium]);
 
   return (
-    <div ref={wrapperRef} className="h-[200vh]">
-      <div className=" relative grid grid-cols-12 pt-25 px-6  pb-[80vh]">
-        <div className="col-span-3"></div>
+    <div
+      ref={wrapperRef}
+      className=""
+    >
+      <div className=" relative grid grid-cols-12 pt-25 px-6 gap-1 pb-[30vh]
+      md:relative md:grid md:grid-cols-12 md:pt-25 md:px-6 md:pb-[30vh] md:gap-0
+      lg:relative lg:grid lg:grid-cols-12 lg:pt-25 lg:px-6 lg:pb-[30vh] lg:gap-0">
 
-        <div ref={sideBarRef} className="col-span-3 flex flex-col  gap-4 ">
+        {/* Left Bar */}
+        <div
+          ref={sideBarRef}
+          className=" col-start-1 col-span-3 flex flex-col  gap-4 h-screen  
+          md:col-start-2 md:h-screen md:col-span-3 md:flex md:flex-col md:gap-4
+          lg:col-start-4 lg:col-span-3 lg:flex lg:flex-col lg:gap-4 "
+        >
+
           <MaskTextAnimation
             text={"COOKIE POLICY"}
-            className=" leading-7 text-2xl font-semibold"
+            className=" leading-4 text-lg font-semibold font-sans
+            md:leading-7 md:text-2xl md:font-semibold
+            lg:leading-7 lg:text-2xl lg:font-semibold"
           ></MaskTextAnimation>
-          <div className="text-xs  font-bold  flex flex-col gap-1">
+          <div className="text-xs  font-bold  flex flex-col gap-1 md:text-xs md:font-bold md:flex md:flex-col md:gap-1 lg:text-xs lg:font-bold lg:flex lg:flex-col lg:gap-1">
             <h2
-              className={`${activeCookie == 1 ? "opacity-100" : "opacity-30"}`}
+              className={`${activeCookie == 1 ? "opacity-100" : "opacity-30"} `}
             >
               Overview
             </h2>
             <h2
-              className={`${activeCookie == 2 ? "opacity-100" : "opacity-30"}`}
+              className={`${activeCookie == 2 ? "opacity-100" : "opacity-30"} `}
             >
               Cookie Consent
             </h2>
           </div>
+
+
         </div>
 
-        <div className="col-span-4  flex flex-col ">
-          <div className="text-xs flex flex-col font-sans gap-10">
-            <div className="flex flex-col gap-3">
+
+
+             {/* Right Bar */}
+        <div className=" col-start-4 col-span-9  flex flex-col
+        md:col-start-6 md:col-span-6 md:flex md:flex-col
+        lg:col-start-8 lg:col-span-4 lg:flex lg:flex-col ">
+
+
+
+
+          <div className="text-xs flex flex-col font-sans gap-10
+          md:text-xs md:flex md:flex-col md:font-sans md:gap-10
+          lg:text-xs lg:flex lg:flex-col lg:font-sans lg:gap-10">
+            <div className="flex flex-col gap-3 md:flex md:flex-col md:gap-3 lg:flex lg:flex-col lg:gap-3">
               <h2
                 ref={overviewRef}
-                className={`text-xs font-bold opacity-30 ${activeCookie == 1 ? "opacity-100" : "opacity-30"}`}
+                className={`text-xs font-bold opacity-30 ${activeCookie == 1 ? "opacity-100" : "opacity-30"} md:text-xs md:font-bold   lg:text-xs lg:font-bold `}
               >
                 Overview
               </h2>
@@ -208,16 +237,18 @@ const CookiePolicyPage = () => {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2  ">
+            <div className="flex flex-col gap-2  md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-2">
               <h2
                 ref={consentRef}
-                className={`text-xs font-bold opacity-30 ${activeCookie == 2 ? "opacity-100" : "opacity-30"}`}
+                className={`text-xs font-bold opacity-30 ${activeCookie == 2 ? "opacity-100" : "opacity-30"} md:text-xs md:font-bold  lg:text-xs lg:font-bold  `}
               >
                 Cookie Consent
               </h2>
-              <div className="flex flex-row items-baseline ">
-                <h2 className="text-xs font-bold ">Your current state:</h2>
-                <p className="text-[0.7rem]">
+              <div className="flex flex-col items-baseline md:flex md:flex-col md:items-baseline lg:flex lg:flex-row lg:items-baseline">
+                <h2 className="text-xs font-bold md:text-xs md:font-bold lg:text-xs lg:font-bold">
+                  Your current state:
+                </h2>
+                <p className="text-[0.7rem] md:text-[0.7rem] lg:text-[0.7rem]">
                   {!hasConsentDecision
                     ? "Not defined yet"
                     : consentState.analytics && consentState.marketing
@@ -227,13 +258,21 @@ const CookiePolicyPage = () => {
                       : "Custom."}
                 </p>
               </div>
-              <div className="flex flex-row items-baseline">
-                <h2 className="text-xs font-bold ">Your consent ID:</h2>
-                <p className="text-[0.7rem]">{consentId}</p>
+              <div className=" flex flex-col items-baseline md:flex md:flex-col md:items-baseline lg:flex lg:flex-row lg:items-baseline">
+                <h2 className="text-xs font-bold md:text-xs md:font-bold lg:text-xs lg:font-bold">
+                  Your consent ID:
+                </h2>
+                <p className="  break-all text-[0.7rem] md:text-[0.7rem] lg:text-[0.7rem]">
+                  {consentId}
+                </p>
               </div>
-              <div className="flex flex-row items-baseline">
-                <h2 className="text-xs font-bold ">Consent date:</h2>
-                <p className="text-[0.7rem]">{consentDate}</p>
+              <div className=" flex flex-col items-baseline md:flex md:flex-col md:items-baseline lg:flex lg:flex-row lg:items-baseline">
+                <h2 className="text-xs font-bold md:text-xs md:font-bold lg:text-xs lg:font-bold">
+                  Consent date:
+                </h2>
+                <p className="text-[0.7rem] md:text-[0.7rem] lg:text-[0.7rem]">
+                  {consentDate}
+                </p>
 
                 
               </div>
@@ -242,9 +281,16 @@ const CookiePolicyPage = () => {
               </div>
             </div>
           </div>
+
+
+
         </div>
 
-        <div className="col-span-2"></div>
+
+
+
+
+       
       </div>
      
     </div>

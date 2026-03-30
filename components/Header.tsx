@@ -5,6 +5,8 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { GSP_NO_RETURNED_VALUE } from "next/dist/lib/constants";
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
@@ -13,6 +15,7 @@ function Header() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const topRef = useRef<HTMLImageElement | null>(null);
   const bottomRef = useRef<HTMLImageElement | null>(null);
+  const pathname = usePathname();
 
   useLayoutEffect(() => {
     if (!rootRef.current || !topRef.current || !bottomRef.current) return;
@@ -72,6 +75,16 @@ function Header() {
     };
   }, []);
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>)=>{
+    if(pathname ==='/'){
+      e.preventDefault();
+         window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+    }else return;
+  }
+
   return (
     <header className="fixed top-1 left-0 w-full z-150 m-0 p-0 text-center pointer-events-none">
       <div className="p-0 m-0">
@@ -79,6 +92,7 @@ function Header() {
         scroll={false}
           href="/"
           className="leading-none inline-block pointer-events-auto  "
+          onClick={handleClick}
         >
           <div
             ref={rootRef}
@@ -88,14 +102,14 @@ function Header() {
               ref={topRef}
               src="/landingTransition/Asset-5.svg"
               alt="Parla"
-              className="w-10 mt-1 block"
+              className="w-13 mt-1 block"
             />
 
             <img
               ref={bottomRef}
               src="/landingTransition/rectangular-part-of-logo-inside-parla.svg"
               alt="Parla"
-              className="w-10 mt-1 absolute left-0 top-0 block"
+              className="w-13 mt-1 absolute left-0 top-0 block"
             />
           </div>
         </Link>

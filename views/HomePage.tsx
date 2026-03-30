@@ -9,6 +9,7 @@ import MainSection4 from "../sections/MainSection4";
 import MainSection5 from "../sections/MainSection5";
 import MainSection2 from "@/sections/MainSection2";
 import PortfolioVideoPlayer from "@/components/VideoPlayer";
+import MainSection7 from "@/sections/MainSection7";
 
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -40,7 +41,7 @@ export default function Home() {
         textColor="text-black"
         bgColor="bg-black"
       />
-      <MainSection4></MainSection4>
+      <MainSection7></MainSection7>
 
       <ParagraphSticky
         index={2}
