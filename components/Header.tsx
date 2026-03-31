@@ -75,21 +75,21 @@ function Header() {
     };
   }, []);
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>)=>{
-    if(pathname ==='/'){
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
       e.preventDefault();
-         window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-    }else return;
-  }
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    } else return;
+  };
 
   return (
     <header className="fixed top-1 left-0 w-full z-150 m-0 p-0 text-center pointer-events-none">
       <div className="p-0 m-0">
         <Link
-        scroll={false}
+          scroll={false}
           href="/"
           className="leading-none inline-block pointer-events-auto  "
           onClick={handleClick}

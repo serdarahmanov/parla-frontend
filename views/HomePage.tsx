@@ -10,6 +10,7 @@ import MainSection5 from "../sections/MainSection5";
 import MainSection2 from "@/sections/MainSection2";
 import PortfolioVideoPlayer from "@/components/VideoPlayer";
 import MainSection7 from "@/sections/MainSection7";
+import MainSection8 from "@/sections/MainSection8";
 
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -28,7 +29,7 @@ export default function Home() {
         sectionId="section-2"
         zIndexClassName="z-21"
       ></MainSection6>
-      <MainSection3></MainSection3>
+      <MainSection8></MainSection8>
 
       <ParagraphSticky
         index={1}
