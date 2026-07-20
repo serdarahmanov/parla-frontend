@@ -1,24 +1,31 @@
 "use client";
-import React, { useRef , useLayoutEffect} from "react";
+import React, { useRef, useLayoutEffect } from "react";
 import { useRouter } from "next/router";
 import HoverSwapLink from "../animations/HoverSwapLink";
-import gsap from 'gsap'
+import gsap from "gsap";
+import { usePathname } from "next/navigation";
 
 const navItems = [
-   { label: "Work", href: "/work", analytics: "nav-work" },
+  { label: "Work", href: "/work", analytics: "nav-work" },
   { label: "Information", href: "/about", analytics: "nav-info" },
-
-  
 ];
 function NavBar() {
   const { pathname } = useRouter();
-  const rootRef = useRef< HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const isActiveRoute = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
+  const pathnameHomePage = usePathname();
 
-useLayoutEffect(() => {
-    
-    if(!rootRef.current)return;
+  const findHomePage = (pathnameX: string) => {
+    if (pathnameX === "/") {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  useLayoutEffect(() => {
+    if (!rootRef.current) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -32,38 +39,29 @@ useLayoutEffect(() => {
           opacity: 1,
           duration: 0.8,
           stagger: 0.08,
-          ease: 'power3.out',
+          ease: "power3.out",
           delay: 0.2,
           clearProps: "opacity",
-        }
-      )
-    }, rootRef)
+        },
+      );
+    }, rootRef);
 
-    return () => ctx.revert()
-  }, [])
-
-
-
-
-
-
-
-
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <div  className="fixed text-white mix-blend-difference  top-3 right-6 text-right z-100">
-      <nav  ref={rootRef} className="site-nav flex flex-row gap-10">
+    <div className="fixed text-white mix-blend-difference  top-3 right-6 text-right z-100">
+      <nav ref={rootRef} className="site-nav flex flex-row gap-10">
         {navItems.map((item) => (
           <HoverSwapLink
             key={item.href}
             href={item.href}
             text={item.label}
             data-analytics={item.analytics}
-            className={` text-[0.6em] md:text-[0.7rem]  lg:text-xs font-sans font-medium ${isActiveRoute(item.href) ? "opacity-100" : "opacity-40"}`}
+            className={` text-[0.6em] md:text-[0.7rem]  lg:text-xs font-sans font-medium ${findHomePage(pathnameHomePage) ? "opacity-100" : isActiveRoute(item.href) ? "opacity-100" : "opacity-40"}`}
           />
         ))}
       </nav>
-        
     </div>
   );
 }

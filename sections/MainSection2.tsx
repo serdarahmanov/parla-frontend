@@ -176,7 +176,7 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
               const currentLeft = rect.left;
               const itemWidth = rect.width;
 
-              const stackSpacing = 46;
+              const stackSpacing = 50;
               const stackWidth =
                 itemWidth + (photosArray.length - 1) * stackSpacing;
               const stackLeft = rowCenter - stackWidth / 2;
@@ -186,12 +186,15 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
               return targetLeft - currentLeft;
             },
 
-            rotate: (index) => (index - centerIndex) * 1.5,
-            
+            // rotate: (index) => (index - centerIndex) * 1.5,
+            rotateY: (index,el)=>{
+              
+              return 40 + index*5
+            },
             scale: 0.9,
             stagger: 0.02,
-            duration: 0.3,
-            ease: "power1.out",
+            // duration: 0.3,
+            ease: "none",
           },
           1,
         );
@@ -245,14 +248,14 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
             className="flex flex-row gap-1 bg-[#fefefe] "
           >
             {[...works, ...works].map((work, index) => (
-              <div key={index} className="w-[10%]  ">
+              <div key={index} className="w-[10%] perspective-midrange ">
                 <img
                   ref={(el) => {
                     introPhotosRef.current[index] = el;
                   }}
                   src={work.poster}
                   alt=""
-                  className="  "
+                  className="transform-3d  "
                 />
               </div>
             ))}
