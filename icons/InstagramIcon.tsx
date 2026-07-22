@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utilities";
+import { cn } from "@/lib/utils";
 
 type InstagramIconProps = {
   className?: string

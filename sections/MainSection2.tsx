@@ -3,44 +3,146 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MaskTextAnimation from "@/animations/MaskTextAnimation";
 import useScreenFlag from "@/lib/utils/useScreenFlag";
 import { works } from "@/components/data/works";
 import SplitText from "gsap/SplitText";
+import LiveClock from "@/components/LiveClock";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 type MainSection2Props = {
   videoLinks: string[];
   maskText: string;
+  introDone?: boolean;
 };
 
-const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
+const MainSection2 = ({
+  videoLinks,
+  maskText,
+  introDone,
+}: MainSection2Props) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const introPhotosRef = useRef<(HTMLImageElement | null)[]>([]);
   const introTextRef = useRef<HTMLHeadingElement | null>(null);
-  const introDescRef = useRef<HTMLParagraphElement | null>(null);
+  const turkmenistanRef = useRef<HTMLHeadingElement | null>(null);
+  const clockWrapRef = useRef<HTMLDivElement | null>(null);
   const photosWrapperRef = useRef<HTMLDivElement | null>(null);
+  const introMetaRowRef = useRef<HTMLDivElement | null>(null);
+  const emailRowRef = useRef<HTMLDivElement | null>(null);
+  const emailTextRef = useRef<HTMLHeadingElement | null>(null);
+  const emailIconWrapRef = useRef<HTMLDivElement | null>(null);
   const { isSmall, isMedium, isLarge } = useScreenFlag();
   const logo1Ref = useRef<HTMLImageElement | null>(null);
   const logo2Ref = useRef<HTMLImageElement | null>(null);
   const logo3Ref = useRef<HTMLImageElement | null>(null);
   const logo4Ref = useRef<HTMLImageElement | null>(null);
+  const [emailCopied, setEmailCopied] = useState(false);
+  const copyIconRef = useRef<HTMLImageElement | null>(null);
+
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText("hello@parla.com");
+      setEmailCopied(true);
+      setTimeout(() => setEmailCopied(false), 3000);
+    } catch {
+      // clipboard access denied or unavailable
+    }
+  };
+
+  useEffect(() => {
+    if (!copyIconRef.current) return;
+
+    gsap.fromTo(
+      copyIconRef.current,
+      { scale: 0.5, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" },
+    );
+  }, [emailCopied]);
 
   useGSAP(
     () => {
       if (
+        !introDone ||
         !wrapperRef.current ||
         !introTextRef.current ||
-        !introDescRef.current ||
         !introPhotosRef.current.length ||
         !photosWrapperRef.current
       )
         return;
 
       let textSplitTween: gsap.core.Tween | null = null;
-      let descTextTween: gsap.core.Tween | null = null;
+
+      gsap.set(introTextRef.current, { opacity: 1 });
+      const metaEls = [turkmenistanRef.current, clockWrapRef.current].filter(
+        Boolean,
+      );
+
+      if (metaEls.length) {
+        gsap.set(metaEls, { opacity: 1 });
+
+        gsap.from(metaEls, {
+          xPercent: 100,
+          duration: 0.6,
+          stagger: 0.08,
+          // delay: 1,
+          ease: [0.76, 0, 0.24, 1],
+          onComplete: () => {
+            gsap.fromTo(
+              metaEls,
+              { xPercent: 0 },
+              {
+                xPercent: -100,
+                ease: "none",
+                stagger: 0.03,
+                scrollTrigger: {
+                  trigger: wrapperRef.current,
+                  start: "top top",
+                  end: "center 70%",
+                  pin: introMetaRowRef.current,
+                  pinSpacing: false,
+                  scrub: true,
+                },
+              },
+            );
+          },
+        });
+      }
+
+      const emailEls = [emailTextRef.current, emailIconWrapRef.current].filter(
+        Boolean,
+      );
+
+      if (emailEls.length) {
+        gsap.set(emailEls, { opacity: 1 });
+
+        gsap.from(emailEls, {
+          xPercent: 100,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: [0.76, 0, 0.24, 1],
+          onComplete: () => {
+            gsap.fromTo(
+              emailEls,
+              { xPercent: 0 },
+              {
+                xPercent: -100,
+                ease: "none",
+                stagger: 0.03,
+                scrollTrigger: {
+                  trigger: wrapperRef.current,
+                  start: "top top",
+                  end: "center 90%",
+                  pin: emailRowRef.current,
+                  pinSpacing: false,
+                  scrub: true,
+                },
+              },
+            );
+          },
+        });
+      }
 
       const textSplit = SplitText.create(introTextRef.current, {
         type: "lines,words",
@@ -54,7 +156,7 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
             yPercent: 100,
             duration: 0.4,
             stagger: 0.03,
-            delay: 1,
+            // delay: 0.05,
             ease: [0.76, 0, 0.24, 1],
           });
 
@@ -65,8 +167,10 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
             stagger: 0.03,
             scrollTrigger: {
               trigger: wrapperRef.current,
-              start: "top top-=5%",
-              end: "bottom 90%",
+              start: "top top",
+              end: "center 70%",
+              pin: introTextRef.current,
+              pinSpacing: false,
               scrub: true,
             },
           });
@@ -74,147 +178,14 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
           return tl;
         },
       });
-
-      const descSplit = SplitText.create(introDescRef.current, {
-        type: "words",
-        mask: "words",
-        autoSplit: true,
-        onSplit: (self) => {
-          const tl = gsap.timeline();
-
-          // entry
-          tl.from(self.words, {
-            yPercent: 100,
-            duration: 0.4,
-            stagger: 0.03,
-            delay: 1.2,
-            ease: [0.76, 0, 0.24, 1],
-          });
-
-          // scroll exit
-          gsap.to(self.words, {
-            yPercent: 100,
-            ease: "none",
-            stagger: 0.002,
-            scrollTrigger: {
-              trigger: wrapperRef.current,
-              start: "top top-=5%",
-              end: "bottom 90%",
-              scrub: true,
-            },
-          });
-
-          return tl;
-        },
-      });
-
-      const photosArray = introPhotosRef.current.filter(
-        (el): el is HTMLImageElement => el !== null,
-      );
-
-      if (photosArray.length && wrapperRef.current) {
-        gsap.set(photosArray, {
-          clipPath: "inset(0 0 100% 0)",
-        });
-
-        gsap.to(photosArray, {
-          clipPath: "inset(0 0 0% 0)",
-          duration: 0.6,
-          stagger: 0.04,
-          delay: 1.3,
-          ease: [0.76, 0, 0.24, 1],
-        });
-
-        const centerIndex = (photosArray.length - 1) / 2;
-
-        gsap.set(photosArray, {
-          transformOrigin: "center center",
-        });
-
-        const rowRect = wrapperRef.current.getBoundingClientRect();
-        const rowCenter = rowRect.left + rowRect.width / 2;
-
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: wrapperRef.current,
-            start: "top top-=5%",
-            end: "bottom 55%",
-            scrub: true,
-            // toggleActions: "play none reverse none",
-            invalidateOnRefresh: true,
-          },
-        });
-
-        timeline.to(
-          photosArray,
-          {
-            skewY: 6,
-            stagger: 0.02,
-            // duration: 0.3,
-            ease: "none",
-          },
-          0,
-        );
-
-        timeline.to(
-          photosWrapperRef.current,
-          {
-            yPercent: -150,
-            ease: "none",
-          },
-          0,
-        );
-
-        timeline.to(
-          photosArray,
-          {
-            x: (index, el) => {
-              const rowRect = photosWrapperRef.current.getBoundingClientRect();
-              const rowCenter = rowRect.left + rowRect.width / 2;
-
-              const rect = el.getBoundingClientRect();
-              const currentLeft = rect.left;
-              const itemWidth = rect.width;
-
-              const stackSpacing = 50;
-              const stackWidth =
-                itemWidth + (photosArray.length - 1) * stackSpacing;
-              const stackLeft = rowCenter - stackWidth / 2;
-
-              const targetLeft = stackLeft + index * stackSpacing;
-
-              return targetLeft - currentLeft;
-            },
-
-            // rotate: (index) => (index - centerIndex) * 1.5,
-            rotateY: (index,el)=>{
-              
-              return 40 + index*5
-            },
-            scale: 0.9,
-            stagger: 0.02,
-            // duration: 0.3,
-            ease: "none",
-          },
-          1,
-        );
-
-
-        timeline.to(photosArray,{
-          autoAlpha: 0,
-          stagger: 0.02,
-          scale: 0,
-        },2)
-      }
 
       return () => {
         textSplit.revert();
-        descSplit.revert();
-
       };
     },
     {
       scope: wrapperRef,
+      dependencies: [introDone],
     },
   );
 
@@ -222,71 +193,117 @@ const MainSection2 = ({ videoLinks, maskText }: MainSection2Props) => {
     <div
       id="section-1"
       ref={wrapperRef}
-      className="sticky top-0 h-screen w-full z-20 overflow-hidden bg-[#fefefe] font-sans"
+      className="relative mb-30 h-[200dvh] w-full z-20  bg-[#fefefe] font-sans"
     >
-      <div className="relative h-full w-full grid grid-rows-6 px-6 pb-5">
-        <div className="row-span-1 "></div>
-        <div className="row-span-3 flex flex-col gap-5 overflow-hidden">
-          <h1
-            ref={introTextRef}
-            className=" lg:text-[7rem] w-[70%] leading-[5.8rem] font-normal uppercase overflow-hidden tracking-tighter [word-spacing:0.20em]"
-          >
-            Parla is a marketing & content partner
-          </h1>
+      <div className="relative h-[80dvh] w-full grid grid-rows-6 px-6 pb-5">
 
-          <p
-            ref={introDescRef}
-            className="font-normal opacity-100 [word-spacing:0.10em] uppercase text-ce-secondary"
-          >We define brand direction, develop content, and build systems that
-            keep everything consistent and scalable
-          </p>
-        </div>
 
-        <div className="row-span-2 flex flex-col gap  bg-[#fefefe] h-full ">
-          <div
-            ref={photosWrapperRef}
-            className="flex flex-row gap-1 bg-[#fefefe] "
-          >
-            {[...works, ...works].map((work, index) => (
-              <div key={index} className="w-[10%] perspective-midrange ">
-                <img
-                  ref={(el) => {
-                    introPhotosRef.current[index] = el;
-                  }}
-                  src={work.poster}
-                  alt=""
-                  className="transform-3d  "
+        <div className="row-span-2 flex  justify-end gap-4 px-10 pt-10">
+          <div ref={introMetaRowRef} className="flex justify-end gap-4 w-full">
+            <div className="overflow-hidden">
+              <h2
+                ref={turkmenistanRef}
+                className="font-semibold text-sm opacity-0"
+              >
+                Turkmenistan
+              </h2>
+            </div>
+
+            <div className="overflow-hidden">
+              <div ref={clockWrapRef} className="opacity-0">
+                <LiveClock
+                  className={" w-[5ch] text-right text-sm font-semibold "}
                 />
               </div>
-            ))}
+            </div>
           </div>
+        </div>
 
-          {/* <div className="self-center intro-logo gap-0.5 grid grid-cols-2 grid-rows-2   w-10">
-            <img
-              ref={logo1Ref}
-              src="/landingTransition/Asset-1.svg"
-              alt="Parla"
-              className="row-start-1 col-start-1 row-span-1 col-span-1 "
-            />
-            <img
-              src="/landingTransition/Asset-2.svg"
-              alt="Parla"
-              ref={logo2Ref}
-              className="row-start-1 col-start-2  row-span-1 col-span-1"
-            />
-            <img
-              src="/landingTransition/Asset-3.svg"
-              alt="Parla"
-              ref={logo3Ref}
-              className="row-start-2 col-start-1   row-span-1 col-span-1"
-            />
-            <img
-              src="/landingTransition/Asset-4.svg"
-              alt="Parla"
-              ref={logo4Ref}
-              className=" row-start-2 col-start-2   row-span-1 col-span-1 "
-            />
-          </div> */}
+
+        <div className="row-span-3 flex  gap-5 overflow-hidden justify-start ">
+          <h1
+            ref={introTextRef}
+            className=" opacity-0 lg:text-[4rem] mx-auto w-[90%] leading-[4.5rem] font-semibold  overflow-hidden tracking-tighter   "
+          >
+            <span className="pl-30">Parla</span> is a production and software
+            studio.{" "}
+            <span className="opacity-30 font-suisse-works font-normal italic">
+              We combine established production expertise with new digital
+              capabilities.
+            </span>
+          </h1>
+
+        </div>
+
+
+        <div className=" relative  row-span-1 w  flex   items-end">
+
+          <div
+            ref={emailRowRef}
+            className="relative  mx-auto w-[90%] h-10   flex items-center justify-left gap-2 "
+          >
+              <div className="overflow-hidden">
+                <h2 ref={emailTextRef} className=" font-semibold text-sm opacity-0">
+                  hello@parla.com
+                </h2>
+              </div>
+
+              <div className="relative inline-flex">
+                <div className="overflow-hidden">
+                  <div ref={emailIconWrapRef} className="opacity-0">
+                    <button
+                      type="button"
+                      onClick={handleCopyEmail}
+                      disabled={emailCopied}
+                      aria-label="Copy email address"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-(--ink)/10"
+                    >
+                      <img
+                        ref={copyIconRef}
+                        src={emailCopied ? "/header-icons/copy-success.svg" : "/header-icons/copy.svg"}
+                        alt=""
+                        className="w-5 h-5"
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pointer-events-none absolute left-1/2 -top-2 -translate-x-1/2 -translate-y-full">
+                  <span
+                    className={`cta inline-flex items-center justify-center whitespace-nowrap h-7 rounded-full bg-(--ink)/10 px-3 text-sm font-semibold text-black transition-all duration-300 ease-out ${
+                      emailCopied ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                    }`}
+                  >
+                    Copied!
+                  </span>
+                </div>
+              </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div className="flex flex-col gap  bg-[#fefefe] h-full   px-6">
+        <div
+          ref={photosWrapperRef}
+          className="flex flex-row gap-3 bg-[#fefefe] "
+        >
+          {works.slice(0, 3).map((work, index) => (
+            <div
+              key={index}
+              className={`${index === 2 ? "w-[50%]" : "w-[25%] mt-12"} perspective-midrange`}
+            >
+              <img
+                ref={(el) => {
+                  introPhotosRef.current[index] = el;
+                }}
+                src={work.poster}
+                alt=""
+                className="transform-3d rounded-[calc(var(--r-island)/2)] w-full"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>

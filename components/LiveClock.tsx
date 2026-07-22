@@ -16,7 +16,7 @@ const timeFormatter = useMemo(
         timeZone: "Asia/Ashgabat",
         hour: "2-digit",
         minute: "2-digit",
-        second: "2-digit",
+        // second: "2-digit",
         hour12: false,
       }),
     [],
@@ -35,7 +35,7 @@ const timeFormatter = useMemo(
   return (
     <div className='relative'>
        
-          <div className={className} >{time} GTM+5</div>
+          <div className={className} >{time}</div>
         
     </div>
   )

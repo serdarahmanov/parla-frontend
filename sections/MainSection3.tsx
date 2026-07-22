@@ -88,7 +88,6 @@ const MainSection3 = () => {
           end: isLarge?"center 40%":isMedium?"center 40%":"center center",
           // toggleActions: "play none none none",
           scrub: true,
-          markers:true,
         },
       });
 
@@ -179,7 +178,7 @@ const MainSection3 = () => {
                 ref={(el) => {
                   titleRefs.current[index] = el;
                 }}
-                className="title text-[1.2rem] leading-[1.2rem] md:text-2xl  lg:text-2xl  font-medium tracking-tight opacity-30 font-sans mb-2"
+                className="title will-change-transform text-[1.2rem] leading-[1.2rem] md:text-2xl  lg:text-2xl  font-medium tracking-tight opacity-30 font-sans mb-2"
               >
                 {item.title}
               </div>

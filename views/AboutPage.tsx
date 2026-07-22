@@ -14,10 +14,10 @@ const images = [
 function About() {
   return (
     <div
-      className="relative pb-10 pt-15 px-6  w-full h-screen
+      className="header-clearance-top relative pb-10 px-6  w-full h-screen
      flex flex-col gap-y-10
-      md:relative md:pb-10 md:pt-15 md:px-6 md:w-full md:min-h-screen md:flex md:font-sans md:flex-col md:gap-y-5 
-      lg:relative lg:pb-10 lg:pt-20 lg:px-6 lg:grid lg:w-full   lg:font-sans
+      md:relative md:pb-10 md:px-6 md:w-full md:min-h-screen md:flex md:font-sans md:flex-col md:gap-y-5
+      lg:relative lg:pb-10 lg:px-6 lg:grid lg:w-full   lg:font-sans
       lg:gap-x-3 lg:grid-cols-12 lg:grid-rows-2 lg:h-screen lg:gap-y-15  "
     >
       <div className=" grid grid-cols-3 md:row-span-2 md:col-span-10 md:col-start-1 md:grid md:grid-cols-10  md:gap-x-5 lg:col-span-12 lg:row-span-1 lg:grid lg:grid-cols-12 lg:gap-x-3 ">

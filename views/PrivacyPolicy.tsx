@@ -46,9 +46,9 @@ const PrivacyPolicy = () => {
     <div ref={wrapperRef} className="bg-white md:bg-white lg:bg-white">
 
         {/* Inner Wrapper definig grip rules */}
-      <div className="relative grid grid-cols-12 pt-25 pb-[80vh] px-6 font-sans gap-1
-      md:relative md:grid md:grid-cols-12 md:pt-25 md:pb-[80vh] md:px-6 md:gap-0
-      lg:relative lg:grid lg:grid-cols-12 lg:pt-25 lg:pb-[80vh] lg:px-6 kg:gap-0 ">
+      <div className="header-clearance-top relative grid grid-cols-12 pb-[80vh] px-6 font-sans gap-1
+      md:relative md:grid md:grid-cols-12 md:pb-[80vh] md:px-6 md:gap-0
+      lg:relative lg:grid lg:grid-cols-12 lg:pb-[80vh] lg:px-6 kg:gap-0 ">
 
 
           {/* Left Side Bar */}

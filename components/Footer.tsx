@@ -1,7 +1,7 @@
 "use client";
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
-import HoverSwapLink from "../animations/HoverSwapLink";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 function Footer() {
@@ -37,8 +37,8 @@ function Footer() {
       ref={footerRef}
       className="absolute bottom-3 left-0 top-auto w-full z-55 grid grid-cols-4 px-6  
         font-sans
-    text-[0.6rem] font-semibold text-black md:text-[0.7rem]
-    lg:text-xs lg:font-semibold items-end overflow-hidden"
+    text-[0.6rem] font-small text-black md:text-sm
+    lg:text-sm lg:font-small items-end overflow-hidden"
     >
       <div className=" col-span-1  ">
         <h2 className="opacity-40"> PARLA® ©2024</h2>
@@ -48,33 +48,47 @@ function Footer() {
         </div>
 
       <div className="col-span-1">
-        <HoverSwapLink
-          className={`text-inherit ${
-    pathname === "/cookie" ? "opacity-100" : "opacity-40"
-  }`}
+        <Link
+          scroll={false}
           href="/cookie"
-          text="Cookie Policy"
           data-analytics="footer-cookie-policy"
-        />
+          className={`cta inline-flex items-center h-[var(--cta-h)] rounded-[var(--r-cta)] px-4 font-semibold transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2 ${
+            pathname === "/cookie"
+              ? "bg-(--ink) text-white"
+              : "text-black hover:bg-(--ink)/10"
+          }`}
+        >
+          cookie Policy
+        </Link>
       </div>
       <div className="col-span-1">
-        <HoverSwapLink
-          className={`text-inherit ${
-    pathname === "/privacy-policy" ? "opacity-100" : "opacity-40"
-  }`}
+        <Link
+          scroll={false}
           href="/privacy-policy"
-          text="Privacy Policy"
           data-analytics="footer-privacy-policy"
-        />
+          className={`cta inline-flex items-center h-[var(--cta-h)] rounded-[var(--r-cta)] px-4 font-semibold transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2 ${
+            pathname === "/privacy-policy"
+              ? "bg-(--ink) text-white"
+              : "text-black hover:bg-(--ink)/10"
+          }`}
+        >
+          privacy Policy
+        </Link>
       </div>
 
       <div className="col-span-1 flex justify-end ">
-        <HoverSwapLink
-          className="text-inherit opacity-40 "
+        <Link
+          scroll={false}
           href="/by-rahmanov"
-          text=" Site by Rahmanov"
           data-analytics="footer-site-by-rahmanov"
-        />
+          className={`cta inline-flex items-center h-[var(--cta-h)] rounded-[var(--r-cta)] px-4 font-semibold transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2 ${
+            pathname === "/by-rahmanov"
+              ? "bg-(--ink) text-white"
+              : "text-black hover:bg-(--ink)/10"
+          }`}
+        >
+          site by Rahmanov
+        </Link>
       </div>
     </div>
   );

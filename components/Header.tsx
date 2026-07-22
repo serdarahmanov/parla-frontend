@@ -5,7 +5,8 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
+import { motion } from "framer-motion";
 import { GSP_NO_RETURNED_VALUE } from "next/dist/lib/constants";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -15,7 +16,7 @@ function Header() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const topRef = useRef<HTMLImageElement | null>(null);
   const bottomRef = useRef<HTMLImageElement | null>(null);
-  const pathname = usePathname();
+  const { pathname } = useRouter();
 
   useLayoutEffect(() => {
     if (!rootRef.current || !topRef.current || !bottomRef.current) return;
@@ -79,42 +80,47 @@ function Header() {
     if (pathname === "/") {
       e.preventDefault();
       window.scrollTo({
+        
         top: 0,
         behavior: "smooth",
       });
     } else return;
   };
 
-  return (
-    <header className="fixed top-1 left-0 w-full z-150 m-0 p-0 text-center pointer-events-none">
-      <div className="p-0 m-0">
-        <Link
-          scroll={false}
-          href="/"
-          className="leading-none inline-block pointer-events-auto  "
-          onClick={handleClick}
-        >
-          <div
-            ref={rootRef}
-            className=" relative block overflow-hidden w-auto "
-          >
-            <img
-              ref={topRef}
-              src="/landingTransition/Asset-5.svg"
-              alt="Parla"
-              className="w-13 mt-1 block"
-            />
+  const isHome = pathname === "/";
 
-            <img
-              ref={bottomRef}
-              src="/landingTransition/rectangular-part-of-logo-inside-parla.svg"
-              alt="Parla"
-              className="w-13 mt-1 absolute left-0 top-0 block"
-            />
-          </div>
-        </Link>
+  return (
+    <Link
+      scroll={false}
+      href="/"
+      className="cta relative flex h-[var(--cta-h)] items-center leading-none shrink-0 rounded-[var(--r-cta)] px-4
+        motion-reduce:transition-none
+        focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2"
+      onClick={handleClick}
+    >
+      {isHome && (
+        <motion.div
+          layoutId="nav-active-pill"
+          className="cta absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)"
+          transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
+        />
+      )}
+      <div ref={rootRef} className="relative z-10 block overflow-hidden w-auto">
+        <img
+          ref={topRef}
+          src="/landingTransition/Asset-5.svg"
+          alt="Parla"
+          className="w-14 block"
+        />
+
+        <img
+          ref={bottomRef}
+          src="/landingTransition/rectangular-part-of-logo-inside-parla.svg"
+          alt="Parla"
+          className="w-14 absolute left-0 top-0 block"
+        />
       </div>
-    </header>
+    </Link>
   );
 }
 

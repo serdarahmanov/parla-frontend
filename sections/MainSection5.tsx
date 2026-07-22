@@ -9,21 +9,18 @@ import { useGSAP } from "@gsap/react";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const clients = [
-  { id: "1", brandName: "Aytac", logo: "/clients/tas-logo-black.png" },
-  { id: "2", brandName: "Hyundai", logo: "/clients/tas-logo-black.png" },
-  { id: "3", brandName: "Kids Expo", logo: "/clients/tas-logo-black.png" },
-  { id: "4", brandName: "Gandaş", logo: "/clients/tas-logo-black.png" },
-  { id: "5", brandName: "Tör", logo: "/clients/tas-logo-black.png" },
-  { id: "6", brandName: "Real", logo: "/clients/tas-logo-black.png" },
-  { id: "7", brandName: "Bold", logo: "/clients/tas-logo-black.png" },
-  { id: "8", brandName: "Softea", logo: "/clients/tas-logo-black.png" },
-  { id: "9", brandName: "Rahat", logo: "/clients/tas-logo-black.png" },
-  { id: "10", brandName: "Tachil", logo: "/clients/tas-logo-black.png" },
-  { id: "11", brandName: "Gatnaşyk", logo: "/clients/tas-logo-black.png" },
-  { id: "12", brandName: "TMCeli", logo: "/clients/tas-logo-black.png" },
-  { id: "13", brandName: "Panasian", logo: "/clients/tas-logo-black.png" },
-  { id: "14", brandName: "Depe", logo: "/clients/tas-logo-black.png" },
-  { id: "15", brandName: "Birzatlar", logo: "/clients/tas-logo-black.png" },
+  { id: "1", brandName: "Asushi", logo: "/clients/Asushi.png" },
+  { id: "2", brandName: "Ayna", logo: "/clients/ayna.png" },
+  { id: "3", brandName: "Berkara Gerb", logo: "/clients/Berkara-Gerb.png" },
+  { id: "4", brandName: "Candash", logo: "/clients/Candash-Photoroom.png" },
+  { id: "5", brandName: "Ellkitap", logo: "/clients/ellkitap-black-4.png" },
+  { id: "6", brandName: "Family", logo: "/clients/family.png" },
+  { id: "7", brandName: "Momo", logo: "/clients/momo2.png" },
+  { id: "8", brandName: "Noor", logo: "/clients/noor-logo.png" },
+  { id: "9", brandName: "Sarwan", logo: "/clients/Sarwan.png" },
+  { id: "10", brandName: "Yumak", logo: "/clients/yumak_logo_redrawn.png" },
+  { id: "11", brandName: "Client logo", logo: "/clients/5875432986994478538-Photoroom.png" },
+  { id: "12", brandName: "Client logo", logo: "/clients/6043859631290912008-Photoroom.png" },
 ];
 
 const MainSection5 = () => {

@@ -393,6 +393,11 @@ export default function PortfolioVideoPlayer({
     setIsHover(false);
   }, [clearInactivityTimer]);
 
+  const handleTouchStart = useCallback(() => {
+    setIsHover(true);
+    scheduleInactivityHide();
+  }, [scheduleInactivityHide]);
+
   return (
     <section className="z-[100] flex h-screen w-full items-center justify-center  overflow-hidden">
       <div
@@ -408,6 +413,7 @@ export default function PortfolioVideoPlayer({
         onMouseEnter={handlePointerEnter}
         onMouseMove={handlePointerMove}
         onMouseLeave={handlePointerLeave}
+        onTouchStart={handleTouchStart}
       >
         <video
           ref={videoRef}
@@ -453,19 +459,44 @@ export default function PortfolioVideoPlayer({
           </div>
         </div>
 
-        <div  className="video_player_interface absolute inset-x-0 bottom-0 z-20 py-4 lg:bottom-[30vh] font-sans">
-          <div ref={nameAndClientRef} className="video_player_interface_layout mx-6 grid grid-cols-5 items-center gap-6">
+        <div className="video_player_interface absolute inset-x-0 bottom-0 z-20 py-4 lg:bottom-[30vh] font-sans">
+          <div ref={nameAndClientRef} className="video_player_interface_layout mx-4 lg:mx-6 grid grid-cols-2 items-center gap-x-4 gap-y-3 lg:grid-cols-5 lg:gap-6">
 
-            <div 
+            {/* Title — col 1 row 1 on mobile; col 1 on desktop */}
+            <div
               className={`video_player_content_col col-span-1 justify-self-start text-left text-white transition-opacity duration-150 ${
                 isPlaying ? "opacity-0" : "opacity-100"
               }`}
             >
-              <h1 className="m-0 p-0 text-2xl font-medium uppercase tracking-tighter">{videoName}</h1>
-              <p className="m-0 p-0 text-md font-medium tracking-tight">{clientName}</p>
+              <h1 className="m-0 p-0 text-base lg:text-2xl font-medium uppercase tracking-tighter line-clamp-1">{videoName}</h1>
+              <p className="m-0 p-0 text-xs lg:text-md font-medium tracking-tight">{clientName}</p>
             </div>
 
-            <div className="video_player_timeline_component relative col-span-3 h-10 w-full min-w-0 justify-self-center overflow-visible">
+            {/* Controls — col 2 row 1 on mobile; col 5 on desktop (lg:order-3) */}
+            <div className="video_player_control_wrap col-span-1 justify-self-end flex items-center gap-2 lg:gap-3 text-xs font-semibold text-white lg:order-3">
+              <div
+                data-vimeo-control="mute"
+                className="video_player_sound_wrap flex items-center gap-1 lg:gap-2"
+                onClick={toggleMute}
+                role="button"
+                aria-label={isMuted ? "Unmute video" : "Mute video"}
+              >
+                <div className="video_player_sound_mute flex h-6 w-6 items-center justify-center">
+                  <img src="/player/sound-on.svg" alt="" className="video_player_vol_up_svg h-5 w-5" />
+                  <img src="/player/sound-off.svg" alt="" className="video_player_vol_mute_svg h-5 w-5" />
+                </div>
+                <div className="video_player_sound_stat_wrap">
+                  <p className="video_player_sound_stat_text">On</p>
+                </div>
+              </div>
+
+              <button type="button" onClick={toggleFullscreen} className="video_player_screen_text whitespace-nowrap">
+                {isFullscreen ? "Normal" : "Full Screen"}
+              </button>
+            </div>
+
+            {/* Timeline — row 2 full-width on mobile; col 2-4 on desktop (lg:order-2) */}
+            <div className="video_player_timeline_component relative col-span-2 lg:col-span-3 h-10 w-full min-w-0 justify-self-center overflow-visible lg:order-2">
               <progress
                 ref={progressRef}
                 max={duration || 0}
@@ -491,28 +522,6 @@ export default function PortfolioVideoPlayer({
                   00:00
                 </span>
               </div>
-            </div>
-
-            <div className="video_player_control_wrap col-span-1 justify-self-end grid grid-cols-[4.5rem_auto] items-center gap-3 text-xs font-semibold text-white">
-              <div
-                data-vimeo-control="mute"
-                className="video_player_sound_wrap flex w-full items-center gap-2"
-                onClick={toggleMute}
-                role="button"
-                aria-label={isMuted ? "Unmute video" : "Mute video"}
-              >
-                <div className="video_player_sound_mute flex h-6 w-6 items-center justify-center">
-                  <img src="/player/sound-on.svg" alt="" className="video_player_vol_up_svg h-5 w-5" />
-                  <img src="/player/sound-off.svg" alt="" className="video_player_vol_mute_svg h-5 w-5" />
-                </div>
-                <div className="video_player_sound_stat_wrap">
-                  <p className="video_player_sound_stat_text">On</p>
-                </div>
-              </div>
-
-              <button type="button" onClick={toggleFullscreen} className="video_player_screen_text">
-                {isFullscreen ? "Normal" : "Full Screen"}
-              </button>
             </div>
           </div>
         </div>

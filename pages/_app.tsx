@@ -1,5 +1,6 @@
 import type { AppProps } from "next/app";
 import { IBM_Plex_Sans, Geist } from "next/font/google";
+import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +9,7 @@ import "@/components/PageTransition/page-transition.css";
 import SmoothScroll from "../components/SmoothScroll";
 import { AnimatePresence } from "framer-motion";
 import PageTransition from "@/components/PageTransition/PageTransition";
+import SiteHeader from "@/components/SiteHeader";
 import LandingIntro from "@/components/LandingIntro";
 import { useCallback, useEffect, useState } from "react";
 import ConsentScripts from "@/components/Consent/ConsentScripts";
@@ -23,6 +25,52 @@ const ibmPlexSans = IBM_Plex_Sans({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const suisseWorks = localFont({
+  variable: "--font-suisse-works",
+  src: [
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-Book.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-BookItalic.otf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-RegularItalic.otf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-Medium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-MediumItalic.otf",
+      weight: "500",
+      style: "italic",
+    },
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../public/font/suisse-font-family/SuisseWorksTrial-BoldItalic.otf",
+      weight: "700",
+      style: "italic",
+    },
+  ],
+});
+
 
 
 export default function App({ Component, pageProps, router }: AppProps) {
@@ -36,9 +84,9 @@ export default function App({ Component, pageProps, router }: AppProps) {
   useScrollTacking({enabled:enableScrollTracking, getEngagementTimeMs:engagement.getEngagementTimeMs });
 
   useEffect(() => {
-    document.body.classList.add(geist.variable, ibmPlexSans.variable);
+    document.body.classList.add(geist.variable, ibmPlexSans.variable, suisseWorks.variable);
     return () => {
-      document.body.classList.remove(geist.variable, ibmPlexSans.variable);
+      document.body.classList.remove(geist.variable, ibmPlexSans.variable, suisseWorks.variable);
     };
   }, []);
 
@@ -67,13 +115,14 @@ export default function App({ Component, pageProps, router }: AppProps) {
               onComplete={handleIntroComplete}
             />
           )}
+          <SiteHeader introDone={pageReady} />
           <AnimatePresence mode="wait"
           onExitComplete={() => {                                                                                                                                                                                                           
               window.scrollTo({ top: 0, left: 0, behavior: "auto" });                                                                                                                                                                         
     }}
     >
             <PageTransition key={router.asPath} introDone={pageReady}>
-              <Component {...pageProps} />
+              <Component {...pageProps} introDone={!introVisible} />
             </PageTransition>
           </AnimatePresence>
         </main>

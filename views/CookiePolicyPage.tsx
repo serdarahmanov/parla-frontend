@@ -155,9 +155,9 @@ const CookiePolicyPage = () => {
       ref={wrapperRef}
       className=""
     >
-      <div className=" relative grid grid-cols-12 pt-25 px-6 gap-1 pb-[30vh]
-      md:relative md:grid md:grid-cols-12 md:pt-25 md:px-6 md:pb-[30vh] md:gap-0
-      lg:relative lg:grid lg:grid-cols-12 lg:pt-25 lg:px-6 lg:pb-[30vh] lg:gap-0">
+      <div className="header-clearance-top relative grid grid-cols-12 px-6 gap-1 pb-[30vh]
+      md:relative md:grid md:grid-cols-12 md:px-6 md:pb-[30vh] md:gap-0
+      lg:relative lg:grid lg:grid-cols-12 lg:px-6 lg:pb-[30vh] lg:gap-0">
 
         {/* Left Bar */}
         <div

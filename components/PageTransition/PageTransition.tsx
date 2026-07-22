@@ -1,8 +1,6 @@
-import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useLayoutEffect, useState } from "react";
 import { motion, Variants } from "framer-motion";
 import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import NavBar from "@/components/NavBar";
 import { usePathname } from "next/navigation";
 
 type Props = {
@@ -96,8 +94,6 @@ const PageTransition = ({ children, introDone }: Props) => {
 
   return (
     <div className="inner">
-      <Header />
-          <NavBar />
       <motion.div {...anim(slide)} className="slide"></motion.div>
       <motion.div {...anim(perspective)} className="page">
         <motion.div {...anim(opacity)}>

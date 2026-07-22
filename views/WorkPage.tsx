@@ -135,7 +135,7 @@ const Page = () => {
       <div className="relative grid grid-cols-12 gap-2 md:relative md:grid md:grid-cols-12 lg:relative lg:grid lg:grid-cols-12">
     
         {/* Left column */}
-        <div className="relative col-start-1 col-span-9 flex flex-col gap-1 pt-15 pb-100 md:relative md:col-start-2 md:col-span-7 md:flex md:flex-col md:gap-2 md:pt-25 md:pb-15 lg:relative lg:col-start-2 lg:col-span-8 lg:flex lg:flex-col lg:gap-2 lg:pt-25 lg:pb-15">
+        <div className="header-clearance-top relative col-start-1 col-span-9 flex flex-col gap-1 pb-100 md:relative md:col-start-2 md:col-span-7 md:flex md:flex-col md:gap-2 md:pb-15 lg:relative lg:col-start-2 lg:col-span-8 lg:flex lg:flex-col lg:gap-2 lg:pb-15">
         <h1 className="text-4xl font-medium pb-[3rem] font-sans">Camera is vertical</h1>
           {works.map((work, index) => (
             <Link

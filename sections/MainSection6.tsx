@@ -106,7 +106,7 @@ const MainSection6 = ({
     <section
       ref={wrapperRef}
       id={sectionId}
-      className={`sticky top-0 left-0 h-screen overflow-hidden flex flex-col justify-between items-center bg-[#fefefe] ${zIndexClassName} shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]`}
+      className={`relative   h-screen overflow-hidden flex flex-col justify-between items-center bg-[#fefefe] ${zIndexClassName} shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]`}
     >
       <div className="relative top-0 left-0 z-10 flex  w-full gap-5  text-ce-text flex-col pt-[20%] overflow-hidden items-center">
         <h1

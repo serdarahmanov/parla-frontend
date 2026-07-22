@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import ParagraphSticky from "@/animations/ParagraphSticky";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import MainSection6 from "../sections/MainSection6";
 import MainSection3 from "../sections/MainSection3";
@@ -12,16 +12,23 @@ import PortfolioVideoPlayer from "@/components/VideoPlayer";
 import MainSection7 from "@/sections/MainSection7";
 import MainSection8 from "@/sections/MainSection8";
 
-export default function Home() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const mainSection2VideoLinks = ["/video/TasVegias.mp4"];
+gsap.registerPlugin(ScrollTrigger);
+
+type HomeProps = {
+  introDone?: boolean;
+};
+
+export default function Home({ introDone }: HomeProps) {
+  const mainSection2VideoLinks = ["D:/portfolio/MusicVideo/BASHYMYAYLADY.mp4"];
   const mainSection2MaskText = "WE BUILD BRANDS";
 
   return (
-    <div className="relative bg-[#fefefe]">
- 
-
-      <MainSection2 videoLinks={["/video/TasVegias.mp4"]} maskText={"WE MAKE IT"} />
+    <div className="relative bg-[#FAFAF9] text-[#050506]">
+      <MainSection2
+        videoLinks={["/video/TasVegias.mp4"]}
+        maskText={"WE MAKE IT"}
+        introDone={introDone}
+      />
 
       <MainSection6
         videoLinks={mainSection2VideoLinks}
@@ -30,47 +37,8 @@ export default function Home() {
         zIndexClassName="z-21"
       ></MainSection6>
       <MainSection8></MainSection8>
-
-      <ParagraphSticky
-        index={1}
-        activeIndex={activeIndex}
-        onActiveChange={setActiveIndex}
-        text={"SERVICES"}
-        triggerSelector="#section-3"
-        startTop="110vh"
-        topStay="2vh"
-        textColor="text-black"
-        bgColor="bg-black"
-      />
       <MainSection7></MainSection7>
-
-      <ParagraphSticky
-        index={2}
-        activeIndex={activeIndex}
-        onActiveChange={setActiveIndex}
-        text={"PROCESS"}
-        secondText="Our Process "
-        triggerSelector="#section-4"
-        textColor="text-black"
-        bgColor="bg-black"
-        startTop="150vh"
-        topStay="3.5vh"
-      />
       <MainSection5></MainSection5>
-
-      <ParagraphSticky
-        index={3}
-        activeIndex={activeIndex}
-        onActiveChange={setActiveIndex}
-        text={"CLIENTS"}
-        secondText="Our Process "
-        triggerSelector="#section-5"
-        textColor="text-black"
-        bgColor="bg-black"
-        startTop="200vh"
-        topStay="5vh"
-      />
-    
     </div>
   );
 }
