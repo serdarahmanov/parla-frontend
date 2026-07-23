@@ -46,11 +46,12 @@ function NavBar({
     setLanguage((current) => (current === "tk" ? "ru" : "tk"));
 
   useLayoutEffect(() => {
-    if (!rootRef.current) return;
+    const node = rootRef.current;
+    if (!node) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        rootRef.current.children,
+        node.children,
         {
           x: 20,
           opacity: 0,

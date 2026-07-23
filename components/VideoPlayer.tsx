@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { usePathname } from "next/navigation";
+import { EASE_BRAND } from "@/lib/gsap/customEase";
 
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -104,13 +105,13 @@ export default function PortfolioVideoPlayer({
     clipPath: "inset(0% 0% 0% 0%)",
     opacity: 1,
     duration: 0.8,
-    ease: [0.76, 0, 0.24, 1],
+    ease: EASE_BRAND,
   }
 ).from(nameAndClientRef.current,{
       opacity:0,
       y: 50,
       duration: 0.4,
-      ease:[0.76, 0, 0.24, 1],
+      ease: EASE_BRAND,
       delay: 0.3,
       clearProps: "opacity"
     })

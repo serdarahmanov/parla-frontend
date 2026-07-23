@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import ScrollCounter from "../components/ScrollCounter";
 import { works } from "@/components/data/works";
 import useScreenFlag from "../lib/utils/useScreenFlag";
+import { EASE_BRAND } from "@/lib/gsap/customEase";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const Page = () => {
@@ -73,7 +74,7 @@ const Page = () => {
           {
             clipPath: "inset(0% 0% 0% 0%)",
             duration: 0.7,
-            ease: [0.76, 0, 0.24, 1],
+            ease: EASE_BRAND,
             scale: 1.25,
             delay: 0.2,
           },

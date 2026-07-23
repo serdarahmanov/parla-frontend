@@ -9,11 +9,12 @@ function Footer() {
   const pathname = usePathname();
 
   useLayoutEffect(() => {
-    if (!footerRef.current) return;
+    const node = footerRef.current;
+    if (!node) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        footerRef.current.children,
+        node.children,
         {
           y: 20,
           opacity: 0,

@@ -1,1 +1,1 @@
-export const GTM_ID = "GTM-MM9N6562";
+export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID!;

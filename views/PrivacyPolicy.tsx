@@ -96,7 +96,7 @@ const PrivacyPolicy = () => {
           {privacyPolicy.sections.map((section, index) => (
             <div key={index} className=" flex flex-col gap-2 md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-2">
               <h2
-                ref={(el) => (policiesRef.current[index] = el)}
+                ref={(el) => { policiesRef.current[index] = el; }}
                 className={`text-xs font-black    ${activePolicy == index ? "opacity-100" : "opacity-30"} `}
               >
                 {" "}

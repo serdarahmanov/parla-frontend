@@ -38,7 +38,7 @@ const PageTransition = ({ children, introDone }: Props) => {
     };
   };
 
-  const opacity = {
+  const opacity: Variants = {
     initial: {
       opacity: 0,
     },
@@ -50,7 +50,7 @@ const PageTransition = ({ children, introDone }: Props) => {
     },
   };
 
-  const slide = {
+  const slide: Variants = {
     initial: {
       top: "100vh",
     },
@@ -67,7 +67,7 @@ const PageTransition = ({ children, introDone }: Props) => {
     },
   };
 
-  const perspective = {
+  const perspective: Variants = {
     initial: {
       // y: 0,
       // scale: 1,

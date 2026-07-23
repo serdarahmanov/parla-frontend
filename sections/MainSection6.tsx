@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import SplitText from "gsap/SplitText";
+import { EASE_BRAND } from "@/lib/gsap/customEase";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -45,7 +46,7 @@ const MainSection6 = ({
           scale: 1,
           rotate: 0,
           duration: 0.4,
-          ease: [0.76, 0, 0.24, 1],
+          ease: EASE_BRAND,
           scrollTrigger: {
               trigger: parllaxTextRef.current,
               start: "top bottom+=4%",
@@ -68,7 +69,7 @@ const MainSection6 = ({
             yPercent: 0,
             duration: 0.1,
             stagger: 0.03,
-            ease: [0.76, 0, 0.24, 1],
+            ease: EASE_BRAND,
             scrollTrigger: {
               trigger: parllaxTextRef.current,
               start: "top 80%",
@@ -82,7 +83,7 @@ const MainSection6 = ({
             yPercent: 0,
             duration: 0.1,
             stagger: 0.02,
-            ease: [0.76, 0, 0.24, 1],
+            ease: EASE_BRAND,
             scrollTrigger: {
               trigger: parllaxTextRef.current,
               start: "top 80%",

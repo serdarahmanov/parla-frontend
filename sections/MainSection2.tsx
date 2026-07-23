@@ -9,6 +9,7 @@ import useScreenFlag from "@/lib/utils/useScreenFlag";
 import { works } from "@/components/data/works";
 import SplitText from "gsap/SplitText";
 import LiveClock from "@/components/LiveClock";
+import { EASE_BRAND } from "@/lib/gsap/customEase";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -87,7 +88,7 @@ const MainSection2 = ({
           duration: 0.6,
           stagger: 0.08,
           // delay: 1,
-          ease: [0.76, 0, 0.24, 1],
+          ease: EASE_BRAND,
           onComplete: () => {
             gsap.fromTo(
               metaEls,
@@ -121,7 +122,7 @@ const MainSection2 = ({
           xPercent: 100,
           duration: 0.6,
           stagger: 0.08,
-          ease: [0.76, 0, 0.24, 1],
+          ease: EASE_BRAND,
           onComplete: () => {
             gsap.fromTo(
               emailEls,
@@ -157,7 +158,7 @@ const MainSection2 = ({
             duration: 0.4,
             stagger: 0.03,
             // delay: 0.05,
-            ease: [0.76, 0, 0.24, 1],
+            ease: EASE_BRAND,
           });
 
           // scroll exit

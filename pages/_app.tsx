@@ -1,5 +1,4 @@
 import type { AppProps } from "next/app";
-import { IBM_Plex_Sans, Geist } from "next/font/google";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
@@ -17,12 +16,11 @@ import { useEngagementTracking } from "@/components/analytics/useEngagementTrack
 import { useScrollTacking } from "@/components/analytics/useScrollTracking";
 import { usePageViewTracking } from "@/components/analytics/usePageViewTracking";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
-
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-ibm",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+const geist = localFont({
+  src: "../public/font/geist/geist-latin.woff2",
+  weight: "100 900",
+  style: "normal",
+  variable: "--font-sans",
 });
 
 const suisseWorks = localFont({
@@ -84,9 +82,9 @@ export default function App({ Component, pageProps, router }: AppProps) {
   useScrollTacking({enabled:enableScrollTracking, getEngagementTimeMs:engagement.getEngagementTimeMs });
 
   useEffect(() => {
-    document.body.classList.add(geist.variable, ibmPlexSans.variable, suisseWorks.variable);
+    document.body.classList.add(geist.variable, suisseWorks.variable);
     return () => {
-      document.body.classList.remove(geist.variable, ibmPlexSans.variable, suisseWorks.variable);
+      document.body.classList.remove(geist.variable, suisseWorks.variable);
     };
   }, []);
 
@@ -104,7 +102,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
     <div className={cn("m-0 p-0", "font-sans", "bg-[#fefefe]", geist.variable)}>
       <ConsentScripts />
       <div
-        className={`${ibmPlexSans.className} relative p-0 m-0 min-h-screen bg-[#fefefe] text-black`}
+        className="relative p-0 m-0 min-h-screen bg-[#fefefe] text-black"
       >
         <SmoothScroll />
         <Toaster richColors position="top-right" />

@@ -26,7 +26,7 @@ const MaskTextAnimation = ({ text, className }: Props) => {
           await document.fonts.ready;
         }
 
-        const split = new SplitText(topRef.current, {
+        split = new SplitText(topRef.current, {
           type: "lines, words, chars",
         });
         gsap.from(split.chars, {

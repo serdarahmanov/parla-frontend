@@ -5,6 +5,7 @@ import React, { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { EASE_BRAND } from "@/lib/gsap/customEase";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -36,7 +37,7 @@ const MainSection5 = () => {
         scale: 1.2,
         y: 50,
         opacity: 0,
-        ease: [0.76, 0, 0.24, 1],
+        ease: EASE_BRAND,
         stagger: 0.03,
         duration: 0.2,
         scrollTrigger: {
