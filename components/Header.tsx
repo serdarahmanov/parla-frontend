@@ -12,7 +12,11 @@ import { GSP_NO_RETURNED_VALUE } from "next/dist/lib/constants";
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
 
-function Header() {
+type HeaderProps = {
+  activePillLayoutId?: string;
+};
+
+function Header({ activePillLayoutId = "nav-active-pill" }: HeaderProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const topRef = useRef<HTMLImageElement | null>(null);
   const bottomRef = useRef<HTMLImageElement | null>(null);
@@ -93,15 +97,15 @@ function Header() {
     <Link
       scroll={false}
       href="/"
-      className="cta relative flex h-[var(--cta-h)] items-center leading-none shrink-0 rounded-[var(--r-cta)] px-4
+      className="cta nav-active-link relative flex h-[var(--cta-h)] items-center leading-none shrink-0 rounded-[var(--r-cta)] px-4
         motion-reduce:transition-none
         focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2"
       onClick={handleClick}
     >
       {isHome && (
         <motion.div
-          layoutId="nav-active-pill"
-          className="cta absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)"
+          layoutId={activePillLayoutId}
+          className="cta nav-active-pill absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)"
           transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
         />
       )}

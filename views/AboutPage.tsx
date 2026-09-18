@@ -1,5 +1,6 @@
 
 import Paragraph from "../animations/Paragraph";
+import { motion } from "framer-motion";
 
 import HoverSwapLink from "@/animations/HoverSwapLink";
 import LiveClock from "@/components/LiveClock";
@@ -14,7 +15,7 @@ const images = [
 function About() {
   return (
     <div
-      className="header-clearance-top relative pb-10 px-6  w-full h-screen
+      className="about-page header-clearance-top relative pb-10 px-6  w-full h-screen
      flex flex-col gap-y-10
       md:relative md:pb-10 md:px-6 md:w-full md:min-h-screen md:flex md:font-sans md:flex-col md:gap-y-5
       lg:relative lg:pb-10 lg:px-6 lg:grid lg:w-full   lg:font-sans
@@ -29,7 +30,12 @@ function About() {
             isLines
           />
         </div>
-        <div className="col-start-3 col-span-1   md:col-start-8 md:col-span-3 lg:col-start-10 lg:col-span-3">
+        <motion.div
+          initial={{ clipPath: "inset(50% 50% 50% 50%)" }}
+          animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+          transition={{ duration: 0.7, delay: 0.3, ease: [0.32, 0.72, 0, 1] }}
+          className="col-start-3 col-span-1 md:col-start-8 md:col-span-3 lg:col-start-10 lg:col-span-3"
+        >
           {images.map((item) => (
             <img
               src={item.href}
@@ -38,7 +44,7 @@ function About() {
               className="w-full object-contain md:w-full md:object-contain lg:w-full lg:object-contain"
             />
           ))}
-        </div>
+        </motion.div>
       </div>
 
       <div className="flex-col flex gap-10 font-sans md:text-[0.7rem] md:leading-[0.9rem] md:flex md:flex-wrap md:flex-row md:gap-5 lg:col-span-12 lg:row-span-1 lg:grid lg:grid-cols-12 lg:gap-x-3  lg:text-xs lg:font-normal lg:font-sans ">
@@ -47,13 +53,18 @@ function About() {
         
         <div className="font-normal text-[0.8rem]  md:w-[40vw]  md:text-[0.7rem] md:leading-[0.9rem] lg:col-start-1 lg:col-span-3 lg:w-full lg:text-xs">
           <div className=" flex flex-col gap-2 md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-3 ">
-            <h1 className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50">
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 0.5, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.45, ease: [0.32, 0.72, 0, 1] }}
+              className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
+            >
               What We Do
-            </h1>
+            </motion.h1>
             <Paragraph
               delay={0.6}
               stagger={0.05}
-              text="Brand strategy, content strategy, creative direction, pre-production planning, production management, storytelling, social media content systems, campaign execution, and ongoing marketing support for businesses that want clarity, consistency, and real results."
+              text="Marketing and creative direction, production management, music distribution, web and mobile applications, eCommerce, SAAS platforms, AI-generated content, and interior/exterior architecture design for businesses that want clarity, consistency, and real results."
               isLines
             />
           </div>
@@ -62,8 +73,19 @@ function About() {
 
         <div className="font-normal text-[0.8rem] font-sans md:w-[40vw] md:text-[0.7rem] md:leading-[0.9rem] lg:col-start-7 lg:col-span-3  lg:text-xs lg:font-normal lg:font-sans ">
           <div className="flex flex-col gap-2 md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-3">
-            <h1 className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50">Contact</h1>
-            <div>
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 0.5, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.65, ease: [0.32, 0.72, 0, 1] }}
+              className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
+            >
+              Contact
+            </motion.h1>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.75, ease: [0.32, 0.72, 0, 1] }}
+            >
               <HoverSwapLink
                 href={"mailto:info@parla.com"}
                 text={"info@parla.com"}
@@ -85,7 +107,7 @@ function About() {
                 text={"Telegram"}
                 data-analytics="social-telegram"
               />
-            </div>
+            </motion.div>
           </div>
         </div>
 
@@ -95,7 +117,14 @@ function About() {
           
           
           <div className="flex flex-col gap-2   md:w-[40vw] md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-3 lg:w-full">
-            <h1 className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50">Office</h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 0.5, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.85, ease: [0.32, 0.72, 0, 1] }}
+              className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
+            >
+              Office
+            </motion.h1>
             <div>
            
               <Paragraph
@@ -108,9 +137,14 @@ function About() {
             </div>
           </div>
           <div className=" flex flex-col gap-2 md:w-[40vw]  md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-3  lg:w-full">
-            <h1 className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50">
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 0.5, y: 0 }}
+              transition={{ duration: 0.5, delay: 1, ease: [0.32, 0.72, 0, 1] }}
+              className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
+            >
               Working Hours
-            </h1>
+            </motion.h1>
             <div>
               <Paragraph
                 delay={0.8}
@@ -128,7 +162,13 @@ function About() {
               />
              
 
-              <LiveClock className={" font-bold text-[0.7rem] font-sans opacity-50 md:text-[0.6rem] "} />
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 0.5, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.15, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <LiveClock className={" font-bold text-[0.7rem] font-sans opacity-50 md:text-[0.6rem] "} />
+              </motion.div>
             </div>
           </div>
         </div>

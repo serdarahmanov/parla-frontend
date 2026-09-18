@@ -3,6 +3,7 @@ import { useGSAP } from '@gsap/react'
 import React, { useRef } from 'react'
 import SplitText from 'gsap/SplitText'
 import gsap from 'gsap'
+import { EASE_BRAND } from '@/lib/gsap/customEase'
 
 
 gsap.registerPlugin(useGSAP);
@@ -10,6 +11,8 @@ gsap.registerPlugin(SplitText);
 
 type Props ={
     text: string,
+    as?: "p" | "span",
+    className?: string,
     isLines?: boolean,
     delay?: number
     stagger?:number
@@ -20,9 +23,9 @@ type Props ={
 
 
 
-const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1, revealImmediately = false}: Props) => {
+const Paragraph = ( {text, as: TextElement = "p", className, isLines=false, delay=1, stagger=0.05, duration=1, revealImmediately = false}: Props) => {
 
-    const paragraphRef = useRef<HTMLParagraphElement | null>(null);
+    const paragraphRef = useRef<HTMLParagraphElement | HTMLSpanElement | null>(null);
     const outerRef =useRef<HTMLDivElement | null> (null);
 
   useGSAP(() => {
@@ -50,7 +53,7 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1, rev
           xPercent: 5,
           rotation: -0.5,
           duration,
-          ease: "expo.out",
+          ease: EASE_BRAND,
           stagger,
           delay,
         };
@@ -70,7 +73,7 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1, rev
           autoAlpha: 0,
           yPercent: 25,
           duration,
-          ease: "expo.out",
+          ease: EASE_BRAND,
           stagger,
           delay,
         };
@@ -99,7 +102,14 @@ const Paragraph = ( {text, isLines=false, delay=1, stagger=0.05, duration=1, rev
 
     return (
 
-      <p  ref={paragraphRef}>{text}</p>
+      <TextElement
+        ref={(node) => {
+          paragraphRef.current = node;
+        }}
+        className={className}
+      >
+        {text}
+      </TextElement>
 
     
   )

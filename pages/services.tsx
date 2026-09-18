@@ -8,7 +8,7 @@ const ServicesPage: NextPage = () => (
       <title>Services | Parla</title>
       <meta
         name="description"
-        content="Brand strategy, content strategy, creative direction, production, and ongoing marketing support from Parla."
+        content="Marketing and creative direction, production management, music distribution, web and mobile applications, eCommerce, SAAS platforms, AI-generated content, and interior/exterior architecture design from Parla."
       />
     </Head>
     <Services />

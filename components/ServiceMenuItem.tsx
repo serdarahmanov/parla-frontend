@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import type { ServiceItem } from "@/components/data/services";
 
@@ -17,31 +18,42 @@ export default function ServiceMenuItem({
   index,
   onHoverStart,
 }: ServiceMenuItemProps) {
+  const { asPath } = useRouter();
+  const serviceHref = `/service/${service.slug}`;
+  const currentPath = asPath.split("?")[0];
+  const isActive =
+    currentPath === serviceHref || currentPath.startsWith(`${serviceHref}/`);
+
   return (
-    <div
-      className="service-item cta rounded-[var(--r-cta)] bg-(--ink)/10"
-      onMouseEnter={onHoverStart}
+    <Link
+      href={serviceHref}
+      className={`service-link block h-full${isActive ? " is-active" : ""}`}
     >
-      <motion.div
-        initial={false}
-        animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-        transition={{
-          duration: 0.22,
-          ease: [0.32, 0.72, 0, 1],
-          delay: open ? index * 0.04 : 0,
-        }}
-        className="h-full"
+      <div
+        className={`service-item cta h-full rounded-[var(--r-cta)] bg-(--ink)/10${
+          isActive ? " is-active" : ""
+        }`}
+        onMouseEnter={onHoverStart}
       >
-        <Link
-          href="/services"
-          scroll={false}
-          className="block px-4 pt-3 pb-3
-            text-sm md:text-base lg:text-base font-sans font-extrabold tracking-tight
-            text-(--ink)"
+        <motion.div
+          initial={false}
+          animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          transition={{
+            duration: 0.22,
+            ease: [0.32, 0.72, 0, 1],
+            delay: open ? index * 0.04 : 0,
+          }}
+          className="h-full"
         >
-          {service.title}
-        </Link>
-      </motion.div>
-    </div>
+          <span
+            className="block px-4 pt-3 pb-3
+              text-sm md:text-base lg:text-base font-sans font-medium tracking-tight
+              text-inherit"
+          >
+            {service.title}
+          </span>
+        </motion.div>
+      </div>
+    </Link>
   );
 }

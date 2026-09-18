@@ -24,7 +24,7 @@ const clients = [
   { id: "12", brandName: "Client logo", logo: "/clients/6043859631290912008-Photoroom.png" },
 ];
 
-const MainSection5 = () => {
+const ClientsSection = () => {
   const clientsRef = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement | null>(null);
 
@@ -56,9 +56,9 @@ const MainSection5 = () => {
     <section
       ref={sectionRef}
       id="section-5"
-      className="relative z-39 h-screen w-full bg-[#fefefe] flex flex-col  items-center  pt-[20vh]  gap-y-20
-      md:relative md:z-39 md:h-screen md:w-full md:bg-[#fefefe] md:flex md:flex-col md:items-center md:pt-auto md:gap-y-20  
-      lg:relative lg:z-39 lg:h-screen lg:w-full lg:bg-[#fefefe] lg:flex lg:flex-col lg:items-center lg:pt-25 lg:gap-y-20 "
+      className="relative z-39 h-screen w-full flex flex-col items-center pt-[20vh] gap-y-20
+      md:relative md:z-39 md:h-screen md:w-full md:flex md:flex-col md:items-center md:pt-auto md:gap-y-20
+      lg:relative lg:z-39 lg:h-screen lg:w-full lg:flex lg:flex-col lg:items-center lg:pt-25 lg:gap-y-20"
     >
       {/* Brands We've Worked With */}
       <div
@@ -98,9 +98,9 @@ const MainSection5 = () => {
 
       {/* Logo */}
       <div
-        className=" relative w-full  bg-[#fefefe] flex flex-col items-center
-      md:relative md:w-full md:bg-[#fefefe] md:flex md:flex-col md:items-center
-      lg:relative lg:w-full lg:bg-[#fefefe] lg:flex lg:flex-col lg:items-center "
+        className="relative w-full flex flex-col items-center
+      md:relative md:w-full md:flex md:flex-col md:items-center
+      lg:relative lg:w-full lg:flex lg:flex-col lg:items-center"
       >
         <div
           className=" gap-[0.05rem] grid grid-cols-2 grid-rows-2  w-4 
@@ -133,4 +133,4 @@ const MainSection5 = () => {
   );
 };
 
-export default MainSection5;
+export default ClientsSection;

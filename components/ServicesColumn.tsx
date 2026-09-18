@@ -67,7 +67,7 @@ export default function ServicesColumn({
 
   return (
     <div
-      className="services-column grid flex-1 gap-[var(--pad)]"
+      className="services-column grid flex-1 gap-1"
       style={{ height, gridTemplateRows }}
       onMouseLeave={handleColumnLeave}
     >

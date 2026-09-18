@@ -42,7 +42,7 @@ const cardsData = [
   },
 ];
 
-const MainSection7 = () => {
+const ProcessSection = () => {
   const containerRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const textWrapRef = useRef<HTMLDivElement | null>(null);
@@ -367,18 +367,18 @@ const MainSection7 = () => {
   return (
     <section ref={containerRef}
     id="section-4"
-    className="wrapper w-full h-screen overflow-hidden z-40 bg-[#fefefe] border-b-1 border-[#eeeeee]">
+    className="wrapper w-full h-screen overflow-hidden z-40">
       {/* OUTER TRACK SECTION TO SHOW ONLY THIS AREA */}
-      <div className=" tracker h-[80%]  md:h-[90%]  lg:h-[85%] pt-10 ">
+      <div className=" tracker h-[80%]  md:h-[90%]  lg:h-[90%] pt-10 ">
         {/* TRACK FOR HORIZONTAL SCROLLING */}
         <div
           ref={trackRef}
-          className="flex items-center  gap-1 md:gap-2 w-max  h-full p-10   overflow-hidden"
+          className="flex items-center gap-1 md:gap-2 w-max h-full overflow-hidden"
         >
           {cardsData.map((card, index) => (
             <div
               key={card.id}
-              className={`w-[70vw]  md:w-[40vw] lg:w-[30vw]   h-fit  flex-none overflow-hidden   `}
+              className={`w-[70vw] h-fit flex-none overflow-hidden`}
 
               //   "w-[70vw] h-full flex-none bg-fuchsia-400"
             >
@@ -400,7 +400,7 @@ const MainSection7 = () => {
       >
         <h2
           ref={titleRef}
-          className=" self-end tracking-tight font-medium text-[1.3rem]  leading-[1.3rem]  md:text-[1.7rem] md:leading-[1.7rem]   md:text-end  md:self-auto   lg:text-end font-sans    md:mt-0 lg:mt-0"
+          className=" self-center tracking-tight font-medium text-[1.3rem]  leading-[1.3rem]  md:text-[1.7rem] md:leading-[1.7rem]   md:text-end  md:self-auto   lg:text-end font-sans    md:mt-0 lg:mt-0"
         >
           {displayedCard.caption}
         </h2>
@@ -412,4 +412,4 @@ const MainSection7 = () => {
   );
 };
 
-export default MainSection7;
+export default ProcessSection;

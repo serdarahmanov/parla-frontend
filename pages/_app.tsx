@@ -10,7 +10,7 @@ import { AnimatePresence } from "framer-motion";
 import PageTransition from "@/components/PageTransition/PageTransition";
 import SiteHeader from "@/components/SiteHeader";
 import LandingIntro from "@/components/LandingIntro";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ConsentScripts from "@/components/Consent/ConsentScripts";
 import { useEngagementTracking } from "@/components/analytics/useEngagementTracking";
 import { useScrollTacking } from "@/components/analytics/useScrollTracking";
@@ -74,6 +74,8 @@ const suisseWorks = localFont({
 export default function App({ Component, pageProps, router }: AppProps) {
   const [pageReady, setPageReady] = useState(false);
   const [introVisible, setIntroVisible] = useState(true);
+  const [glassTransitionVisible, setGlassTransitionVisible] = useState(false);
+  const navigationEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const enableScrollTracking = router.pathname ==="/"|| router.pathname==="/work";
   const engagement = useEngagementTracking();
   usePageViewTracking(router);
@@ -88,6 +90,42 @@ export default function App({ Component, pageProps, router }: AppProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      if (navigationEndTimeoutRef.current) {
+        clearTimeout(navigationEndTimeoutRef.current);
+        navigationEndTimeoutRef.current = null;
+      }
+      document.body.classList.remove("footer-active");
+      document.body.classList.add("is-navigating");
+      setGlassTransitionVisible(true);
+    };
+
+    const handleRouteChangeEnd = () => {
+      navigationEndTimeoutRef.current = setTimeout(() => {
+        document.body.classList.remove("is-navigating");
+        setGlassTransitionVisible(false);
+        navigationEndTimeoutRef.current = null;
+      }, 450);
+    };
+
+    router.events.on("routeChangeStart", handleRouteChangeStart);
+    router.events.on("routeChangeComplete", handleRouteChangeEnd);
+    router.events.on("routeChangeError", handleRouteChangeEnd);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChangeStart);
+      router.events.off("routeChangeComplete", handleRouteChangeEnd);
+      router.events.off("routeChangeError", handleRouteChangeEnd);
+      if (navigationEndTimeoutRef.current) {
+        clearTimeout(navigationEndTimeoutRef.current);
+        navigationEndTimeoutRef.current = null;
+      }
+      document.body.classList.remove("is-navigating");
+      setGlassTransitionVisible(false);
+    };
+  }, [router.events]);
+
   
 
   const handleRevealStart = useCallback(() => {
@@ -99,14 +137,14 @@ export default function App({ Component, pageProps, router }: AppProps) {
   }, []);
 
   return (
-    <div className={cn("m-0 p-0", "font-sans", "bg-[#fefefe]", geist.variable)}>
+    <div className={cn("site-shell m-0 p-0", "font-sans", geist.variable)}>
       <ConsentScripts />
       <div
-        className="relative p-0 m-0 min-h-screen bg-[#fefefe] text-black"
+        className="site-shell-inner relative p-0 m-0 min-h-screen text-black"
       >
         <SmoothScroll />
         <Toaster richColors position="top-right" />
-        <main className="p-0 m-0 min-h-full w-full relative">
+        <main className="site-main p-0 m-0 min-h-full w-full relative">
           {introVisible && (
             <LandingIntro
               onRevealStart={handleRevealStart}
@@ -114,6 +152,10 @@ export default function App({ Component, pageProps, router }: AppProps) {
             />
           )}
           <SiteHeader introDone={pageReady} />
+          <div
+            aria-hidden="true"
+            className={`route-glass-transition ${glassTransitionVisible ? "is-visible" : ""}`}
+          />
           <AnimatePresence mode="wait"
           onExitComplete={() => {                                                                                                                                                                                                           
               window.scrollTo({ top: 0, left: 0, behavior: "auto" });                                                                                                                                                                         

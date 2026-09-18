@@ -45,7 +45,9 @@ const services = [
   },
 ];
 
-const MainSection3 = () => {
+const initialServiceColors = ["#f9f9f8", "#909090", "#787878", "#606060"];
+
+const ServicesSection = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -62,18 +64,21 @@ const MainSection3 = () => {
   );
 
   cards.forEach((card, index) => {
-    if (index === 0) return;
+   if (index === 0) {
+     gsap.set(card, { backgroundColor: initialServiceColors[index] });
+     return;
+   }
 
    gsap.set(card, {
     y: -100,
     rotate: -5,
-    backgroundColor: "#c2c2c2",
+    backgroundColor: initialServiceColors[index],
   });
 
   gsap.to(card, {
     y: 0,
     rotate: 0,
-    backgroundColor: "#fefefe",
+    backgroundColor: "#f9f9f8",
     ease: "none",
     scrollTrigger: {
       trigger: card,
@@ -94,10 +99,10 @@ const MainSection3 = () => {
     <section
       id="section-3"
       ref={sectionRef}
-      className="relative z-30 h-screen flex flex-col bg-[#fefefe]   overflow-hidden shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]"
+      className="relative z-30 h-screen flex flex-col overflow-hidden shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]"
     >
 
-      <div className="relative bg-[#fefefe] w-full pt-25"></div>
+      <div className="relative w-full pt-25"></div>
       <div className="relative flex flex-col h-full w-full  pb-10  font-sans overflow-hidden">
         {services.map((service, index) => (
             
@@ -107,7 +112,7 @@ const MainSection3 = () => {
               cardRefs.current[index]= el;
             }}
             style={{ zIndex: 50 - index , transformOrigin: "left" }}
-            className={`relative h-[25%] w-full  border-t-1 border-b-1 border-[#eeeeee] bg-[#fefefe] grid  grid-cols-2  lg:grid-cols-6 overflow-hidden gap-1 lg:gap-3 pl-25 md:pl-30 lg:pl-30 pr-6 lg:pr-10 `}
+            className={`relative h-[25%] w-full border-t-1 border-b-1 border-[#eeeeee] grid grid-cols-2 lg:grid-cols-6 overflow-hidden gap-1 lg:gap-3 pl-25 md:pl-30 lg:pl-30 pr-6 lg:pr-10`}
           >
 
 {/* " h-[25%] w-full  border-t-1 border-[#eeeeee] grid grid-cols-6 overflow-hidden gap-3" */}
@@ -186,4 +191,4 @@ const MainSection3 = () => {
   );
 };
 
-export default MainSection3;
+export default ServicesSection;

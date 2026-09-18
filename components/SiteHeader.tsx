@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import { Menu } from "lucide-react";
 import Header from "@/components/Header";
 import NavBar from "@/components/NavBar";
 import ServicesColumn from "@/components/ServicesColumn";
 import { services } from "@/components/data/services";
+import { ServicesIcon } from "@/icons/ServicesIcon";
+import { WorkIcon } from "@/icons/WorkIcon";
 
 type Props = {
   introDone: boolean;
@@ -27,17 +31,29 @@ const SERVICES_COLUMN_HEIGHT = "calc(24rem + (var(--pad) * 3))";
 const SERVICES_PANEL_HEIGHT = "calc(25.5rem + (var(--pad) * 3))";
 
 const SiteHeader = ({ introDone }: Props) => {
-  const { pathname } = useRouter();
+  const { pathname, events } = useRouter();
   const [isLifted, setIsLifted] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuWidthExpanded, setMobileMenuWidthExpanded] = useState(false);
+  const [mobileLanguage, setMobileLanguage] = useState<"tk" | "ru">("tk");
+  const mobileMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mobileMenuOpenRef = useRef(false);
+  const mobileMenuWidthExpandedRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const islandRef = useRef<HTMLDivElement | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const topRowClipRef = useRef<HTMLDivElement | null>(null);
   const islandInnerRef = useRef<HTMLDivElement | null>(null);
   const closeServicesTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const collapseAfterServicesTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const servicesOpenRef = useRef(false);
   const canCollapse = !NO_COLLAPSE_ROUTES.includes(pathname ?? "");
+  const navCollapsed = collapsed && !isHovered;
+  const isMobileRouteActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => {
     servicesOpenRef.current = servicesOpen;
@@ -68,14 +84,99 @@ const SiteHeader = ({ introDone }: Props) => {
   };
 
   useEffect(() => {
-    setServicesOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     return () => {
       if (closeServicesTimeoutRef.current) clearTimeout(closeServicesTimeoutRef.current);
+      if (collapseAfterServicesTimeoutRef.current) {
+        clearTimeout(collapseAfterServicesTimeoutRef.current);
+      }
+      if (mobileMenuTimerRef.current) clearTimeout(mobileMenuTimerRef.current);
     };
   }, []);
+
+  const toggleMobileMenu = () => {
+    if (mobileMenuTimerRef.current) {
+      clearTimeout(mobileMenuTimerRef.current);
+      mobileMenuTimerRef.current = null;
+    }
+
+    if (mobileMenuOpenRef.current) {
+      mobileMenuOpenRef.current = false;
+      setMobileMenuOpen(false);
+      mobileMenuTimerRef.current = setTimeout(() => {
+        mobileMenuWidthExpandedRef.current = false;
+        setMobileMenuWidthExpanded(false);
+        mobileMenuTimerRef.current = null;
+      }, 300);
+      return;
+    }
+
+    mobileMenuWidthExpandedRef.current = true;
+    setMobileMenuWidthExpanded(true);
+    mobileMenuTimerRef.current = setTimeout(() => {
+      mobileMenuOpenRef.current = true;
+      setMobileMenuOpen(true);
+      mobileMenuTimerRef.current = null;
+    }, 300);
+  };
+
+  const closeMobileMenu = useCallback(() => {
+    if (!mobileMenuOpenRef.current && !mobileMenuWidthExpandedRef.current) return;
+    if (mobileMenuTimerRef.current) clearTimeout(mobileMenuTimerRef.current);
+    mobileMenuOpenRef.current = false;
+    setMobileMenuOpen(false);
+    mobileMenuTimerRef.current = setTimeout(() => {
+      mobileMenuWidthExpandedRef.current = false;
+      setMobileMenuWidthExpanded(false);
+      mobileMenuTimerRef.current = null;
+    }, 300);
+  }, []);
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setServicesOpen(false);
+      closeMobileMenu();
+    };
+
+    events.on("routeChangeStart", handleRouteChangeStart);
+    return () => events.off("routeChangeStart", handleRouteChangeStart);
+  }, [events, closeMobileMenu]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleOutsidePointerDown = (event: PointerEvent) => {
+      const menu = mobileMenuRef.current;
+      if (menu && !menu.contains(event.target as Node)) {
+        closeMobileMenu();
+      }
+    };
+
+    document.addEventListener("pointerdown", handleOutsidePointerDown);
+    return () => document.removeEventListener("pointerdown", handleOutsidePointerDown);
+  }, [mobileMenuOpen, closeMobileMenu]);
+
+  const handleIslandEnter = () => {
+    if (collapseAfterServicesTimeoutRef.current) {
+      clearTimeout(collapseAfterServicesTimeoutRef.current);
+      collapseAfterServicesTimeoutRef.current = null;
+    }
+    setIsHovered(true);
+  };
+
+  const handleIslandLeave = () => {
+    if (!servicesOpenRef.current) {
+      setIsHovered(false);
+      return;
+    }
+
+    // Close the taller services panel first. Keep the nav expanded until its
+    // max-height transition has finished so the header never collapses first.
+    setServicesOpen(false);
+    collapseAfterServicesTimeoutRef.current = setTimeout(() => {
+      setIsHovered(false);
+      collapseAfterServicesTimeoutRef.current = null;
+    }, 300);
+  };
 
   // Shrink the island to the logo (plus the active nav link, if any) when
   // scrolling down, and bring it back when scrolling up. Plain scrollY
@@ -208,11 +309,87 @@ const SiteHeader = ({ introDone }: Props) => {
     <>
       <div ref={sentinelRef} className="absolute top-0 left-0 w-full h-px" aria-hidden="true" />
       <div
-        className={`shell fixed left-0 right-0 z-150 flex justify-start pl-4 md:pl-6 pointer-events-none ${isLifted ? "is-lifted" : ""}`}
+        className={`shell fixed left-0 right-0 z-150 flex items-start justify-between px-4 pointer-events-none md:justify-start md:px-0 md:pl-6 ${isLifted ? "is-lifted" : ""}`}
       >
+        <div className="header-island island pointer-events-auto inline-flex p-[var(--pad)] md:hidden">
+          <Header activePillLayoutId="nav-active-pill-mobile" />
+        </div>
+
+        <div
+          ref={mobileMenuRef}
+          className={`header-island island pointer-events-auto inline-flex flex-col overflow-hidden p-[var(--pad)] md:hidden ${
+            mobileMenuWidthExpanded
+              ? "w-[calc(9rem+var(--pad)*2)]"
+              : "w-[calc(var(--cta-h)+var(--pad)*2)]"
+          }`}
+          style={{
+            width: mobileMenuWidthExpanded
+              ? "calc(9rem + (var(--pad) * 2))"
+              : "calc(var(--cta-h) + (var(--pad) * 2))",
+          }}
+        >
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+            onClick={toggleMobileMenu}
+            className="cta relative inline-flex h-[var(--cta-h)] w-[var(--cta-h)] items-center justify-center rounded-[var(--r-cta)] text-(--ink) transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2"
+          >
+            <Menu aria-hidden="true" className="size-5" />
+          </button>
+
+          <div
+            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(.32,.72,0,1)] ${
+              mobileMenuOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <nav className="min-h-0" aria-label="Mobile navigation">
+              <div className="mt-2 flex min-w-[9rem] flex-col gap-1 pt-2">
+                <Link
+                  href="/services"
+                  scroll={false}
+                  onClick={closeMobileMenu}
+                  className={`mobile-menu-link cta inline-flex items-center gap-2 rounded-[var(--r-cta)] px-3 py-2 text-sm font-extrabold capitalize transition-colors duration-300 ease-out hover:bg-(--ink)/10 ${
+                    isMobileRouteActive("/services")
+                      ? "nav-active-link bg-(--ink) text-white"
+                      : "text-(--ink)"
+                  }`}
+                >
+                  <ServicesIcon aria-hidden="true" className="size-4" />
+                  Services
+                </Link>
+                <Link
+                  href="/about"
+                  scroll={false}
+                  onClick={closeMobileMenu}
+                  className={`mobile-menu-link cta inline-flex items-center gap-2 rounded-[var(--r-cta)] px-3 py-2 text-sm font-extrabold capitalize transition-colors duration-300 ease-out hover:bg-(--ink)/10 ${
+                    isMobileRouteActive("/about")
+                      ? "nav-active-link bg-(--ink) text-white"
+                      : "text-(--ink)"
+                  }`}
+                >
+                  <WorkIcon aria-hidden="true" className="size-4" />
+                  Information
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setMobileLanguage((current) => (current === "tk" ? "ru" : "tk"))}
+                  aria-label="Switch language"
+                  className="mobile-menu-link cta inline-flex items-center gap-2 rounded-[var(--r-cta)] px-3 py-2 text-left text-sm font-extrabold text-(--ink) transition-colors duration-300 ease-out hover:bg-(--ink)/10"
+                >
+                  <img src="/header-icons/language-svgrepo-com.svg" alt="" aria-hidden="true" className="size-4" />
+                  {mobileLanguage}
+                </button>
+              </div>
+            </nav>
+          </div>
+        </div>
+
         <div
           ref={islandRef}
-          className="island pointer-events-auto inline-block p-[var(--pad)] motion-reduce:transition-none"
+          className="island pointer-events-auto hidden p-[var(--pad)] motion-reduce:transition-none md:inline-block"
+          onMouseEnter={handleIslandEnter}
+          onMouseLeave={handleIslandLeave}
           style={{ willChange: servicesOpen ? "height" : undefined }}
         >
           <div ref={topRowClipRef}>
@@ -222,7 +399,7 @@ const SiteHeader = ({ introDone }: Props) => {
             >
               <Header />
               <NavBar
-                collapsed={collapsed}
+                collapsed={navCollapsed}
                 servicesOpen={servicesOpen}
                 onServicesHoverStart={openServicesMenu}
                 onServicesHoverEnd={scheduleCloseServicesMenu}
@@ -239,7 +416,7 @@ const SiteHeader = ({ introDone }: Props) => {
             }`}
             style={{ maxHeight: servicesOpen ? SERVICES_PANEL_HEIGHT : "0px" }}
           >
-            <div className="flex flex-col gap-[var(--pad)] pt-6 sm:flex-row">
+            <div className="flex flex-col gap-1 pt-6 sm:flex-row">
               {[services.slice(0, 4), services.slice(4, 8)].map((column, i) => (
                 <ServicesColumn
                   key={i}

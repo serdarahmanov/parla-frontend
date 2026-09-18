@@ -43,7 +43,7 @@ const PrivacyPolicy = () => {
   }, [wrapperRef]);
 
   return (
-    <div ref={wrapperRef} className="bg-white md:bg-white lg:bg-white">
+    <div ref={wrapperRef}>
 
         {/* Inner Wrapper definig grip rules */}
       <div className="header-clearance-top relative grid grid-cols-12 pb-[80vh] px-6 font-sans gap-1

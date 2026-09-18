@@ -5,7 +5,6 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import gsap from "gsap";
 import { WorkIcon } from "@/icons/WorkIcon";
-import { InformationIcon } from "@/icons/InformationIcon";
 import { ServicesIcon } from "@/icons/ServicesIcon";
 
 const SERVICES_HREF = "/services";
@@ -16,7 +15,6 @@ const LANGUAGE_KEY = "language";
 
 const navItems = [
   { label: "services", href: "/services", analytics: "nav-services", Icon: ServicesIcon },
-  { label: "work", href: "/work", analytics: "nav-work", Icon: InformationIcon },
   { label: "information", href: "/about", analytics: "nav-info", Icon: WorkIcon },
 ];
 
@@ -114,12 +112,12 @@ function NavBar({
               text-sm md:text-base lg:text-base font-sans font-extrabold tracking-tight
               motion-reduce:transition-none
               focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2
-               ${active ? "text-white" : "text-(--ink)"}`}
+               ${active ? "nav-active-link text-white" : "text-(--ink)"}`}
           >
             {active && (
               <motion.div
                 layoutId="nav-active-pill"
-                className="cta absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)"
+                className="cta nav-active-pill absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)"
                 transition={{ duration: 0.42, ease: [0.32, 0.72, 0, 1] }}
               />
             )}
@@ -133,7 +131,7 @@ function NavBar({
               {!active && highlightedHref === item.href && (
                 <motion.div
                   layoutId="nav-hover-pill"
-                  className="cta absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)/10"
+                  className="cta nav-hover-pill absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)/10"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -163,7 +161,7 @@ function NavBar({
           setHoveredHref((h) => (h === LANGUAGE_KEY ? null : h))
         }
         aria-label={`Switch language to ${language === "tk" ? "Russian" : "Turkmen"}`}
-        className="cta relative inline-flex items-center gap-2 h-[var(--cta-h)] rounded-[var(--r-cta)] px-4
+              className="cta relative inline-flex items-center gap-2 h-[var(--cta-h)] rounded-[var(--r-cta)] px-4
           text-sm md:text-base lg:text-base font-sans font-extrabold tracking-tight
           text-(--ink)
           motion-reduce:transition-none
@@ -173,7 +171,7 @@ function NavBar({
           {highlightedHref === LANGUAGE_KEY && (
             <motion.div
               layoutId="nav-hover-pill"
-              className="cta absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)/10"
+              className="cta nav-hover-pill absolute inset-0 rounded-[var(--r-cta)] bg-(--ink)/10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

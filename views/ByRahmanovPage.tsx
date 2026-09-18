@@ -32,7 +32,7 @@ function ByRahmanov() {
   }, [wrapperRef]);
 
   return (
-    <div ref={wrapperRef} className="bg-white">
+    <div ref={wrapperRef}>
       <div className="header-clearance-top relative grid grid-cols-12 pb-[10vh] px-6 ">
         <div
           ref={leftSideBarRef}

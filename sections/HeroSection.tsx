@@ -13,20 +13,21 @@ import { EASE_BRAND } from "@/lib/gsap/customEase";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
-type MainSection2Props = {
+type HeroSectionProps = {
   videoLinks: string[];
   maskText: string;
   introDone?: boolean;
 };
 
-const MainSection2 = ({
+const HeroSection = ({
   videoLinks,
   maskText,
   introDone,
-}: MainSection2Props) => {
+}: HeroSectionProps) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const introPhotosRef = useRef<(HTMLImageElement | null)[]>([]);
   const introTextRef = useRef<HTMLHeadingElement | null>(null);
+  const introPanelRef = useRef<HTMLDivElement | null>(null);
   const turkmenistanRef = useRef<HTMLHeadingElement | null>(null);
   const clockWrapRef = useRef<HTMLDivElement | null>(null);
   const photosWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +35,8 @@ const MainSection2 = ({
   const emailRowRef = useRef<HTMLDivElement | null>(null);
   const emailTextRef = useRef<HTMLHeadingElement | null>(null);
   const emailIconWrapRef = useRef<HTMLDivElement | null>(null);
+  const copiedMessageRef = useRef<HTMLSpanElement | null>(null);
+  const captionRef = useRef<HTMLParagraphElement | null>(null);
   const { isSmall, isMedium, isLarge } = useScreenFlag();
   const logo1Ref = useRef<HTMLImageElement | null>(null);
   const logo2Ref = useRef<HTMLImageElement | null>(null);
@@ -67,6 +70,7 @@ const MainSection2 = ({
       if (
         !introDone ||
         !wrapperRef.current ||
+        !introPanelRef.current ||
         !introTextRef.current ||
         !introPhotosRef.current.length ||
         !photosWrapperRef.current
@@ -74,6 +78,38 @@ const MainSection2 = ({
         return;
 
       let textSplitTween: gsap.core.Tween | null = null;
+
+      ScrollTrigger.create({
+        trigger: wrapperRef.current,
+        start: "top top",
+        end: "top+=85%",
+        pin: introPanelRef.current,
+        pinSpacing: false,
+        invalidateOnRefresh: true,
+      });
+
+      const createScrollExit = (elements: HTMLElement[], stagger: number) => {
+        const exitTween = gsap.to(elements, {
+          xPercent: -100,
+          duration: 0.6,
+          stagger,
+          ease: EASE_BRAND,
+          paused: true,
+        });
+
+        ScrollTrigger.create({
+          trigger: wrapperRef.current,
+          start: "top top",
+          // end: "bottom top",
+          onUpdate: (self) => {
+            if (self.progress > 0) {
+              exitTween.play();
+            } else {
+              exitTween.reverse();
+            }
+          },
+        });
+      };
 
       gsap.set(introTextRef.current, { opacity: 1 });
       const metaEls = [turkmenistanRef.current, clockWrapRef.current].filter(
@@ -83,32 +119,19 @@ const MainSection2 = ({
       if (metaEls.length) {
         gsap.set(metaEls, { opacity: 1 });
 
-        gsap.from(metaEls, {
-          xPercent: 100,
-          duration: 0.6,
-          stagger: 0.08,
-          // delay: 1,
-          ease: EASE_BRAND,
-          onComplete: () => {
-            gsap.fromTo(
-              metaEls,
-              { xPercent: 0 },
-              {
-                xPercent: -100,
-                ease: "none",
-                stagger: 0.03,
-                scrollTrigger: {
-                  trigger: wrapperRef.current,
-                  start: "top top",
-                  end: "center 70%",
-                  pin: introMetaRowRef.current,
-                  pinSpacing: false,
-                  scrub: true,
-                },
-              },
-            );
+        gsap.fromTo(
+          metaEls,
+          { xPercent: 100 },
+          {
+            xPercent: 0,
+            duration: 0.6,
+            delay: 0.45,
+            ease: EASE_BRAND,
+            overwrite: "auto",
           },
-        });
+        );
+
+        createScrollExit(metaEls as HTMLElement[], 0.03);
       }
 
       const emailEls = [emailTextRef.current, emailIconWrapRef.current].filter(
@@ -121,28 +144,16 @@ const MainSection2 = ({
         gsap.from(emailEls, {
           xPercent: 100,
           duration: 0.6,
+          delay: 0.75,
           stagger: 0.08,
           ease: EASE_BRAND,
-          onComplete: () => {
-            gsap.fromTo(
-              emailEls,
-              { xPercent: 0 },
-              {
-                xPercent: -100,
-                ease: "none",
-                stagger: 0.03,
-                scrollTrigger: {
-                  trigger: wrapperRef.current,
-                  start: "top top",
-                  end: "center 90%",
-                  pin: emailRowRef.current,
-                  pinSpacing: false,
-                  scrub: true,
-                },
-              },
-            );
-          },
         });
+
+        createScrollExit(emailEls as HTMLElement[], 0.03);
+      }
+
+      if (copiedMessageRef.current) {
+        createScrollExit([copiedMessageRef.current], 0);
       }
 
       const textSplit = SplitText.create(introTextRef.current, {
@@ -156,6 +167,7 @@ const MainSection2 = ({
           tl.from(self.words, {
             yPercent: 100,
             duration: 0.4,
+            delay: 0.4,
             stagger: 0.03,
             // delay: 0.05,
             ease: EASE_BRAND,
@@ -170,8 +182,6 @@ const MainSection2 = ({
               trigger: wrapperRef.current,
               start: "top top",
               end: "center 70%",
-              pin: introTextRef.current,
-              pinSpacing: false,
               scrub: true,
             },
           });
@@ -179,6 +189,39 @@ const MainSection2 = ({
           return tl;
         },
       });
+
+      const introPhotos = introPhotosRef.current.filter(
+        (photo): photo is HTMLImageElement => Boolean(photo),
+      );
+
+      if (introPhotos.length) {
+        gsap.fromTo(
+          introPhotos,
+          { opacity: 0, y: 14 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            delay: 0.3,
+            stagger: 0.1,
+            ease: EASE_BRAND,
+          },
+        );
+      }
+
+      if (captionRef.current) {
+        gsap.fromTo(
+          captionRef.current,
+          { opacity: 0, y: 12 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            delay: 0.85,
+            ease: EASE_BRAND,
+          },
+        );
+      }
 
       return () => {
         textSplit.revert();
@@ -194,12 +237,15 @@ const MainSection2 = ({
     <div
       id="section-1"
       ref={wrapperRef}
-      className="relative mb-30 h-[200dvh] w-full z-20  bg-[#fefefe] font-sans"
+      className="relative mb-30 h-[185dvh] w-full z-20 font-sans"
     >
-      <div className="relative h-[80dvh] w-full grid grid-rows-6 px-6 pb-5">
+      <div
+        ref={introPanelRef}
+        className="relative h-[85dvh] w-full grid grid-rows-6 px-6 pb-5"
+      >
 
 
-        <div className="row-span-2 flex  justify-end gap-4 px-10 pt-10">
+        <div className="row-span-2 flex justify-end gap-4 px-10 pt-[var(--header-clearance)] md:pt-10">
           <div ref={introMetaRowRef} className="flex justify-end gap-4 w-full">
             <div className="overflow-hidden">
               <h2
@@ -224,7 +270,7 @@ const MainSection2 = ({
         <div className="row-span-3 flex  gap-5 overflow-hidden justify-start ">
           <h1
             ref={introTextRef}
-            className=" opacity-0 lg:text-[4rem] mx-auto w-[90%] leading-[4.5rem] font-semibold  overflow-hidden tracking-tighter   "
+            className="opacity-0 mx-auto w-[90%] text-[clamp(1.5rem,6vw,2.5rem)] leading-[clamp(1.75rem,6.6vw,2.75rem)] font-semibold overflow-hidden tracking-tighter md:text-[clamp(2.9rem,6vw,4.6rem)] md:leading-[clamp(3.25rem,6.6vw,5.1rem)]"
           >
             <span className="pl-30">Parla</span> is a production and software
             studio.{" "}
@@ -269,8 +315,9 @@ const MainSection2 = ({
                   </div>
                 </div>
 
-                <div className="pointer-events-none absolute left-1/2 -top-2 -translate-x-1/2 -translate-y-full">
+                <div className="pointer-events-none absolute left-1/2 -top-2 -translate-x-1/2 -translate-y-full overflow-hidden">
                   <span
+                    ref={copiedMessageRef}
                     className={`cta inline-flex items-center justify-center whitespace-nowrap h-7 rounded-full bg-(--ink)/10 px-3 text-sm font-semibold text-black transition-all duration-300 ease-out ${
                       emailCopied ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
                     }`}
@@ -285,30 +332,58 @@ const MainSection2 = ({
 
       </div>
 
-      <div className="flex flex-col gap  bg-[#fefefe] h-full   px-6">
+      <div className="flex h-[100dvh] flex-col gap px-6">
+        
         <div
           ref={photosWrapperRef}
-          className="flex flex-row gap-3 bg-[#fefefe] "
+          className="grid h-full grid-cols-4 grid-rows-8 gap-3"
         >
-          {works.slice(0, 3).map((work, index) => (
-            <div
-              key={index}
-              className={`${index === 2 ? "w-[50%]" : "w-[25%] mt-12"} perspective-midrange`}
+          <div className="main-section-2-photo-container-1 col-start-1 row-start-2 row-span-3 perspective-midrange">
+            <img
+              ref={(el) => {
+                introPhotosRef.current[0] = el;
+              }}
+              src={works[0].poster}
+              alt=""
+              className="main-section-2-photo-1 transform-3d rounded-[calc(var(--r-island)/2)] h-full w-full object-cover"
+            />
+          </div>
+
+          <div className="main-section-2-photo-container-2 col-start-2 row-start-2 row-span-4 perspective-midrange">
+            <img
+              ref={(el) => {
+                introPhotosRef.current[1] = el;
+              }}
+              src={works[1].poster}
+              alt=""
+              className="main-section-2-photo-2 transform-3d rounded-[calc(var(--r-island)/2)] h-full w-full object-cover"
+            />
+          </div>
+
+          <div className="main-section-2-photo-container-3 col-start-3 col-span-2 row-span-8 perspective-midrange">
+            <img
+              ref={(el) => {
+                introPhotosRef.current[2] = el;
+              }}
+              src={works[2].poster}
+              alt=""
+              className="main-section-2-photo-3 transform-3d rounded-[calc(var(--r-island)/2)] h-full w-full object-cover"
+            />
+          </div>
+
+          <div className="main-section-2-photo-caption col-start-1 col-span-2 row-start-7 row-span-2">
+            <p
+              ref={captionRef}
+              className="text-[clamp(2.05rem,4vw,3.15rem)] leading-[clamp(2.3rem,4.45vw,3.5rem)] font-medium tracking-tighter text-[#050506]"
             >
-              <img
-                ref={(el) => {
-                  introPhotosRef.current[index] = el;
-                }}
-                src={work.poster}
-                alt=""
-                className="transform-3d rounded-[calc(var(--r-island)/2)] w-full"
-              />
-            </div>
-          ))}
+              <span className="pl-30">We</span> shape visual stories with production craft and digital precision.
+            </p>
+          </div>
         </div>
+
       </div>
     </div>
   );
 };
 
-export default MainSection2;
+export default HeroSection;

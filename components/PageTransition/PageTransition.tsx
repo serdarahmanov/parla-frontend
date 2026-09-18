@@ -50,43 +50,15 @@ const PageTransition = ({ children, introDone }: Props) => {
     },
   };
 
-  const slide: Variants = {
-    initial: {
-      top: "100vh",
-    },
-    enter: {
-      top: "100vh",
-    },
-    exit: {
-      top: "0",
-      // scale: 1,
-      transition: {
-        duration: 1,
-        ease: [0.76, 0, 0.24, 1],
-      },
-    },
-  };
-
   const perspective: Variants = {
     initial: {
-      // y: 0,
-      // scale: 1,
       opacity: 1,
     },
     enter: {
-      // y: 0,
-      // scale: 1,
       opacity: 1,
     },
     exit: {
-      // y: -100,
-      // scale: 0.9,
-      opacity: 0.2,
-      clipPath: "inset(100px 300px 100px 300px)",
-      transition: {
-        duration: 1.2,
-        ease: [0.76, 0, 0.24, 1],
-      },
+      opacity: 1,
     },
   };
 
@@ -94,7 +66,6 @@ const PageTransition = ({ children, introDone }: Props) => {
 
   return (
     <div className="inner">
-      <motion.div {...anim(slide)} className="slide"></motion.div>
       <motion.div {...anim(perspective)} className="page">
         <motion.div {...anim(opacity)}>
           

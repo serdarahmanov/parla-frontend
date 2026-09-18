@@ -10,19 +10,19 @@ import { EASE_BRAND } from "@/lib/gsap/customEase";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
-type MainSection6Props = {
+type VideoMaskSectionProps = {
   videoLinks: string[];
   maskText: string;
   sectionId?: string;
   zIndexClassName?: string;
 };
 
-const MainSection6 = ({
+const VideoMaskSection = ({
   videoLinks,
   maskText,
   sectionId = "section-6",
   zIndexClassName = "z-21",
-}: MainSection6Props) => {
+}: VideoMaskSectionProps) => {
    const logo1Ref = useRef<HTMLImageElement | null>(null);
     const logo2Ref = useRef<HTMLImageElement | null>(null);
     const logo3Ref = useRef<HTMLImageElement | null>(null);
@@ -107,7 +107,7 @@ const MainSection6 = ({
     <section
       ref={wrapperRef}
       id={sectionId}
-      className={`relative   h-screen overflow-hidden flex flex-col justify-between items-center bg-[#fefefe] ${zIndexClassName} shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]`}
+      className={`relative h-screen overflow-hidden flex flex-col justify-between items-center ${zIndexClassName} shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]`}
     >
       <div className="relative top-0 left-0 z-10 flex  w-full gap-5  text-ce-text flex-col pt-[20%] overflow-hidden items-center">
         <h1
@@ -171,4 +171,4 @@ const MainSection6 = ({
   );
 };
 
-export default MainSection6;
+export default VideoMaskSection;
