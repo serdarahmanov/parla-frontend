@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import SplitText from "gsap/SplitText";
 import { EASE_BRAND } from "@/lib/gsap/customEase";
+import { usePageEntry } from "@/components/PageEntryProvider";
 
 gsap.registerPlugin(useGSAP);
 gsap.registerPlugin(SplitText);
@@ -17,9 +18,13 @@ type Props = {
 
 const MaskTextAnimation = ({ text, className, delay = 0.5 }: Props) => {
   const topRef = useRef<HTMLSpanElement | null>(null);
+  const { entry } = usePageEntry();
+  const entryId = entry?.id ?? null;
 
   useGSAP(
     () => {
+      if (!entryId) return;
+
         let split: SplitText | null = null;
       const run = async () => {
         if (!topRef.current) return;
@@ -48,7 +53,7 @@ const MaskTextAnimation = ({ text, className, delay = 0.5 }: Props) => {
         split?.revert();
       };
     },
-    { scope: topRef, dependencies: [text, delay] },
+    { scope: topRef, dependencies: [entryId, text, delay], revertOnUpdate: true },
   );
 
   return (

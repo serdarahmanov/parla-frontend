@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import useScreenFlag from "@/lib/utils/useScreenFlag";
 import SplitText from "gsap/SplitText";
+import { usePageEntry } from "@/components/PageEntryProvider";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -59,6 +60,8 @@ const ProcessSection = () => {
   // Transisiton control
   const isTransitioningRef = useRef(false);
   const pendingIndexxRef = useRef<number | null>(null);
+  const { entry } = usePageEntry();
+  const entryId = entry?.id ?? null;
 
   const getInitialX = (cards: HTMLElement[]) => {
     const firstCard = cards[0];
@@ -155,7 +158,7 @@ const ProcessSection = () => {
 
   useGSAP(
     () => {
-      if (!trackRef.current || !containerRef.current) return;
+      if (!entryId || !trackRef.current || !containerRef.current) return;
 
       const cards = Array.from(trackRef.current.children) as HTMLElement[];
       const images = cards.map(
@@ -193,13 +196,18 @@ const ProcessSection = () => {
         trackTL.kill();
       };
     },
-    { scope: containerRef },
+    { scope: containerRef, dependencies: [entryId], revertOnUpdate: true },
   );
 
   // Text Exit Animation
   useGSAP(
     () => {
-      if (!titleRef.current || !descRef.current || !textWrapRef.current) return;
+      if (
+        !entryId ||
+        !titleRef.current ||
+        !descRef.current ||
+        !textWrapRef.current
+      ) return;
       // if the current displayed text and active text is same do not do anything
       if (activeIndex === displayedIndex) return;
       // if the animation is running do not animate
@@ -272,13 +280,17 @@ const ProcessSection = () => {
         splitDesc.revert();
       };
     },
-    { dependencies: [activeIndex, displayedIndex,isLarge,isMedium,isSmall], scope: textWrapRef },
+    {
+      dependencies: [entryId, activeIndex, displayedIndex, isLarge, isMedium, isSmall],
+      scope: textWrapRef,
+      revertOnUpdate: true,
+    },
   );
 
   // Text IN Transition Animation
   useGSAP(
     () => {
-      if (!titleRef.current || !descRef.current) return;
+      if (!entryId || !titleRef.current || !descRef.current) return;
     let titleInTween: gsap.core.Tween | null = null;
     let descInTween: gsap.core.Tween | null = null;
       
@@ -361,7 +373,11 @@ const ProcessSection = () => {
         splitDesc.revert();
       };
     },
-    { dependencies: [displayedIndex,isMedium,isLarge,isSmall], scope: textWrapRef, revertOnUpdate: true },
+    {
+      dependencies: [entryId, displayedIndex, isMedium, isLarge, isSmall],
+      scope: textWrapRef,
+      revertOnUpdate: true,
+    },
   );
 
   return (

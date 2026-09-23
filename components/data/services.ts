@@ -10,6 +10,7 @@ export type ServiceItem = {
     description: string;
   }[];
   image?: string;
+  icon?: string;
 };
 
 export const slugifyOffering = (offering: string) =>

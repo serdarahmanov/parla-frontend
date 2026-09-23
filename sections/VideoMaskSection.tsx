@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import SplitText from "gsap/SplitText";
 import { EASE_BRAND } from "@/lib/gsap/customEase";
+import { usePageEntry } from "@/components/PageEntryProvider";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -30,10 +31,17 @@ const VideoMaskSection = ({
   const wrapperRef = useRef(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const parllaxTextRef = useRef<HTMLHeadingElement | null>(null);
+  const { entry } = usePageEntry();
+  const entryId = entry?.id ?? null;
 
   useGSAP(
     () => {
-      if (!wrapperRef.current || !parllaxTextRef.current || !videoRef.current)
+      if (
+        !entryId ||
+        !wrapperRef.current ||
+        !parllaxTextRef.current ||
+        !videoRef.current
+      )
         return;
 
       const videoEntry = gsap.fromTo(
@@ -100,19 +108,19 @@ const VideoMaskSection = ({
         videoEntry.kill();
       };
     },
-    { scope: wrapperRef },
+    { scope: wrapperRef, dependencies: [entryId], revertOnUpdate: true },
   );
 
   return (
     <section
       ref={wrapperRef}
       id={sectionId}
-      className={`relative h-screen overflow-hidden flex flex-col justify-between items-center ${zIndexClassName} shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]`}
+      className={`relative h-screen overflow-hidden flex flex-col justify-between items-center ${zIndexClassName}`}
     >
       <div className="relative top-0 left-0 z-10 flex  w-full gap-5  text-ce-text flex-col pt-[20%] overflow-hidden items-center">
         <h1
           ref={parllaxTextRef}
-          className="relative font-semibold tracking-tighter font-sans text-[4rem] leading-[4rem]  text-center overflow-hidden text-white"
+          className="relative overflow-hidden text-center font-sans text-[2rem] leading-[2rem] font-semibold tracking-tighter text-white md:text-[4rem] md:leading-[4rem]"
         >
           WE BUILD BRANDS
         </h1>

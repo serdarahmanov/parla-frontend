@@ -4,6 +4,7 @@ import React, { useRef } from 'react'
 import SplitText from 'gsap/SplitText'
 import gsap from 'gsap'
 import { EASE_BRAND } from '@/lib/gsap/customEase'
+import { usePageEntry } from '@/components/PageEntryProvider'
 
 
 gsap.registerPlugin(useGSAP);
@@ -27,8 +28,12 @@ const Paragraph = ( {text, as: TextElement = "p", className, isLines=false, dela
 
     const paragraphRef = useRef<HTMLParagraphElement | HTMLSpanElement | null>(null);
     const outerRef =useRef<HTMLDivElement | null> (null);
+    const { entry } = usePageEntry();
+    const entryId = entry?.id ?? null;
 
   useGSAP(() => {
+    if (!entryId) return;
+
     const el = paragraphRef.current;
     if (!el) return;
 
@@ -97,7 +102,7 @@ const Paragraph = ( {text, as: TextElement = "p", className, isLines=false, dela
       cancelled = true;
       split?.revert();
     };
-  }, [text, isLines, delay, stagger, duration, revealImmediately]); // if we leave the dependency section empty , it runs only once when page load
+  }, [entryId, text, isLines, delay, stagger, duration, revealImmediately]);
 
 
     return (
@@ -107,6 +112,7 @@ const Paragraph = ( {text, as: TextElement = "p", className, isLines=false, dela
           paragraphRef.current = node;
         }}
         className={className}
+        style={{ opacity: entryId ? undefined : 0 }}
       >
         {text}
       </TextElement>

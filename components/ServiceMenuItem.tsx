@@ -30,11 +30,19 @@ export default function ServiceMenuItem({
       className={`service-link block h-full${isActive ? " is-active" : ""}`}
     >
       <div
-        className={`service-item cta h-full rounded-[var(--r-cta)] bg-(--ink)/10${
+        className={`service-item group relative cta h-full rounded-[var(--r-cta)] bg-(--ink)/10${
           isActive ? " is-active" : ""
         }`}
         onMouseEnter={onHoverStart}
       >
+        {service.icon && (
+          <img
+            src={service.icon}
+            alt=""
+            aria-hidden="true"
+            className="absolute top-1/2 left-1/2 size-9 -translate-x-1/2 -translate-y-1/2 opacity-50 transition-opacity duration-300 group-hover:opacity-80"
+          />
+        )}
         <motion.div
           initial={false}
           animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
@@ -46,7 +54,7 @@ export default function ServiceMenuItem({
           className="h-full"
         >
           <span
-            className="block px-4 pt-3 pb-3
+            className="block px-4 pt-3 pr-14 pb-3
               text-sm md:text-base lg:text-base font-sans font-medium tracking-tight
               text-inherit"
           >

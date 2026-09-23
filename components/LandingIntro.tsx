@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
+import { usePageEntry } from "@/components/PageEntryProvider";
 
 type LandingIntroProps = {
   onRevealStart: () => void;
@@ -10,6 +11,7 @@ export default function LandingIntro({
   onRevealStart,
   onComplete,
 }: LandingIntroProps) {
+  const { notifyLandingEntry } = usePageEntry();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const logo1Ref = useRef<HTMLImageElement | null>(null);
   const logo2Ref = useRef<HTMLImageElement | null>(null);
@@ -23,9 +25,7 @@ export default function LandingIntro({
     if (!rootRef.current && !flairRef.current) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        onComplete,
-      });
+      const tl = gsap.timeline();
 
       tl
       // .to(flairRef.current, {
@@ -89,18 +89,20 @@ export default function LandingIntro({
           ease: "power4.inOut",
           delay: 0.5,
           onStart: onRevealStart,
-        });
+          onComplete,
+        })
+        .call(notifyLandingEntry, [], ">-0.3");
     }, rootRef);
 
     return () => ctx.revert();
-  }, [onComplete, onRevealStart]);
+  }, [notifyLandingEntry, onComplete, onRevealStart]);
 
   return (
     <div
       ref={rootRef}
       className="z-[9999] w-full fixed h-screen flex items-center justify-center  text-white overflow-hidden"
     >
-      <div className="intro-overlay fixed inset-0 object-cover bg-(--page)">
+      <div className="intro-overlay fixed inset-0 object-cover bg-black">
 
 
 

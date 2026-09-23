@@ -5,27 +5,22 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import VideoMaskSection from "@/sections/VideoMaskSection";
 import HeroSection from "@/sections/HeroSection";
+import ProductionSection from "@/sections/ProductionSection";
 import PortfolioVideoPlayer from "@/components/VideoPlayer";
 import ProcessSection from "@/sections/ProcessSection";
 import ServicesSection from "@/sections/ServicesSection";
+import { works } from "@/components/data/works";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type HomeProps = {
-  introDone?: boolean;
-};
-
-export default function Home({ introDone }: HomeProps) {
+export default function Home() {
   const mainSection2VideoLinks = ["D:/portfolio/MusicVideo/BASHYMYAYLADY.mp4"];
   const mainSection2MaskText = "WE BUILD BRANDS";
 
   return (
     <div className="relative text-[#050506]">
-      <HeroSection
-        videoLinks={["/video/TasVegias.mp4"]}
-        maskText={"WE MAKE IT"}
-        introDone={introDone}
-      />
+      <HeroSection />
+      <ProductionSection videoLinks={works.map((work) => work.videoSrc)} />
 
       <VideoMaskSection
         videoLinks={mainSection2VideoLinks}

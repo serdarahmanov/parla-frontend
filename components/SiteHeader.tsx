@@ -11,6 +11,29 @@ import { services } from "@/components/data/services";
 import { ServicesIcon } from "@/icons/ServicesIcon";
 import { WorkIcon } from "@/icons/WorkIcon";
 
+const headerServices = [
+  {
+    ...services.find((service) => service.slug === "brand-strategy")!,
+    title: "Marketing",
+    icon: "/services/icons/marketing.svg",
+  },
+  {
+    ...services.find((service) => service.slug === "production-management")!,
+    title: "Production",
+    icon: "/services/icons/production.svg",
+  },
+  {
+    ...services.find((service) => service.slug === "web-mobile-applications")!,
+    title: "Software Development",
+    icon: "/services/icons/software-development.svg",
+  },
+  {
+    ...services.find((service) => service.slug === "interior-exterior-architecture-design")!,
+    title: "Design",
+    icon: "/services/icons/design.svg",
+  },
+];
+
 type Props = {
   introDone: boolean;
 };
@@ -417,7 +440,7 @@ const SiteHeader = ({ introDone }: Props) => {
             style={{ maxHeight: servicesOpen ? SERVICES_PANEL_HEIGHT : "0px" }}
           >
             <div className="flex flex-col gap-1 pt-6 sm:flex-row">
-              {[services.slice(0, 4), services.slice(4, 8)].map((column, i) => (
+              {[headerServices.slice(0, 2), headerServices.slice(2, 4)].map((column, i) => (
                 <ServicesColumn
                   key={i}
                   services={column}

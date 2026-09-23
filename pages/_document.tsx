@@ -9,6 +9,12 @@ export default function Document() {
         <link rel="stylesheet" href="/vendor/klaro.css" />
       </Head>
       <body>
+        <Script id="scroll-restoration" strategy="beforeInteractive">
+          {`if ("scrollRestoration" in window.history) {
+            window.history.scrollRestoration = "manual";
+          }
+          window.scrollTo(0, 0);`}
+        </Script>
         <Script id="consent-banner" strategy="beforeInteractive">
           {consentBridgeScript}
         </Script>

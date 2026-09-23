@@ -24,7 +24,7 @@ function About() {
       <div className=" grid grid-cols-3 md:row-span-2 md:col-span-10 md:col-start-1 md:grid md:grid-cols-10  md:gap-x-5 lg:col-span-12 lg:row-span-1 lg:grid lg:grid-cols-12 lg:gap-x-3 ">
         <div className="col-start-1 col-span-2 font-sans font-semibold leading-5 tracking-tight  md:col-start-1 md:col-span-6 lg:col-start-1 md:text-2xl md:leading-[1.4rem] lg:col-span-7 lg:font-sans lg:tracking-tight lg:text-[2rem] lg:leading-8 lg:font-medium ">
           <Paragraph
-            delay={0.4}
+            delay={0}
             stagger={0.05}
             text="Parla is a strategic marketing and content partner for brands that want structured, long-term growth. We do not just produce visuals or post content - we build the system behind it, from positioning and strategy to production and execution."
             isLines
@@ -33,7 +33,7 @@ function About() {
         <motion.div
           initial={{ clipPath: "inset(50% 50% 50% 50%)" }}
           animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-          transition={{ duration: 0.7, delay: 0.3, ease: [0.32, 0.72, 0, 1] }}
+          transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
           className="col-start-3 col-span-1 md:col-start-8 md:col-span-3 lg:col-start-10 lg:col-span-3"
         >
           {images.map((item) => (
@@ -56,13 +56,13 @@ function About() {
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 0.5, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.45, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
               className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
             >
               What We Do
             </motion.h1>
             <Paragraph
-              delay={0.6}
+              delay={0}
               stagger={0.05}
               text="Marketing and creative direction, production management, music distribution, web and mobile applications, eCommerce, SAAS platforms, AI-generated content, and interior/exterior architecture design for businesses that want clarity, consistency, and real results."
               isLines
@@ -76,7 +76,7 @@ function About() {
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 0.5, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.65, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
               className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
             >
               Contact
@@ -84,7 +84,7 @@ function About() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.75, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 0.65, ease: [0.32, 0.72, 0, 1] }}
             >
               <HoverSwapLink
                 href={"mailto:info@parla.com"}
@@ -120,7 +120,7 @@ function About() {
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 0.5, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.85, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
               className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
             >
               Office
@@ -128,7 +128,7 @@ function About() {
             <div>
            
               <Paragraph
-                delay={0.8}
+                delay={0}
                 stagger={0.05}
                 text="Studio B12, Block 3, Berkarar Business Center Atatürk Street, Berkararlyk District, Ashgabat, Turkmenistan"
                 isLines
@@ -140,21 +140,21 @@ function About() {
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 0.5, y: 0 }}
-              transition={{ duration: 0.5, delay: 1, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
               className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold md:opacity-50 lg:text-[0.7rem] lg:font-bold lg:opacity-50"
             >
               Working Hours
             </motion.h1>
             <div>
               <Paragraph
-                delay={0.8}
+                delay={0}
                 stagger={0.05}
                 text="Monday to Friday"
                 isLines
                 revealImmediately
               />
               <Paragraph
-                delay={0.85}
+                delay={0}
                 stagger={0.05}
                 text="08:00 AM - 06:00 PM"
                 isLines
@@ -165,7 +165,7 @@ function About() {
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 0.5, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.15, ease: [0.32, 0.72, 0, 1] }}
+                transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               >
                 <LiveClock className={" font-bold text-[0.7rem] font-sans opacity-50 md:text-[0.6rem] "} />
               </motion.div>

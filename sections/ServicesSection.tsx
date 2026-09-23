@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import React, { useRef } from "react";
 import useScreenFlag from "@/lib/utils/useScreenFlag";
 import { RedirectType } from "next/navigation";
+import { usePageEntry } from "@/components/PageEntryProvider";
 
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -13,51 +14,56 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 const services = [
   {
     id: 1,
-    title: "BRAND IDENTITY",
+    title: "PRODUCT STRATEGY",
     description:
-      "Creating a unique visual and emotional image of the brand, including logo, colors, typography, and overall style",
-    href: "/Section-3/Section-3-1.png",
-    logo: "/blackSVGs/Asset-1.svg",
+      "Defining user needs, product goals, core features, and a clear technical roadmap",
+    href: "/software engineering/icons/product-strategy.png",
   },
   {
     id: 2,
-    title: "BRAND GUIDELINES",
+    title: "UX & UI DESIGN",
     description:
-      "A clear set of rules on how to use the brand consistently across all platforms and materials",
-    href: "/Section-3/Section-3-2.png",
-    logo: "/blackSVGs/Asset-2.svg",
+      "Designing intuitive user journeys, accessible interfaces, and interactive prototypes",
+    href: "/software engineering/icons/ux-design.png",
   },
   {
     id: 3,
-    title: "PRODUCT DESIGN",
+    title: "SOFTWARE DEVELOPMENT",
     description:
-      "Designing the look, feel, and functionality of a product to align with the brand and user needs",
-    href: "/Section-3/Section-3-3.png",
-    logo: "/blackSVGs/Asset-3.svg",
+      "Engineering scalable web, mobile, backend, and cloud systems with clean architecture",
+    href: "/software engineering/icons/software-engineering.png",
   },
   {
     id: 4,
-    title: "CONCEPT DEVELOPMENT",
+    title: "QUALITY ENGINEERING",
     description:
-      "Creating the idea and visual direction for packaging that attracts attention and reflects the brand",
-    href: "/Section-3/Section-3-1.png",
-    logo: "/blackSVGs/Asset-4.svg",
+      "Validating functionality, performance, accessibility, security, and product reliability",
+    href: "/software engineering/icons/quality-engineering.png",
+  },
+  {
+    id: 5,
+    title: "LAUNCH & GROWTH",
+    description:
+      "Deploying, monitoring real-world usage, and continuously improving the product",
+    href: "/software engineering/icons/launch-growth.png",
   },
 ];
 
-const initialServiceColors = ["#f9f9f8", "#909090", "#787878", "#606060"];
+const initialServiceColors = ["#f9f9f8", "#a8a8a8", "#909090", "#787878", "#606060"];
 
 const ServicesSection = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const titleRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { entry } = usePageEntry();
+  const entryId = entry?.id ?? null;
 
   const { isSmall, isMedium, isLarge } = useScreenFlag();
 
 
   useGSAP(() => {
-  if (!sectionRef.current || !cardRefs.current.length) return;
+  if (!entryId || !sectionRef.current || !cardRefs.current.length) return;
 
   const cards = cardRefs.current.filter(
     (card): card is HTMLDivElement => card !== null
@@ -89,7 +95,11 @@ const ServicesSection = () => {
     },
   });
   });
-}, { scope: sectionRef, dependencies:[ isSmall, isMedium, isLarge] ,revertOnUpdate:true,});
+}, {
+  scope: sectionRef,
+  dependencies: [entryId, isSmall, isMedium, isLarge],
+  revertOnUpdate: true,
+});
 
 
 
@@ -112,30 +122,29 @@ const ServicesSection = () => {
               cardRefs.current[index]= el;
             }}
             style={{ zIndex: 50 - index , transformOrigin: "left" }}
-            className={`relative h-[25%] w-full border-t-1 border-b-1 border-[#eeeeee] grid grid-cols-2 lg:grid-cols-6 overflow-hidden gap-1 lg:gap-3 pl-25 md:pl-30 lg:pl-30 pr-6 lg:pr-10`}
+            className={`relative h-[20%] w-full border-t-1 border-b-1 border-[#eeeeee] grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 overflow-hidden gap-1 lg:gap-3 px-4 md:pl-30 md:pr-6 lg:pl-30 lg:pr-10`}
           >
 
 {/* " h-[25%] w-full  border-t-1 border-[#eeeeee] grid grid-cols-6 overflow-hidden gap-3" */}
 
-            <div className="col-span-1 lg:col-span-2 flex flex-col lg:flex-row gap-2  pt-6">
-              <div>
-                <img src={service.logo} alt="" className=" object-contain max-w-2 opacity-30" />
-              </div>
-              <h2 className="   text-[1.3rem] leading-[1.3rem]  md:text-[2.5rem] font-semibold  lg:leading-[2rem] tracking-tight">{service.title}</h2>
-            </div>
-            {(isLarge|| isMedium) &&(<h2 className="text-xs opacity-90 pt-6 text-ce-secondary ">{service.title}</h2>)}
-          
-
-            <p className="col-span-1 lg:col-span-2 text-[0.8rem] leading-[0.8rem]  lg:text-[1rem] lg:leading-[1rem] font-medium tracking-tight pt-6">{service.description}</p>
-
-
-            {(isMedium || isLarge)&& (<div className="overflow-hidden py-2 px-2">
+            <div className="col-span-1 md:col-span-2 flex items-start gap-2 pt-6">
               <img
                 src={service.href}
                 alt=""
-                className="object-cover  w-full h-full"
+                className="h-7 w-7 shrink-0 object-contain md:h-8 md:w-8 lg:hidden"
               />
-            </div>)}
+              <h2 className="   text-[1.3rem] leading-[1.3rem]  md:text-[2.5rem] font-semibold  lg:leading-[2rem] tracking-tight">{service.title}</h2>
+            </div>
+            <p className="col-span-1 md:col-span-2 text-[0.8rem] leading-[0.8rem]  lg:text-[1rem] lg:leading-[1rem] font-medium tracking-tight pt-6">{service.description}</p>
+
+
+            <div className="hidden overflow-hidden px-2 py-2 lg:block">
+              <img
+                src={service.href}
+                alt=""
+                className="h-full w-full object-contain"
+              />
+            </div>
             
           </div>
 
