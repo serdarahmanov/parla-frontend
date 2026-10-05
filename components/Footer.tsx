@@ -3,72 +3,27 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import { ArrowUpRight } from "lucide-react";
-import { services } from "@/components/data/services";
+import { categoryServices } from "@/components/data/services";
+import HoverSwapLink from "@/animations/HoverSwapLink";
+import ParlaIcon from "@/components/ParlaIcon";
 
-const ICON_ASSETS = [
-  {
-    viewBox: "0 0 564.76 698.76",
-    path: "M564.76,678.03V0H0v272.67c0,235.32,190.76,426.08,426.08,426.08h138.68v-20.72Z",
-  },
-  {
-    viewBox: "0 0 564.76 698.76",
-    path: "M0,426.48v272.27h564.76V0h-138.28C190.94,0,0,190.94,0,426.48Z",
-  },
-  {
-    viewBox: "0 0 569.79 698.76",
-    path: "M70.65,0H0v698.76h143.29c235.55,0,426.5-190.95,426.5-426.5V0H70.65Z",
-  },
-  {
-    viewBox: "0 0 569.79 698.76",
-    path: "M145.62,0H0v698.76h569.79v-274.59C569.79,189.9,379.88,0,145.62,0Z",
-  },
-] as const;
-
-const makeIconUri = (
-  viewBox: string,
-  path: string,
-  from: string,
-  to: string,
-  noise: number,
-) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
-  <defs>
-    <linearGradient id="iconGradient" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${from}"/>
-      <stop offset="1" stop-color="${to}"/>
-    </linearGradient>
-    <clipPath id="iconClip"><path d="${path}"/></clipPath>
-    <filter id="iconNoise" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
-      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="1" seed="7" stitchTiles="stitch"/>
-      <feColorMatrix type="matrix" values="1 1 1 0 -1  1 1 1 0 -1  1 1 1 0 -1  0 0 0 0 1"/>
-    </filter>
-  </defs>
-  <g clip-path="url(#iconClip)">
-    <path fill="url(#iconGradient)" d="${path}"/>
-    <rect width="100%" height="100%" filter="url(#iconNoise)" opacity="${noise}"/>
-  </g>
-</svg>`;
-
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+type FooterContent = {
+  cookiePolicyLabel: string;
+  privacyPolicyLabel: string;
+  copyright: string;
+  credit: string;
 };
 
-const ICONS = ICON_ASSETS.map(({ viewBox, path }) => ({
-  aspect: viewBox.replace("0 0 ", " / "),
-  dark: makeIconUri(viewBox, path, "#0d0d0d", "#050505", 0.03),
-  lit: makeIconUri(viewBox, path, "#313131", "#141414", 0.06),
-}));
+const fallbackFooterContent: FooterContent = {
+  cookiePolicyLabel: "Cookie Policy",
+  privacyPolicyLabel: "Privacy Policy",
+  copyright: "PARLA® ©2024",
+  credit: "site by Rahmanov",
+};
 
-const serviceGroups = [
-  {
-    title: "Visual & Marketing",
-    services: services.slice(0, 4),
-  },
-  {
-    title: "Technology",
-    services: services.slice(4),
-  },
-] as const;
+const FOOTER_ICONS = ["top-right", "bottom-right", "top-left", "bottom-left"] as const;
 
 function Footer() {
   const footerRef = useRef<HTMLDivElement | null>(null);
@@ -78,7 +33,36 @@ function Footer() {
   const pointerRef = useRef({ x: 0, y: 0 });
   const animationFrameRef = useRef<number | null>(null);
   const [footerReached, setFooterReached] = useState(false);
+  const [footerContent, setFooterContent] = useState(fallbackFooterContent);
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const locale = router.locale === "en" ? "en" : "tk";
+
+    const loadFooterContent = async () => {
+      try {
+        const response = await fetch(`/api/globals/footer?locale=${locale}&depth=0`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+
+        const content = (await response.json()) as Partial<FooterContent>;
+        setFooterContent({
+          cookiePolicyLabel: content.cookiePolicyLabel || fallbackFooterContent.cookiePolicyLabel,
+          privacyPolicyLabel: content.privacyPolicyLabel || fallbackFooterContent.privacyPolicyLabel,
+          copyright: content.copyright || fallbackFooterContent.copyright,
+          credit: content.credit || fallbackFooterContent.credit,
+        });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    };
+
+    void loadFooterContent();
+    return () => controller.abort();
+  }, [router.locale]);
 
   useEffect(() => {
     const row = iconRowRef.current;
@@ -235,49 +219,83 @@ function Footer() {
       }`}
     >
       <div
-        className="grid w-full grid-cols-1 gap-8 px-2 pb-16 font-sans md:grid-cols-2 md:gap-3 md:px-6"
+        className="grid w-full grid-cols-1 gap-8 px-2 pb-16 font-sans md:grid-cols-3 md:gap-3 md:px-6"
       >
-        {serviceGroups.map((group) => (
-          <div key={group.title} className="col-span-1">
-            <h2 className="mb-4 text-[0.6rem] font-semibold uppercase opacity-40 md:text-sm">
-              {group.title}
-            </h2>
-            <div className="flex flex-col items-start gap-1">
-              {group.services.map((service) => {
-                const serviceHref = `/service/${service.slug}`;
+        <div className="col-span-1 md:col-span-2">
+          <div className="grid grid-cols-1 items-start gap-x-3 gap-y-1 md:grid-cols-2">
+            {categoryServices.map((service) => {
+              const serviceHref = `/service/${service.slug}`;
 
-                return (
-                  <Link
-                    key={service.slug}
-                    href={serviceHref}
-                    scroll={false}
-                    onClick={(event) => {
-                      if (pathname === serviceHref) {
-                        event.preventDefault();
-                        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-                      }
-                    }}
-                    className={`group inline-flex items-center gap-1 text-[0.6rem] font-normal uppercase transition-[color,transform] duration-300 md:text-sm ${
-                      pathname === serviceHref || pathname.startsWith(`${serviceHref}/`)
-                        ? "translate-x-3"
-                        : ""
-                    } ${
-                      footerReached
-                        ? "text-[#a2a2a2] hover:text-white"
-                        : "text-black hover:text-[#696969]"
-                    }`}
-                  >
-                    {service.title}
-                    <ArrowUpRight
-                      aria-hidden="true"
-                      className="size-[1em] shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-(--color-ce-primary)"
-                    />
-                  </Link>
-                );
-              })}
-            </div>
+              return (
+                <Link
+                  key={service.slug}
+                  href={serviceHref}
+                  scroll={false}
+                  onClick={(event) => {
+                    if (pathname === serviceHref) {
+                      event.preventDefault();
+                      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                    }
+                  }}
+                  className={`group inline-flex items-center gap-1 text-[0.6rem] font-normal uppercase transition-[color,transform] duration-300 md:text-sm ${
+                    pathname === serviceHref || pathname?.startsWith(`${serviceHref}/`)
+                      ? "translate-x-3"
+                      : ""
+                  } ${
+                    footerReached
+                      ? "text-[#a2a2a2] hover:text-white"
+                      : "text-black hover:text-[#696969]"
+                  }`}
+                >
+                  {service.title}
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="size-[1em] shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-(--color-ce-primary)"
+                  />
+                </Link>
+              );
+            })}
           </div>
-        ))}
+        </div>
+        <div className="col-span-1 flex flex-col gap-3 md:pl-3">
+          <h2
+            className={`text-[0.6rem] font-bold uppercase md:text-sm ${
+              footerReached ? "text-[#a2a2a2]" : "text-black/50"
+            }`}
+          >
+            Contact us
+          </h2>
+          <div
+            className={`flex flex-col gap-1 text-[0.6rem] font-normal md:text-sm ${
+              footerReached ? "text-[#a2a2a2]" : "text-black"
+            }`}
+          >
+            <HoverSwapLink
+              href="mailto:info@parla.com"
+              text="info@parla.com"
+              data-analytics="footer-contact-email"
+              className="w-fit transition-colors duration-300 hover:text-(--color-ce-primary)"
+            />
+            <HoverSwapLink
+              href="tel:+99361060803"
+              text="+ 99 361 06 0803"
+              data-analytics="footer-contact-phone"
+              className="w-fit transition-colors duration-300 hover:text-(--color-ce-primary)"
+            />
+            <HoverSwapLink
+              href="https://instagram.com/parla_vision"
+              text="Instagram"
+              data-analytics="footer-social-instagram"
+              className="w-fit transition-colors duration-300 hover:text-(--color-ce-primary)"
+            />
+            <HoverSwapLink
+              href="https://t.me/orayevbatyr"
+              text="Telegram"
+              data-analytics="footer-social-telegram"
+              className="w-fit transition-colors duration-300 hover:text-(--color-ce-primary)"
+            />
+          </div>
+        </div>
       </div>
       <div
         ref={iconRowRef}
@@ -286,26 +304,24 @@ function Footer() {
         }`}
       >
         <div className="footer-brand-icon-layer">
-          {ICONS.map((icon, index) => (
-            <img
+          {FOOTER_ICONS.map((position, index) => (
+            <ParlaIcon
               key={`dark-${index}`}
-              src={icon.dark}
-              alt=""
+              position={position}
+              tone="footer-dark"
               aria-hidden="true"
               className="footer-brand-icon"
-              style={{ aspectRatio: icon.aspect }}
             />
           ))}
         </div>
         <div ref={litLayerRef} className="footer-brand-icon-layer footer-brand-icon-layer--lit" aria-hidden="true">
-          {ICONS.map((icon, index) => (
-            <img
+          {FOOTER_ICONS.map((position, index) => (
+            <ParlaIcon
               key={`lit-${index}`}
-              src={icon.lit}
-              alt=""
+              position={position}
+              tone="footer-lit"
               aria-hidden="true"
               className="footer-brand-icon"
-              style={{ aspectRatio: icon.aspect }}
             />
           ))}
         </div>
@@ -318,7 +334,7 @@ function Footer() {
     lg:text-sm lg:font-normal items-center overflow-hidden"
     >
       <div className=" col-span-1  ">
-        <h2 className="opacity-40"> PARLA® ©2024</h2>
+        <h2 className="opacity-40">{footerContent.copyright}</h2>
        
         
         
@@ -333,7 +349,7 @@ function Footer() {
             pathname === "/cookie" ? selectedLink : activeLink
           }`}
         >
-          cookie Policy
+          {footerContent.cookiePolicyLabel}
         </Link>
       </div>
       <div className="col-span-1">
@@ -345,21 +361,12 @@ function Footer() {
             pathname === "/privacy-policy" ? selectedLink : activeLink
           }`}
         >
-          privacy Policy
+          {footerContent.privacyPolicyLabel}
         </Link>
       </div>
 
       <div className="col-span-1 flex justify-end ">
-        <Link
-          scroll={false}
-          href="/by-rahmanov"
-          data-analytics="footer-site-by-rahmanov"
-          className={`cta inline-flex items-center h-[36px] rounded-[var(--r-cta)] px-4 font-normal uppercase transition-colors duration-200 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-(--ink) focus-visible:outline-offset-2 ${
-            pathname === "/by-rahmanov" ? selectedLink : activeLink
-          }`}
-        >
-          site by Rahmanov
-        </Link>
+        <h2 className="opacity-40">{footerContent.credit}</h2>
       </div>
       </div>
     </footer>

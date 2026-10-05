@@ -1,38 +1,55 @@
 "use client";
 
-import React, { useRef } from "react";
-import MaskTextAnimation from "@/animations/MaskTextAnimation";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import SplitText from "gsap/SplitText";
 import { EASE_BRAND } from "@/lib/gsap/customEase";
 import { usePageEntry } from "@/components/PageEntryProvider";
+import ParlaIcon from "@/components/ParlaIcon";
+import type { MarketingMedia } from "@/views/HomePage";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 type VideoMaskSectionProps = {
-  videoLinks: string[];
   maskText: string;
+  marqueeText: string;
+  desktopMedia: MarketingMedia;
+  mobileMedia: MarketingMedia;
   sectionId?: string;
   zIndexClassName?: string;
 };
 
 const VideoMaskSection = ({
-  videoLinks,
   maskText,
+  marqueeText,
+  desktopMedia,
+  mobileMedia,
   sectionId = "section-6",
   zIndexClassName = "z-21",
 }: VideoMaskSectionProps) => {
-   const logo1Ref = useRef<HTMLImageElement | null>(null);
-    const logo2Ref = useRef<HTMLImageElement | null>(null);
-    const logo3Ref = useRef<HTMLImageElement | null>(null);
-    const logo4Ref = useRef<HTMLImageElement | null>(null);
+   const logo1Ref = useRef<SVGSVGElement | null>(null);
+    const logo2Ref = useRef<SVGSVGElement | null>(null);
+    const logo3Ref = useRef<SVGSVGElement | null>(null);
+    const logo4Ref = useRef<SVGSVGElement | null>(null);
   const wrapperRef = useRef(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const mediaRef = useRef<HTMLDivElement | null>(null);
   const parllaxTextRef = useRef<HTMLHeadingElement | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
   const { entry } = usePageEntry();
   const entryId = entry?.id ?? null;
+  const desktopVideo = desktopMedia.video ?? mobileMedia.video;
+  const mobileVideo = mobileMedia.video ?? desktopMedia.video;
+  const desktopCover = desktopMedia.coverImage ?? mobileMedia.coverImage;
+  const mobileCover = mobileMedia.coverImage ?? desktopMedia.coverImage;
+  const videoSourceKey = `${desktopVideo ?? ""}|${mobileVideo ?? ""}`;
+  const hasVideo = Boolean(desktopVideo || mobileVideo);
+  const hasCover = Boolean(desktopCover || mobileCover);
+
+  useEffect(() => {
+    setVideoReady(false);
+  }, [videoSourceKey]);
 
   useGSAP(
     () => {
@@ -40,12 +57,12 @@ const VideoMaskSection = ({
         !entryId ||
         !wrapperRef.current ||
         !parllaxTextRef.current ||
-        !videoRef.current
+        !mediaRef.current
       )
         return;
 
       const videoEntry = gsap.fromTo(
-        videoRef.current,
+        mediaRef.current,
         {
           scale: 1.3,
           rotate: -10,
@@ -108,7 +125,11 @@ const VideoMaskSection = ({
         videoEntry.kill();
       };
     },
-    { scope: wrapperRef, dependencies: [entryId], revertOnUpdate: true },
+    {
+      scope: wrapperRef,
+      dependencies: [entryId, maskText, videoSourceKey],
+      revertOnUpdate: true,
+    },
   );
 
   return (
@@ -122,31 +143,31 @@ const VideoMaskSection = ({
           ref={parllaxTextRef}
           className="relative overflow-hidden text-center font-sans text-[2rem] leading-[2rem] font-semibold tracking-tighter text-white md:text-[4rem] md:leading-[4rem]"
         >
-          WE BUILD BRANDS
+          {maskText}
         </h1>
           <div className="relative z-10 intro-logo gap-1 flex flex-row  pb-10 h-[3.5rem]">
             
-            <img
-              src="/whiteSVGs/Asset-2.svg"
-              alt="Parla"
+            <ParlaIcon
+              position="top-right"
+              fill="#ffffff"
               ref={logo2Ref}
               className=" h-full"
             />
-            <img
-              src="/whiteSVGs/Asset-4.svg"
-              alt="Parla"
+            <ParlaIcon
+              position="bottom-right"
+              fill="#ffffff"
               ref={logo4Ref}
               className="h-full "
             />
-            <img
+            <ParlaIcon
+              position="top-left"
+              fill="#ffffff"
               ref={logo1Ref}
-              src="/whiteSVGs/Asset-1.svg"
-              alt="Parla"
               className="h-full "
             />
-            <img
-              src="/whiteSVGs/Asset-3.svg"
-              alt="Parla"
+            <ParlaIcon
+              position="bottom-left"
+              fill="#ffffff"
               ref={logo3Ref}
               className="h-full"
             />
@@ -158,22 +179,58 @@ const VideoMaskSection = ({
       
       </div>
 
-      <div className="absolute z-9 left-0 top-0 inset-0 w-full h-full bg-black">
-        <video
-          ref={videoRef}
-          className="relative w-full h-full object-cover  lg:object-cover md:object-cover opacity-80"
-          muted
-          loop
-          autoPlay
-          playsInline
-          preload="auto"
-        >
-          {videoLinks.map((videoLink, index) => (
-            <source key={`${videoLink}-${index}`} src={videoLink} />
-          ))}
-        </video>
+      <div
+        ref={mediaRef}
+        className="absolute inset-0 z-9 h-full w-full overflow-hidden rounded-[var(--r-cta)] bg-black"
+      >
+        {hasCover && (
+          <picture>
+            {mobileCover && (
+              <source media="(max-width: 767px)" srcSet={mobileCover.src} />
+            )}
+            {/* This CMS image is rendered as a responsive full-bleed background. */}
+            <img
+              src={(desktopCover ?? mobileCover)?.src}
+              alt={(desktopCover ?? mobileCover)?.alt ?? ""}
+              className="absolute inset-0 h-full w-full object-cover opacity-80"
+            />
+          </picture>
+        )}
+
+        {hasVideo && (
+          <video
+            key={videoSourceKey}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+              videoReady ? "opacity-80" : "opacity-0"
+            }`}
+            muted
+            loop
+            autoPlay
+            playsInline
+            preload="auto"
+            poster={(desktopCover ?? mobileCover)?.src}
+            onLoadedData={() => setVideoReady(true)}
+            onCanPlay={() => setVideoReady(true)}
+            onEmptied={() => setVideoReady(false)}
+            onError={() => setVideoReady(false)}
+          >
+            {mobileVideo && (
+              <source media="(max-width: 767px)" src={mobileVideo} />
+            )}
+            {desktopVideo && (
+              <source media="(min-width: 768px)" src={desktopVideo} />
+            )}
+            <source src={desktopVideo ?? mobileVideo ?? undefined} />
+          </video>
+        )}
       </div>
 
+      <div className="marketing-section-marquee" aria-hidden="true">
+        <div className="marketing-section-marquee-track">
+          <span>{marqueeText}</span>
+          <span>{marqueeText}</span>
+        </div>
+      </div>
 
     </section>
   );

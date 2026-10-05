@@ -19,6 +19,8 @@
 
 # production
 /build
+/media/*
+!/media/.gitkeep
 
 # misc
 .DS_Store
@@ -44,3 +46,4 @@ public/video/*.mp4
 /public/*
 !/public/font/
 !/public/font/**
+

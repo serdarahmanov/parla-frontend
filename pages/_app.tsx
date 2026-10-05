@@ -15,6 +15,7 @@ import ConsentScripts from "@/components/Consent/ConsentScripts";
 import { useEngagementTracking } from "@/components/analytics/useEngagementTracking";
 import { useScrollTacking } from "@/components/analytics/useScrollTracking";
 import { usePageViewTracking } from "@/components/analytics/usePageViewTracking";
+import SiteStructuredData from "@/components/seo/SiteStructuredData";
 
 const geist = localFont({
   src: "../public/font/geist/geist-latin.woff2",
@@ -100,6 +101,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
     <PageEntryProvider landingActive={introVisible}>
       <div className={cn("site-shell m-0 p-0", "font-sans", geist.variable)}>
         <ConsentScripts />
+        <SiteStructuredData />
         <div
           className="site-shell-inner relative p-0 m-0 min-h-screen text-black"
         >

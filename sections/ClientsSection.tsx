@@ -1,5 +1,6 @@
 "use client";
 import Paragraph from "@/animations/Paragraph";
+import ParlaIcon from "@/components/ParlaIcon";
 
 import React, { useRef } from "react";
 import gsap from "gsap";
@@ -107,24 +108,24 @@ const ClientsSection = () => {
         md:gap-[0.05rem] md:grid md:grid-cols-2 md:grid-rows-2 md:w-6
         lg:gap-[0.05rem] lg:grid lg:grid-cols-2 lg:grid-rows-2 lg:w-4 "
         >
-          <img
-            src="/landingTransition/Asset-1.svg"
-            alt="Parla"
+          <ParlaIcon
+            position="top-left"
+            fill="#fdb814"
             className="row-start-1 col-start-1 row-span-1 col-span-1 md:row-start-1 md:col-start-1 md:row-span-1 md:col-span-1 lg:row-start-1 lg:col-start-1 lg:row-span-1 lg:col-span-1 "
           />
-          <img
-            src="/landingTransition/Asset-2.svg"
-            alt="Parla"
+          <ParlaIcon
+            position="top-right"
+            fill="#fdb814"
             className="row-start-1 col-start-2  row-span-1 col-span-1 md:row-start-1 md:col-start-2 md:row-span-1 md:col-span-1 lg:row-start-1 lg:col-start-2 lg:row-span-1 lg:col-span-1"
           />
-          <img
-            src="/landingTransition/Asset-3.svg"
-            alt="Parla"
+          <ParlaIcon
+            position="bottom-left"
+            fill="#fdb814"
             className="row-start-2 col-start-1   row-span-1 col-span-1 md:row-start-2 md:col-start-1 md:row-span-1 md:col-span-1 lg:row-start-2 lg:col-start-1 lg:row-span-1 lg:col-span-1"
           />
-          <img
-            src="/landingTransition/Asset-4.svg"
-            alt="Parla"
+          <ParlaIcon
+            position="bottom-right"
+            fill="#fdb814"
             className=" row-start-2 col-start-2   row-span-1 col-span-1 md:row-start-2 md:col-start-2 md:row-span-1 md:col-span-1 lg:row-start-2 lg:col-start-2 lg:row-span-1 lg:col-span-1 "
           />
         </div>

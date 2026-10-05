@@ -23,20 +23,34 @@ const HeroSection = () => {
   const copiedMessageRef = useRef<HTMLSpanElement | null>(null);
   const [emailCopied, setEmailCopied] = useState(false);
   const copyIconRef = useRef<HTMLImageElement | null>(null);
+  const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousEmailCopiedRef = useRef(emailCopied);
   const { entry } = usePageEntry();
   const entryId = entry?.id ?? null;
 
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText("hello@parla.com");
+
+      if (copyResetTimerRef.current) {
+        clearTimeout(copyResetTimerRef.current);
+      }
+
       setEmailCopied(true);
-      setTimeout(() => setEmailCopied(false), 3000);
+      copyResetTimerRef.current = setTimeout(() => {
+        setEmailCopied(false);
+        copyResetTimerRef.current = null;
+      }, 3000);
     } catch {
       // clipboard access denied or unavailable
     }
   };
 
   useEffect(() => {
+    const previousEmailCopied = previousEmailCopiedRef.current;
+    previousEmailCopiedRef.current = emailCopied;
+
+    if (previousEmailCopied === emailCopied) return;
     if (!copyIconRef.current) return;
 
     gsap.fromTo(
@@ -46,74 +60,103 @@ const HeroSection = () => {
     );
   }, [emailCopied]);
 
+  useEffect(() => {
+    return () => {
+      if (copyResetTimerRef.current) {
+        clearTimeout(copyResetTimerRef.current);
+      }
+    };
+  }, []);
+
   useGSAP(
     () => {
-      if (!entryId || !wrapperRef.current || !introPanelRef.current || !introTextRef.current) {
+      if (
+        !entryId ||
+        !wrapperRef.current ||
+        !introPanelRef.current ||
+        !introTextRef.current
+      ) {
         return;
       }
 
+      const wrapper = wrapperRef.current;
+      let lineExitTween: gsap.core.Tween | null = null;
+      let refreshFrame: number | null = null;
+
       ScrollTrigger.create({
-        trigger: wrapperRef.current,
+        trigger: wrapper,
         start: "top top",
-        end: "top+=85%",
+        end: () => `+=${wrapper.offsetHeight}`,
         pin: introPanelRef.current,
         pinSpacing: false,
         invalidateOnRefresh: true,
       });
 
-      const createScrollExit = (elements: HTMLElement[], stagger: number) => {
-        const exitTween = gsap.to(elements, {
-          xPercent: -100,
-          duration: 0.6,
-          stagger,
-          ease: EASE_BRAND,
-          paused: true,
-        });
+      gsap.set(introTextRef.current, { opacity: 1 });
+      const metaEls = [turkmenistanRef.current, clockWrapRef.current].filter(
+        (element) => element !== null,
+      );
+      const emailEls = [emailTextRef.current, emailIconWrapRef.current].filter(
+        (element) => element !== null,
+      );
+      const entryEls = [...metaEls, ...emailEls];
+      const scrollExitEls = copiedMessageRef.current
+        ? [...entryEls, copiedMessageRef.current]
+        : entryEls;
+      let entryComplete = false;
 
-        ScrollTrigger.create({
-          trigger: wrapperRef.current,
-          start: "top top",
-          onUpdate: (self) => {
-            if (self.progress > 0) exitTween.play();
-            else exitTween.reverse();
-          },
-        });
+      const exitTween = gsap.to(scrollExitEls, {
+        xPercent: -100,
+        duration: 0.6,
+        ease: EASE_BRAND,
+        paused: true,
+      });
+
+      ScrollTrigger.create({
+        trigger: wrapper,
+        start: "top top-=2",
+        end: "bottom top",
+        onEnter: () => {
+          if (entryComplete) exitTween.play();
+        },
+        onLeaveBack: () => {
+          if (entryComplete) exitTween.reverse();
+        },
+      });
+
+      const finishEntry = () => {
+        entryComplete = true;
+
+        if (wrapper.getBoundingClientRect().top <= -2) {
+          exitTween.play();
+        }
       };
 
-      gsap.set(introTextRef.current, { opacity: 1 });
-      const metaEls = [turkmenistanRef.current, clockWrapRef.current].filter(Boolean);
-
-      if (metaEls.length) {
-        gsap.set(metaEls, { opacity: 1 });
-        gsap.fromTo(metaEls, { xPercent: 100 }, {
-          xPercent: 0,
-          duration: 0.6,
-          ease: EASE_BRAND,
-          overwrite: "auto",
-        });
-        createScrollExit(metaEls as HTMLElement[], 0.03);
+      if (entryEls.length) {
+        gsap.set(entryEls, { opacity: 1 });
+        gsap.fromTo(
+          entryEls,
+          { xPercent: 100 },
+          {
+            xPercent: 0,
+            duration: 0.6,
+            ease: EASE_BRAND,
+            overwrite: "auto",
+            onComplete: finishEntry,
+          },
+        );
+      } else {
+        finishEntry();
       }
-
-      const emailEls = [emailTextRef.current, emailIconWrapRef.current].filter(Boolean);
-
-      if (emailEls.length) {
-        gsap.set(emailEls, { opacity: 1 });
-        gsap.from(emailEls, {
-          xPercent: 100,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: EASE_BRAND,
-        });
-        createScrollExit(emailEls as HTMLElement[], 0.03);
-      }
-
-      if (copiedMessageRef.current) createScrollExit([copiedMessageRef.current], 0);
 
       const textSplit = SplitText.create(introTextRef.current, {
         type: "lines,words",
         mask: "lines",
         autoSplit: true,
         onSplit: (self) => {
+          lineExitTween?.scrollTrigger?.kill();
+          lineExitTween?.kill();
+
           const tl = gsap.timeline();
           tl.from(self.words, {
             yPercent: 100,
@@ -122,12 +165,12 @@ const HeroSection = () => {
             ease: EASE_BRAND,
           });
 
-          gsap.to(self.lines, {
+          lineExitTween = gsap.to(self.lines, {
             yPercent: 100,
             ease: "none",
             stagger: 0.03,
             scrollTrigger: {
-              trigger: wrapperRef.current,
+              trigger: wrapper,
               start: "top top",
               end: "bottom top+=45%",
               scrub: true,
@@ -135,11 +178,22 @@ const HeroSection = () => {
             },
           });
 
+          if (refreshFrame !== null) cancelAnimationFrame(refreshFrame);
+          refreshFrame = requestAnimationFrame(() => {
+            refreshFrame = null;
+            ScrollTrigger.refresh();
+          });
+
           return tl;
         },
       });
 
-      return () => textSplit.revert();
+      return () => {
+        if (refreshFrame !== null) cancelAnimationFrame(refreshFrame);
+        lineExitTween?.scrollTrigger?.kill();
+        lineExitTween?.kill();
+        textSplit.revert();
+      };
     },
     {
       scope: wrapperRef,
@@ -153,43 +207,54 @@ const HeroSection = () => {
       id="section-1"
       ref={wrapperRef}
       aria-label="Parla introduction"
-      className="relative z-20 h-[85dvh] w-full font-sans"
+      className="relative z-20 min-h-[85dvh] w-full font-sans"
     >
       <div
         ref={introPanelRef}
-        className="relative grid h-[85dvh] w-full grid-rows-[2fr_3fr_1fr] px-6 pb-5"
+        className="relative grid min-h-[85dvh] w-full grid-rows-[calc(var(--header-top)+var(--header-top)+((var(--cta-h)+(var(--pad)*2))*1.5))_minmax(max-content,3fr)_minmax(max-content,1fr)] px-6 pb-5 md:grid-rows-[calc(var(--header-top)+var(--header-top)+var(--cta-h)+var(--pad)+var(--pad))_minmax(max-content,3fr)_minmax(max-content,1fr)] md:px-0 md:pb-[1.25vw]"
       >
-        <header className="flex items-start justify-end px-10 pt-[var(--header-clearance)] md:pt-10">
-          <div className="flex w-full justify-end gap-4">
+        <header className="flex items-end justify-end px-10 md:w-[100vw] md:items-center md:px-[5vw]">
+          <div className="flex w-full items-baseline justify-end gap-4 md:gap-[1vw]">
             <div className="overflow-hidden">
-              <h2 ref={turkmenistanRef} className="text-sm font-semibold opacity-0">
+              <h2
+                ref={turkmenistanRef}
+                className="text-sm font-semibold opacity-0 md:text-[1vw] md:leading-[1.2]"
+              >
                 Turkmenistan
               </h2>
             </div>
             <div className="overflow-hidden">
               <div ref={clockWrapRef} className="opacity-0">
-                <LiveClock className="w-[5ch] text-right text-sm font-semibold" />
+                <LiveClock className="w-[5ch] text-right text-sm font-semibold md:text-[1vw] md:leading-[1.2]" />
               </div>
             </div>
           </div>
         </header>
 
-        <div className="flex min-h-0 items-start justify-start overflow-hidden">
+        <div className="flex items-center justify-start md:px-[5vw]">
           <h1
             ref={introTextRef}
-            className="mx-auto w-[90%] overflow-hidden text-[clamp(1.5rem,6vw,2.5rem)] font-semibold leading-[clamp(1.75rem,6.6vw,2.75rem)] tracking-tighter opacity-0 md:text-[clamp(2.9rem,6vw,4.6rem)] md:leading-[clamp(3.25rem,6.6vw,5.1rem)]"
+            className="mx-auto w-[90%] text-[clamp(1.5rem,6vw,2.5rem)] font-semibold leading-[1.2] tracking-tighter opacity-0 md:mx-0 md:w-full md:max-w-[30ch] md:text-[4vw]"
           >
-            <span className="pl-30">Parla</span> is a production and software studio.{" "}
+            <span className="pl-30 md:pl-[10vw]">Parla</span> is a production
+            and software studio.{" "}
             <span className="font-suisse-works font-normal italic opacity-30">
-              We combine established production expertise with new digital capabilities.
+              We combine established production expertise with new digital
+              capabilities.
             </span>
           </h1>
         </div>
 
-        <footer className="flex items-end">
-          <div ref={emailRowRef} className="relative mx-auto flex h-10 w-[90%] items-center gap-2">
+        <footer className="flex items-end md:w-[100vw]">
+          <div
+            ref={emailRowRef}
+            className="relative mx-auto flex h-10 w-[90%] items-center gap-2 md:h-[3vw] md:w-[90vw] md:gap-[0.5vw]"
+          >
             <div className="overflow-hidden">
-              <p ref={emailTextRef} className="text-sm font-semibold opacity-0">
+              <p
+                ref={emailTextRef}
+                className="text-sm font-semibold opacity-0 md:text-[1vw] md:leading-[1.2]"
+              >
                 hello@parla.com
               </p>
             </div>
@@ -202,23 +267,29 @@ const HeroSection = () => {
                     onClick={handleCopyEmail}
                     disabled={emailCopied}
                     aria-label="Copy email address"
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-(--ink)/10"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-(--ink)/10 md:size-[2vw]"
                   >
                     <img
                       ref={copyIconRef}
-                      src={emailCopied ? "/header-icons/copy-success.svg" : "/header-icons/copy.svg"}
+                      src={
+                        emailCopied
+                          ? "/header-icons/copy-success.svg"
+                          : "/header-icons/copy.svg"
+                      }
                       alt=""
-                      className="h-5 w-5"
+                      className="h-5 w-5 md:size-[1.25vw]"
                     />
                   </button>
                 </div>
               </div>
 
-              <div className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full overflow-hidden">
+              <div className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full overflow-hidden md:-top-[0.5vw]">
                 <span
                   ref={copiedMessageRef}
-                  className={`cta inline-flex h-7 items-center justify-center whitespace-nowrap rounded-full bg-(--ink)/10 px-3 text-sm font-semibold text-black transition-all duration-300 ease-out ${
-                    emailCopied ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
+                  className={`cta inline-flex h-7 items-center justify-center whitespace-nowrap rounded-full bg-(--ink)/10 px-3 text-sm font-semibold text-black transition-all duration-300 ease-out md:h-[1.75vw] md:px-[0.75vw] md:text-[1vw] md:leading-[1.2] ${
+                    emailCopied
+                      ? "translate-y-0 opacity-100"
+                      : "translate-y-1 opacity-0"
                   }`}
                 >
                   Copied!

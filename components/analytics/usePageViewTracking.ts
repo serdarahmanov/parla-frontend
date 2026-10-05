@@ -24,8 +24,6 @@ function getAnalyticsTitle(pathOrUrl:string){
     if(path==="/work") return "Work | Parla";
     if(path==="/cookie") return "Cookie Policy | Parla";
     if(path==="/privacy-policy") return "Privacy Policy | Parla";
-    if(path==="/by-rahmanov") return "By Rahmanov | Parla";
-
     if(path.startsWith("/work/")){
         const slug = decodeURIComponent (path.replace("/work/","").split("/")[0] ||"");
         const work  = worksBySlug[slug];

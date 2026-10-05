@@ -31,11 +31,16 @@ const WorkSlugPage: NextPage<WorkPageProps> = ({ work }) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+  const supportedLocales = locales ?? ["tk", "en"];
+
   return {
-    paths: works.map((work) => ({
-      params: { slug: work.slug },
-    })),
+    paths: supportedLocales.flatMap((locale) =>
+      works.map((work) => ({
+        params: { slug: work.slug },
+        locale,
+      })),
+    ),
     fallback: false,
   };
 };

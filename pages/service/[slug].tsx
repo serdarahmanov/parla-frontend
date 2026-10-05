@@ -1,7 +1,11 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Head from "next/head";
 import ServiceDetailPage from "@/views/ServiceDetailPage";
-import { services, servicesBySlug, type ServiceItem } from "@/components/data/services";
+import {
+  categoryServices,
+  categoryServicesBySlug,
+  type ServiceItem,
+} from "@/components/data/services";
 
 type ServiceSlugPageProps = {
   service: ServiceItem;
@@ -15,16 +19,21 @@ const ServiceSlugPage: NextPage<ServiceSlugPageProps> = ({ service }) => {
         <meta name="description" content={service.text} />
       </Head>
 
-      <ServiceDetailPage service={service} />
+      <ServiceDetailPage key={service.slug} service={service} />
     </>
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+  const supportedLocales = locales ?? ["tk", "en"];
+
   return {
-    paths: services.map((service) => ({
-      params: { slug: service.slug },
-    })),
+    paths: supportedLocales.flatMap((locale) =>
+      categoryServices.map((service) => ({
+        params: { slug: service.slug },
+        locale,
+      })),
+    ),
     fallback: false,
   };
 };
@@ -36,7 +45,7 @@ export const getStaticProps: GetStaticProps<ServiceSlugPageProps> = async ({ par
     return { notFound: true };
   }
 
-  const service = servicesBySlug[slug];
+  const service = categoryServicesBySlug[slug];
 
   if (!service) {
     return { notFound: true };

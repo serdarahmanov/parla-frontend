@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { usePageEntry } from "@/components/PageEntryProvider";
+import ParlaIcon from "@/components/ParlaIcon";
 
 type LandingIntroProps = {
   onRevealStart: () => void;
@@ -13,10 +14,10 @@ export default function LandingIntro({
 }: LandingIntroProps) {
   const { notifyLandingEntry } = usePageEntry();
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const logo1Ref = useRef<HTMLImageElement | null>(null);
-  const logo2Ref = useRef<HTMLImageElement | null>(null);
-  const logo3Ref = useRef<HTMLImageElement | null>(null);
-  const logo4Ref = useRef<HTMLImageElement | null>(null);
+  const logo1Ref = useRef<SVGSVGElement | null>(null);
+  const logo2Ref = useRef<SVGSVGElement | null>(null);
+  const logo3Ref = useRef<SVGSVGElement | null>(null);
+  const logo4Ref = useRef<SVGSVGElement | null>(null);
   const logo5Ref = useRef<HTMLImageElement | null>(null);
   const flairRef = useRef<HTMLVideoElement | null>(null);
   const hasPlayed = useRef(false);
@@ -37,50 +38,33 @@ export default function LandingIntro({
       //   },
       // })
 
-        .from(logo1Ref.current, {
-          y: -5,
-          x: -5,
-          opacity: 0,
-          duration: 0.6,
-        })
-        .from(
+        .fromTo(
+          logo1Ref.current,
+          { y: -5, x: -5, opacity: 0 },
+          { y: 0, x: 0, opacity: 1, duration: 0.6 },
+        )
+        .fromTo(
           logo2Ref.current,
-          {
-            y: -5,
-            x: 5,
-            opacity: 0,
-            duration: 0.6,
-          },
+          { y: -5, x: 5, opacity: 0 },
+          { y: 0, x: 0, opacity: 1, duration: 0.6 },
           "-=0.4",
         )
-        .from(
+        .fromTo(
           logo3Ref.current,
-          {
-            y: 5,
-            x: -5,
-            opacity: 0,
-            duration: 0.6,
-          },
+          { y: 5, x: -5, opacity: 0 },
+          { y: 0, x: 0, opacity: 1, duration: 0.6 },
           "-=0.4",
         )
-        .from(
+        .fromTo(
           logo4Ref.current,
-          {
-            y: 5,
-            x: 5,
-            opacity: 0,
-            duration: 0.6,
-          },
+          { y: 5, x: 5, opacity: 0 },
+          { y: 0, x: 0, opacity: 1, duration: 0.6 },
           "-=0.4",
         )
-        .from(
+        .fromTo(
           logo5Ref.current,
-          {
-            y: 5,
-          
-            opacity: 0,
-            duration: 0.6,
-          },
+          { y: 5, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6 },
           "-=0.4",
         )
         .to(".intro-overlay", {
@@ -122,28 +106,32 @@ export default function LandingIntro({
         <div className=" text-center z-[10000] w-full h-screen flex flex-col justify-center items-center">
           
           <div className="intro-logo gap-0.5 grid grid-cols-2 grid-rows-2   w-10">
-            <img
+            <ParlaIcon
               ref={logo1Ref}
-              src="/landingTransition/Asset-1.svg"
-              alt="Parla"
+              position="top-left"
+              fill="#fdb814"
+              style={{ opacity: 0 }}
               className="row-start-1 col-start-1 row-span-1 col-span-1 "
             />
-            <img
-              src="/landingTransition/Asset-2.svg"
-              alt="Parla"
+            <ParlaIcon
               ref={logo2Ref}
+              position="top-right"
+              fill="#fdb814"
+              style={{ opacity: 0 }}
               className="row-start-1 col-start-2  row-span-1 col-span-1"
             />
-            <img
-              src="/landingTransition/Asset-3.svg"
-              alt="Parla"
+            <ParlaIcon
               ref={logo3Ref}
+              position="bottom-left"
+              fill="#fdb814"
+              style={{ opacity: 0 }}
               className="row-start-2 col-start-1   row-span-1 col-span-1"
             />
-            <img
-              src="/landingTransition/Asset-4.svg"
-              alt="Parla"
+            <ParlaIcon
               ref={logo4Ref}
+              position="bottom-right"
+              fill="#fdb814"
+              style={{ opacity: 0 }}
               className=" row-start-2 col-start-2   row-span-1 col-span-1 "
             />
           </div>
@@ -152,6 +140,7 @@ export default function LandingIntro({
             src="/landingTransition/Asset-5.svg"
             alt="Parla"
             ref={logo5Ref}
+            style={{ opacity: 0 }}
             className="w-10 mt-1"
           />
         </div>

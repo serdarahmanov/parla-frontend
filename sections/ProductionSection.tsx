@@ -2,31 +2,55 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type TouchEvent } from "react";
 import gsap from "gsap";
-import Image from "next/image";
+import { useGSAP } from "@gsap/react";
+import { useRouter } from "next/router";
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { works } from "@/components/data/works";
 import { EASE_BRAND } from "@/lib/gsap/customEase";
+import { usePageEntry } from "@/components/PageEntryProvider";
+import ParlaIcon from "@/components/ParlaIcon";
 
 type ProductionSectionProps = { videoLinks: string[] };
 
+const productionCoverImages = [
+  "/production/blurred-covers/1a.webp",
+  "/production/blurred-covers/2.webp",
+  "/production/blurred-covers/3.webp",
+  "/production/blurred-covers/4.webp",
+  "/production/blurred-covers/5.webp",
+];
+
 const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
-  const marqueeText = "Parla is a production and software studio. We combine established production expertise with new digital capabilities.";
+  const router = useRouter();
+  const headingRef = useRef<HTMLDivElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const selectedIndexRef = useRef(0);
+  const shouldPlayRef = useRef(true);
   const railTweenRef = useRef<gsap.core.Tween | null>(null);
+  const isRailEnteringRef = useRef(false);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const suppressClickRef = useRef(false);
   const suppressClickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [revealedVideoIndex, setRevealedVideoIndex] = useState<number | null>(null);
+  const [readinessAttempt, setReadinessAttempt] = useState(0);
   const [shouldPlay, setShouldPlay] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const { entry } = usePageEntry();
+  const currentRouteKey = router.asPath.split("#", 1)[0] || "/";
+  const entryId = entry?.routeKey === currentRouteKey ? entry.id : null;
 
   const activeWork = works[selectedIndex];
   const activeVideoSrc = videoLinks[selectedIndex] || activeWork.videoSrc;
+
+  const updateShouldPlay = useCallback((nextShouldPlay: boolean) => {
+    shouldPlayRef.current = nextShouldPlay;
+    setShouldPlay(nextShouldPlay);
+  }, []);
 
   const centerSelectedCard = useCallback((index: number, animate = true) => {
     const viewport = viewportRef.current;
@@ -36,6 +60,7 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
 
     const targetX = viewport.clientWidth / 2 - (card.offsetLeft + card.offsetWidth / 2);
     railTweenRef.current?.kill();
+    isRailEnteringRef.current = false;
 
     if (!animate || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       gsap.set(track, { x: targetX });
@@ -58,6 +83,7 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
     }
 
     selectedIndexRef.current = nextIndex;
+    setRevealedVideoIndex(null);
     setSelectedIndex(nextIndex);
     requestAnimationFrame(() => centerSelectedCard(nextIndex, animate));
   }, [centerSelectedCard]);
@@ -94,25 +120,25 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
   }, [selectProject]);
 
   const toggleVideo = useCallback(async () => {
-    const video = videoRef.current;
+    const video = videoRefs.current[selectedIndexRef.current];
     if (!video) return;
 
     if (shouldPlay) {
       video.pause();
-      setShouldPlay(false);
+      updateShouldPlay(false);
       return;
     }
 
     try {
       await video.play();
-      setShouldPlay(true);
+      updateShouldPlay(true);
     } catch {
-      setShouldPlay(false);
+      updateShouldPlay(false);
     }
-  }, [shouldPlay]);
+  }, [shouldPlay, updateShouldPlay]);
 
   const toggleMute = useCallback(() => {
-    const video = videoRef.current;
+    const video = videoRefs.current[selectedIndexRef.current];
     if (!video) return;
     video.muted = !video.muted;
     setIsMuted(video.muted);
@@ -123,12 +149,76 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
     if (!viewport) return;
 
     const observer = new ResizeObserver(() => {
+      if (!entryId || isRailEnteringRef.current) return;
       centerSelectedCard(selectedIndexRef.current, false);
     });
     observer.observe(viewport);
-    centerSelectedCard(selectedIndexRef.current, false);
+    if (entryId && !isRailEnteringRef.current) {
+      centerSelectedCard(selectedIndexRef.current, false);
+    }
     return () => observer.disconnect();
-  }, [centerSelectedCard]);
+  }, [centerSelectedCard, entryId]);
+
+  useGSAP(() => {
+    const heading = headingRef.current;
+    if (!entryId || !heading) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(heading, { x: 0, opacity: 1 });
+      return;
+    }
+
+    gsap.to(heading, {
+      x: 0,
+      opacity: 1,
+      duration: 1.5,
+      ease: EASE_BRAND,
+    });
+  }, {
+    scope: headingRef,
+    dependencies: [entryId],
+    revertOnUpdate: true,
+  });
+
+  useGSAP(() => {
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    const selectedCard = cardRefs.current[selectedIndexRef.current];
+    if (!entryId || !viewport || !track || !selectedCard) return;
+
+    const targetX = viewport.clientWidth / 2
+      - (selectedCard.offsetLeft + selectedCard.offsetWidth / 2);
+
+    railTweenRef.current?.kill();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      isRailEnteringRef.current = false;
+      gsap.set(track, { x: targetX });
+      return;
+    }
+
+    isRailEnteringRef.current = true;
+    const entryTween = gsap.to(track, {
+      x: targetX,
+      duration: 1.5,
+      ease: EASE_BRAND,
+      overwrite: true,
+      onComplete: () => {
+        isRailEnteringRef.current = false;
+        if (railTweenRef.current === entryTween) railTweenRef.current = null;
+      },
+    });
+    railTweenRef.current = entryTween;
+
+    return () => {
+      if (railTweenRef.current === entryTween) railTweenRef.current = null;
+      isRailEnteringRef.current = false;
+    };
+  }, {
+    scope: viewportRef,
+    dependencies: [entryId],
+    revertOnUpdate: true,
+  });
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
@@ -165,12 +255,113 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
   }, []);
 
   useEffect(() => {
-    const video = videoRef.current;
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      video.muted = isMuted;
+
+      if (index === selectedIndex && shouldPlay) {
+        void video.play().catch(() => updateShouldPlay(false));
+      } else {
+        video.pause();
+      }
+    });
+  }, [activeVideoSrc, isMuted, selectedIndex, shouldPlay, updateShouldPlay]);
+
+  useEffect(() => {
+    const video = videoRefs.current[selectedIndex];
     if (!video) return;
-    video.muted = isMuted;
-    if (shouldPlay) void video.play().catch(() => setShouldPlay(false));
-    else video.pause();
-  }, [activeVideoSrc, isMuted, shouldPlay]);
+
+    let cancelled = false;
+    let frameCallbackId: number | null = null;
+    let fallbackFrameId: number | null = null;
+    let bufferPollId: ReturnType<typeof setInterval> | null = null;
+    let frameWaitStarted = false;
+    let renderedFrameCount = 0;
+
+    const revealVideo = () => {
+      if (cancelled || selectedIndexRef.current !== selectedIndex) return;
+      setRevealedVideoIndex(selectedIndex);
+    };
+
+    const getBufferedSecondsAhead = () => {
+      const currentTime = video.currentTime;
+
+      for (let index = 0; index < video.buffered.length; index += 1) {
+        const start = video.buffered.start(index);
+        const end = video.buffered.end(index);
+        if (start <= currentTime + 0.05 && end >= currentTime) return end - currentTime;
+      }
+
+      return 0;
+    };
+
+    const waitForRenderedFrames = () => {
+      if (cancelled || frameWaitStarted) return;
+      frameWaitStarted = true;
+      if (bufferPollId !== null) {
+        clearInterval(bufferPollId);
+        bufferPollId = null;
+      }
+
+      if (!video.paused && "requestVideoFrameCallback" in video) {
+        const handleRenderedFrame = () => {
+          if (cancelled) return;
+          renderedFrameCount += 1;
+
+          if (renderedFrameCount >= 2) {
+            revealVideo();
+            return;
+          }
+
+          frameCallbackId = video.requestVideoFrameCallback(handleRenderedFrame);
+        };
+
+        frameCallbackId = video.requestVideoFrameCallback(handleRenderedFrame);
+        return;
+      }
+
+      const waitOneMorePaint = () => {
+        fallbackFrameId = window.requestAnimationFrame(revealVideo);
+      };
+      fallbackFrameId = window.requestAnimationFrame(waitOneMorePaint);
+    };
+
+    const checkBuffer = () => {
+      if (cancelled || frameWaitStarted) return;
+
+      const remainingDuration = Number.isFinite(video.duration)
+        ? Math.max(0, video.duration - video.currentTime)
+        : 1.5;
+      const requiredBuffer = Math.min(1.5, remainingDuration);
+      const hasForwardBuffer = getBufferedSecondsAhead() >= requiredBuffer;
+
+      if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA && hasForwardBuffer) {
+        waitForRenderedFrames();
+      }
+    };
+
+    video.addEventListener("progress", checkBuffer);
+    video.addEventListener("canplay", checkBuffer);
+    video.addEventListener("durationchange", checkBuffer);
+    bufferPollId = setInterval(checkBuffer, 100);
+
+    if (shouldPlayRef.current) {
+      void video.play().then(checkBuffer).catch(checkBuffer);
+    }
+    checkBuffer();
+
+    return () => {
+      cancelled = true;
+      video.removeEventListener("progress", checkBuffer);
+      video.removeEventListener("canplay", checkBuffer);
+      video.removeEventListener("durationchange", checkBuffer);
+      if (bufferPollId !== null) clearInterval(bufferPollId);
+      if (frameCallbackId !== null && "cancelVideoFrameCallback" in video) {
+        video.cancelVideoFrameCallback(frameCallbackId);
+      }
+      if (fallbackFrameId !== null) window.cancelAnimationFrame(fallbackFrameId);
+    };
+  }, [activeVideoSrc, readinessAttempt, selectedIndex]);
 
   useEffect(() => {
     return () => {
@@ -181,7 +372,11 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
 
   return (
     <section id="production-section" aria-label="Production" className="production-section relative z-21">
-      <div className="production-library-heading">
+      <div
+        ref={headingRef}
+        className="production-library-heading"
+        style={{ opacity: 0, transform: "translate3d(100vw, 0, 0)" }}
+      >
         <p aria-live="polite">
           <span>{String(selectedIndex + 1).padStart(2, "0")}</span>
           <span aria-hidden="true"> / </span>
@@ -205,14 +400,20 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
             if (event.key === "ArrowRight") { event.preventDefault(); selectProject(selectedIndexRef.current + 1); }
           }}
         >
-          <div ref={trackRef} className="production-library-track">
+          <div
+            ref={trackRef}
+            className="production-library-track"
+            style={{ transform: "translate3d(100vw, 0, 0)" }}
+          >
             {works.map((work, index) => {
               const isSelected = index === selectedIndex;
+              const isVideoVisible = index === revealedVideoIndex;
+              const videoSrc = videoLinks[index] || work.videoSrc;
               return (
                 <article
                   key={work.slug}
                   ref={(element) => { cardRefs.current[index] = element; }}
-                  className={`production-library-card${isSelected ? " is-selected" : ""}`}
+                  className={`production-library-card${isSelected ? " is-selected" : ""}${isVideoVisible ? " is-video-visible" : ""}`}
                   style={{ clipPath: "inset(0 0 80% 0)" }}
                   aria-label={`${index + 1} of ${works.length}: ${work.clientName}, ${work.videoName}`}
                   aria-current={isSelected ? "true" : undefined}
@@ -225,58 +426,66 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
                       selectProject(index);
                     }}
                     aria-label={isSelected ? `${work.clientName} ${work.videoName}, selected` : `Select ${work.clientName} ${work.videoName}`}
-                  >
-                    <span className="production-library-card-media">
-                      <span className="production-library-poster-layer">
-                        <span className="production-library-poster-image">
-                          <Image
-                            src={work.poster ?? work.coverImage}
-                            alt=""
-                            fill
-                            draggable={false}
-                            sizes="39.375dvh"
+                    >
+                      <span className="production-library-card-media">
+                        <span className="production-library-media-overscan">
+                          <span className="production-library-poster-layer" aria-hidden="true">
+                            {/* This pre-optimized decorative asset intentionally bypasses next/image. */}
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={productionCoverImages[index]}
+                              alt=""
+                              draggable={false}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </span>
+                          <video
+                            ref={(element) => { videoRefs.current[index] = element; }}
+                            src={videoSrc}
+                            playsInline
+                            autoPlay={isSelected && shouldPlay}
+                            muted={isMuted}
+                            preload={Math.abs(index - selectedIndex) <= 1 ? "auto" : "metadata"}
+                            onPlaying={() => {
+                              if (index === selectedIndexRef.current) {
+                                setReadinessAttempt((attempt) => attempt + 1);
+                              }
+                            }}
+                            onWaiting={() => {
+                              if (index !== selectedIndexRef.current) return;
+                              setRevealedVideoIndex(null);
+                            }}
+                            onStalled={() => {
+                              if (index !== selectedIndexRef.current) return;
+                              setRevealedVideoIndex(null);
+                            }}
+                            onEnded={() => {
+                              if (index !== selectedIndexRef.current) return;
+                              if (selectedIndexRef.current < works.length - 1) selectProject(selectedIndexRef.current + 1);
+                              else selectProject(0);
+                            }}
                           />
                         </span>
-                      </span>
-                      {isSelected && (
-                        <video
-                          key={activeVideoSrc}
-                          ref={videoRef}
-                          src={activeVideoSrc}
-                          poster={work.poster ?? work.coverImage}
-                          playsInline
-                          autoPlay={shouldPlay}
-                          muted={isMuted}
-                          preload="metadata"
-                          onEnded={() => {
-                            if (selectedIndexRef.current < works.length - 1) selectProject(selectedIndexRef.current + 1);
-                            else if (videoRef.current && shouldPlay) {
-                              videoRef.current.currentTime = 0;
-                              void videoRef.current.play().catch(() => setShouldPlay(false));
-                            }
-                          }}
-                        />
-                      )}
                     </span>
-                    <span className="production-library-card-caption">
+                      <span className="production-library-card-caption">
                       <span
-                        className={`production-library-card-names${isSelected ? " is-visible" : ""}`}
-                        aria-hidden={!isSelected}
+                        className={`production-library-card-names${isSelected && isVideoVisible ? " is-visible" : ""}`}
+                        aria-hidden={!isSelected || !isVideoVisible}
                       >
                           <span>{work.clientName}</span>
                           <span>{work.videoName}</span>
                       </span>
                       <span
-                        className={`production-library-parla-mark${isSelected ? "" : " is-visible"}`}
+                        className={`production-library-parla-mark${!isSelected || !isVideoVisible ? " is-visible" : ""}${isSelected && !isVideoVisible ? " is-loading" : ""}`}
                         aria-hidden="true"
                       >
-                          {[2, 4, 1, 3].map((part, partIndex) => (
-                            <Image
-                              key={part}
-                              src={`/blackSVGs/Asset-${part}.svg`}
-                              alt=""
-                              width={18}
-                              height={18}
+                          {(["top-right", "bottom-right", "top-left", "bottom-left"] as const).map((position, partIndex) => (
+                            <ParlaIcon
+                              key={position}
+                              position={position}
+                              fill="#000000"
+                              aria-hidden="true"
                               style={{ transitionDelay: `${partIndex * 60}ms` }}
                             />
                           ))}
@@ -289,34 +498,31 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
           </div>
         </div>
 
-        <div className="production-library-controls" data-carousel-control>
-          <div className="production-library-video-controls">
-            <button type="button" onClick={() => void toggleVideo()} aria-label={shouldPlay ? "Pause video" : "Play video"}>
-              {shouldPlay ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}
-            </button>
-            <button
-              type="button"
-              className={`cta production-library-sound-toggle${isMuted ? " is-muted" : " is-audible"}`}
-              onClick={toggleMute}
-              role="switch"
-              aria-checked={!isMuted}
-              aria-label={isMuted ? "Turn sound on" : "Turn sound off"}
-            >
-              <span className="cta production-library-sound-thumb" aria-hidden="true">
-                <VolumeX className="production-library-sound-icon production-library-sound-icon--muted" />
-                <Volume2 className="production-library-sound-icon production-library-sound-icon--audible" />
-              </span>
-            </button>
+        <div className="production-library-footer">
+          <div className="production-library-controls" data-carousel-control>
+            <div className="production-library-video-controls">
+              <button type="button" onClick={() => void toggleVideo()} aria-label={shouldPlay ? "Pause video" : "Play video"}>
+                {shouldPlay ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}
+              </button>
+              <button
+                type="button"
+                className={`cta production-library-sound-toggle${isMuted ? " is-muted" : " is-audible"}`}
+                onClick={toggleMute}
+                role="switch"
+                aria-checked={!isMuted}
+                aria-label={isMuted ? "Turn sound on" : "Turn sound off"}
+              >
+                <span className="cta production-library-sound-thumb" aria-hidden="true">
+                  <VolumeX className="production-library-sound-icon production-library-sound-icon--muted" />
+                  <Volume2 className="production-library-sound-icon production-library-sound-icon--audible" />
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="production-library-marquee" aria-hidden="true">
-          <div className="production-library-marquee-track">
-            <span>{marqueeText}</span>
-            <span>{marqueeText}</span>
-          </div>
         </div>
       </div>
+
     </section>
   );
 };

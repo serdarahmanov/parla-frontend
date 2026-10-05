@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { GSP_NO_RETURNED_VALUE } from "next/dist/lib/constants";
+import ParlaIcon from "@/components/ParlaIcon";
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
@@ -19,7 +20,7 @@ type HeaderProps = {
 function Header({ activePillLayoutId = "nav-active-pill" }: HeaderProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const topRef = useRef<HTMLImageElement | null>(null);
-  const bottomRef = useRef<HTMLImageElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
   const { pathname } = useRouter();
 
   useLayoutEffect(() => {
@@ -117,12 +118,18 @@ function Header({ activePillLayoutId = "nav-active-pill" }: HeaderProps) {
           className="w-14 block"
         />
 
-        <img
+        <div
           ref={bottomRef}
-          src="/landingTransition/rectangular-part-of-logo-inside-parla.svg"
-          alt="Parla"
-          className="w-14 absolute left-0 top-0 block"
-        />
+          aria-hidden="true"
+          className="absolute left-0 top-0 block aspect-[1645.06/676.16] w-14"
+        >
+          <div className="absolute left-1/2 top-1/2 grid w-[18%] -translate-x-1/2 -translate-y-1/2 aspect-[569.79/698.76] grid-cols-2 grid-rows-2 gap-[5%]">
+            <ParlaIcon position="top-left" fill="#fdb814" />
+            <ParlaIcon position="top-right" fill="#fdb814" />
+            <ParlaIcon position="bottom-left" fill="#fdb814" />
+            <ParlaIcon position="bottom-right" fill="#fdb814" />
+          </div>
+        </div>
       </div>
     </Link>
   );

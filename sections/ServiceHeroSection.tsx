@@ -12,7 +12,7 @@ type ServiceHeroSectionProps = {
 const ServiceHeroSection = ({ title, text, image }: ServiceHeroSectionProps) => {
   return (
     <section
-      className={`header-clearance-top isolate relative flex h-[70vh] w-full flex-col justify-end overflow-hidden pb-8 font-sans md:h-[70vh] md:pb-[5vw] ${
+      className={`header-clearance-top isolate relative flex h-[70vh] w-full flex-col justify-end overflow-hidden bg-[#050506] pb-8 font-sans md:h-[70vh] md:pb-[2vw] ${
         "text-white"
       }`}
     >
@@ -38,7 +38,7 @@ const ServiceHeroSection = ({ title, text, image }: ServiceHeroSectionProps) => 
           >
           <Link
             href="/services"
-            className="row-start-2 service-offering-link service-hero-back-link group cta inline-flex w-fit items-center gap-1 rounded-[var(--r-cta)] bg-[#f2f2f2]/50 px-4 py-3 text-[12px] font-normal text-white transition-colors duration-200 md:self-start md:w-fit md:px-[1vw] md:py-[0.75vw] md:text-[1vw] focus-visible:outline-2 focus-visible:outline-current focus-visible:outline-offset-2"
+            className="row-start-2 service-offering-link service-hero-back-link group cta inline-flex w-fit items-center gap-1 rounded-[var(--r-cta)] bg-[#f2f2f2]/50 px-4 py-3 text-[12px] font-normal text-black transition-colors duration-200 md:self-start md:w-fit md:px-[1vw] md:py-[0.75vw] md:text-[1vw] focus-visible:outline-2 focus-visible:outline-current focus-visible:outline-offset-2"
           >
             <ArrowLeft
               aria-hidden="true"

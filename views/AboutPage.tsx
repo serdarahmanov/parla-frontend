@@ -8,21 +8,44 @@ import LiveClock from "@/components/LiveClock";
 const images = [
   {
     id: 1,
-    href: "/info-photos/business-people-shaking-hands-agreement_53876-30721.jpg",
+    href: "/info-photos/team.jpg",
   },
+];
+
+const clients = [
+  "Asushi",
+  "Ayna",
+  "Berkara Gerb",
+  "Candash",
+  "Ellkitap",
+  "Family",
+  "Momo",
+  "Noor",
+  "Sarwan",
+  "Yumak",
+  "Altyn",
+  "Arzuw",
+  "Begenç",
+  "Çeper",
+  "Durnalar",
+  "Güneş",
+  "Merjen",
+  "Owad",
+  "Sähra",
+  "Ylham",
 ];
 
 function About() {
   return (
     <div
-      className="about-page header-clearance-top relative pb-10 px-6  w-full h-screen
+      className="about-page header-clearance-top relative px-6 pb-10 mt-6 w-full h-auto
      flex flex-col gap-y-10
-      md:relative md:pb-10 md:px-6 md:w-full md:min-h-screen md:flex md:font-sans md:flex-col md:gap-y-5
+      md:relative md:pb-10 md:px-6 md:w-full md:h-auto md:flex md:font-sans md:flex-col md:gap-y-5
       lg:relative lg:pb-10 lg:px-6 lg:grid lg:w-full   lg:font-sans
-      lg:gap-x-3 lg:grid-cols-12 lg:grid-rows-2 lg:h-screen lg:gap-y-15  "
+      lg:gap-x-3 lg:grid-cols-12 lg:grid-rows-2 lg:h-auto lg:gap-y-15  "
     >
-      <div className=" grid grid-cols-3 md:row-span-2 md:col-span-10 md:col-start-1 md:grid md:grid-cols-10  md:gap-x-5 lg:col-span-12 lg:row-span-1 lg:grid lg:grid-cols-12 lg:gap-x-3 ">
-        <div className="col-start-1 col-span-2 font-sans font-semibold leading-5 tracking-tight  md:col-start-1 md:col-span-6 lg:col-start-1 md:text-2xl md:leading-[1.4rem] lg:col-span-7 lg:font-sans lg:tracking-tight lg:text-[2rem] lg:leading-8 lg:font-medium ">
+      <div className="grid grid-cols-3 gap-y-5 md:row-span-2 md:col-span-10 md:col-start-1 md:grid md:grid-cols-10 md:gap-x-5 lg:col-span-12 lg:row-span-1 lg:grid lg:grid-cols-12 lg:gap-x-3 lg:gap-y-3">
+        <div className="col-start-1 col-span-3 font-sans font-semibold leading-5 tracking-tight md:col-start-1 md:col-span-10 lg:col-span-7 md:text-2xl md:leading-[1.4rem] lg:col-start-1 lg:font-sans lg:tracking-tight lg:text-[2rem] lg:leading-8 lg:font-medium">
           <Paragraph
             delay={0}
             stagger={0.05}
@@ -34,7 +57,7 @@ function About() {
           initial={{ clipPath: "inset(50% 50% 50% 50%)" }}
           animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
           transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
-          className="col-start-3 col-span-1 md:col-start-8 md:col-span-3 lg:col-start-10 lg:col-span-3"
+          className="col-start-1 col-span-3 md:col-start-1 md:col-span-10 lg:col-start-10 lg:col-span-3"
         >
           {images.map((item) => (
             <img
@@ -70,8 +93,25 @@ function About() {
           </div>
         </div>
 
+        <div className="font-normal text-[0.8rem] font-sans md:w-[40vw] md:text-[0.7rem] md:leading-[0.9rem] lg:col-start-1 lg:col-span-3 lg:row-start-2 lg:text-xs lg:font-normal lg:font-sans">
+          <div className="flex flex-col gap-2 md:gap-2 lg:gap-3">
+            <motion.h1
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 0.5, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              className="text-[0.7rem] font-bold opacity-50 md:text-[0.7rem] md:font-bold lg:text-[0.7rem] lg:font-bold"
+            >
+              Clients
+            </motion.h1>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+              {clients.map((client) => (
+                <span key={client}>{client}</span>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        <div className="font-normal text-[0.8rem] font-sans md:w-[40vw] md:text-[0.7rem] md:leading-[0.9rem] lg:col-start-7 lg:col-span-3  lg:text-xs lg:font-normal lg:font-sans ">
+        <div className="font-normal text-[0.8rem] font-sans md:w-[40vw] md:text-[0.7rem] md:leading-[0.9rem] lg:col-start-7 lg:col-span-3 lg:text-xs lg:font-normal lg:font-sans">
           <div className="flex flex-col gap-2 md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-3">
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
@@ -164,10 +204,10 @@ function About() {
 
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 0.5, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
               >
-                <LiveClock className={" font-bold text-[0.7rem] font-sans opacity-50 md:text-[0.6rem] "} />
+                <LiveClock className="font-normal text-[0.8rem] font-sans md:text-[0.7rem] md:leading-[0.9rem] lg:text-xs" />
               </motion.div>
             </div>
           </div>

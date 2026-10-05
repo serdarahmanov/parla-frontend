@@ -23,13 +23,16 @@ const timeFormatter = useMemo(
   );
 
  useEffect(() => {
-    const interval = setInterval(() => {
+    const updateClock = () => {
       setNow(new Date());
-    }, 1000);
+    };
+
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
     return () => clearInterval(interval);
   }, []);
 
-    const time = now ? timeFormatter.format(now) : "00:00:00";
+    const time = now ? timeFormatter.format(now) : "--:--";
 
 
   return (

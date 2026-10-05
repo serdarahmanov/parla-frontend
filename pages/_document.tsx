@@ -1,10 +1,11 @@
 import { Head, Html, Main, NextScript } from "next/document";
+import type { DocumentProps } from "next/document";
 import Script from "next/script";
 import { consentBridgeScript } from "@/lib/consent/consentBridgeScript";
 
-export default function Document() {
+export default function Document({ __NEXT_DATA__ }: DocumentProps) {
   return (
-    <Html lang="en">
+    <Html lang={__NEXT_DATA__.locale ?? "tk"}>
       <Head>
         <link rel="stylesheet" href="/vendor/klaro.css" />
       </Head>

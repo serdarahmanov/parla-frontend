@@ -13,7 +13,7 @@ export const works: WorkItem[] = [
     clientName: "Serdar",
     videoName: "Paradise",
     coverImage: "/Section-4/1F5A8270.webp",
-    videoSrc: "/video/TasVegias.mp4",
+    videoSrc: "/video/Fogg-sketch.mp4",
     poster: "/Section-4/1F5A8270.webp",
   },
   {
@@ -21,7 +21,7 @@ export const works: WorkItem[] = [
     clientName: "Cotki Zatlar",
     videoName: "Campaign Film",
     coverImage: "/Section-4/1F5A8053.webp",
-    videoSrc: "/video/output.mp4",
+    videoSrc: "/video/Geliber-Saylaw-ansat.mp4",
     poster: "/Section-4/1F5A8053.webp",
   },
   {
@@ -29,7 +29,7 @@ export const works: WorkItem[] = [
     clientName: "Edemen Yakinda",
     videoName: "Teaser",
     coverImage: "/Section-4/1F5A7357.webp",
-    videoSrc: "/video/1.MOV",
+    videoSrc: "/video/Qamar-creative.mp4",
     poster: "/Section-4/1F5A7357.webp",
   },
   {
@@ -37,7 +37,7 @@ export const works: WorkItem[] = [
     clientName: "TAS",
     videoName: "Vegias Launch",
     coverImage: "/Section-4/_DSF1938.webp",
-    videoSrc: "/video/TasVegias.mp4",
+    videoSrc: "/video/Hanan-creative-3.mp4",
     poster: "/Section-4/_DSF1938.webp",
   },
   {
@@ -45,7 +45,7 @@ export const works: WorkItem[] = [
     clientName: "Ast Ast",
     videoName: "Director's Cut",
     coverImage: "/Section-4/_DSF1986.webp",
-    videoSrc: "/video/output.mp4",
+    videoSrc: "/video/IMG-4616.mp4",
     poster: "/Section-4/_DSF1986.webp",
   },
 ];

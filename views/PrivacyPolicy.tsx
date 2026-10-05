@@ -4,39 +4,91 @@ import MaskTextAnimation from "@/animations/MaskTextAnimation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import React, { use, useLayoutEffect, useRef, useState } from "react";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(useGSAP);
-gsap.registerPlugin(ScrollToPlugin);
+
+const sectionId = (index: number) => `privacy-policy-section-${index}`;
 
 const PrivacyPolicy = () => {
   const wrapperRef = useRef(null);
   const leftSideBarRef = useRef(null);
-  const policiesRef = useRef<(HTMLDivElement | null)[]>([]);
+  const policiesRef = useRef<(HTMLHeadingElement | null)[]>([]);
+  const programmaticPolicyRef = useRef<number | null>(null);
+  const scrollRequestRef = useRef(0);
   const [activePolicy, setActivePolicy] = useState(0);
+
+  const scrollToSection = useCallback((index: number, updateHash = true) => {
+    const section = policiesRef.current[index];
+    if (!section) return;
+
+    const requestId = ++scrollRequestRef.current;
+    programmaticPolicyRef.current = index;
+
+    if (updateHash) {
+      window.history.replaceState(null, "", `#${sectionId(index)}`);
+    }
+
+    window.dispatchEvent(
+      new CustomEvent("parla-scroll-to-position", {
+        detail: {
+          target: section,
+          offset: -(window.innerHeight * 0.3),
+          onComplete: () => {
+            if (scrollRequestRef.current !== requestId) return;
+            programmaticPolicyRef.current = null;
+            setActivePolicy(index);
+          },
+        },
+      }),
+    );
+  }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash.replace(/^#/, "");
+    const index = privacyPolicy.sections.findIndex(
+      (_, sectionIndex) => sectionId(sectionIndex) === hash,
+    );
+    if (index < 0) return;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollToSection(index, false));
+    });
+  }, [scrollToSection]);
 
   useLayoutEffect(() => {
     if (!wrapperRef.current) return;
 
     const context = gsap.context(() => {
+      const updateActivePolicy = () => {
+        if (programmaticPolicyRef.current !== null) return;
+
+        const activationLine = window.innerHeight * 0.3;
+        let currentPolicy = 0;
+
+        policiesRef.current.forEach((section, index) => {
+          if (section && section.getBoundingClientRect().top <= activationLine) {
+            currentPolicy = index;
+          }
+        });
+
+        setActivePolicy((current) =>
+          current === currentPolicy ? current : currentPolicy,
+        );
+      };
+
       ScrollTrigger.create({
         trigger: wrapperRef.current,
         start: "top top",
         end: "bottom bottom",
         pin: leftSideBarRef.current,
         pinSpacing: false,
+        onUpdate: updateActivePolicy,
+        onRefresh: updateActivePolicy,
       });
 
-      policiesRef.current.forEach((header, i) =>
-        ScrollTrigger.create({
-          trigger: header,
-          start: "top top+=20%",
-          onEnter: () => setActivePolicy(i),
-          onEnterBack: () => setActivePolicy(i),
-        }),
-      );
+      updateActivePolicy();
     }, wrapperRef);
 
     return () => context.revert();
@@ -56,9 +108,9 @@ const PrivacyPolicy = () => {
          {/* className=" col-start-1 col-span-3 flex flex-col  gap-4 h-screen  */}
         <div
           ref={leftSideBarRef}
-          className="h-screen col-span-3 gap-4 flex flex-col col-start-1 
-          md:h-screen md:col-span-3 md:gap-4 md:flex md:flex-col md:col-start-2 
-          lg:h-screen lg:col-span-3 lg:gap-4 lg:flex lg:flex-col lg:col-start-4 "
+          className="box-border h-screen pt-[5vh] col-span-3 gap-4 flex flex-col col-start-1 
+          md:h-screen md:pt-[5vh] md:col-span-3 md:gap-4 md:flex md:flex-col md:col-start-2 
+          lg:h-screen lg:pt-[5vh] lg:col-span-3 lg:gap-4 lg:flex lg:flex-col lg:col-start-4 "
         >
           <MaskTextAnimation
             text={"PRIVACY POLICY"}
@@ -67,21 +119,18 @@ const PrivacyPolicy = () => {
 
           <div className="gap-3 text-xs font-bold  flex flex-col md:gap-1 md:text-xs md:font-bold md:flex md:flex-col lg:gap-1 lg:text-xs lg:font-bold lg:flex lg:flex-col">
             {privacyPolicy.sections.map((section, index) => (
-              <h2
+              <a
                 key={index}
+                href={`#${sectionId(index)}`}
                 className={`${activePolicy == index ? "opacity-100" : "opacity-30"} cursor-pointer`}
-                onClick={() => {
-                  const el = policiesRef.current[index];
-                  if (!el) return;
-                  gsap.to(window, {
-                    duration: 0.8,
-                    scrollTo: { y: el, offsetY: window.innerHeight * 0.2 },
-                    ease: "power2.out",
-                  });
+                onClick={(event) => {
+                  event.preventDefault();
+                  setActivePolicy(index);
+                  scrollToSection(index);
                 }}
               >
                 {section.heading}
-              </h2>
+              </a>
             ))}
           </div>
         </div>
@@ -94,9 +143,15 @@ const PrivacyPolicy = () => {
         md:col-start-6 md:col-span-6 md:gap-8 md:flex md:flex-col
         lg:col-start-8 lg:col-span-4 lg:gap-8 lg:flex lg:flex-col">
           {privacyPolicy.sections.map((section, index) => (
-            <div key={index} className=" flex flex-col gap-2 md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-2">
+            <div
+              key={index}
+              id={sectionId(index)}
+              className=" flex flex-col gap-2 md:flex md:flex-col md:gap-2 lg:flex lg:flex-col lg:gap-2"
+            >
               <h2
-                ref={(el) => { policiesRef.current[index] = el; }}
+                ref={(el) => {
+                  policiesRef.current[index] = el;
+                }}
                 className={`text-xs font-black    ${activePolicy == index ? "opacity-100" : "opacity-30"} `}
               >
                 {" "}

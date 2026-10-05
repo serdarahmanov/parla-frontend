@@ -4,8 +4,6 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import React, { useRef } from "react";
-import useScreenFlag from "@/lib/utils/useScreenFlag";
-import { RedirectType } from "next/navigation";
 import { usePageEntry } from "@/components/PageEntryProvider";
 
 
@@ -53,13 +51,9 @@ const initialServiceColors = ["#f9f9f8", "#a8a8a8", "#909090", "#787878", "#6060
 
 const ServicesSection = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const titleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const { entry } = usePageEntry();
   const entryId = entry?.id ?? null;
-
-  const { isSmall, isMedium, isLarge } = useScreenFlag();
 
 
   useGSAP(() => {
@@ -69,35 +63,49 @@ const ServicesSection = () => {
     (card): card is HTMLDivElement => card !== null
   );
 
-  cards.forEach((card, index) => {
-   if (index === 0) {
-     gsap.set(card, { backgroundColor: initialServiceColors[index] });
-     return;
-   }
+  const animatedCards = cards.slice(1);
 
-   gsap.set(card, {
-    y: -100,
-    rotate: -5,
-    backgroundColor: initialServiceColors[index],
+  gsap.set(cards[0], { backgroundColor: initialServiceColors[0] });
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.set(animatedCards, {
+      y: 0,
+      rotate: 0,
+      backgroundColor: "#f9f9f8",
+    });
+    return;
+  }
+
+  gsap.set(animatedCards, {
+    y: -70,
+    rotate: -3,
+    backgroundColor: (index) => initialServiceColors[index + 1],
   });
 
-  gsap.to(card, {
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: sectionRef.current,
+      start: "top 85%",
+      end: "bottom 105%",
+      scrub: true,
+      invalidateOnRefresh: true,
+      onEnter: () => document.body.classList.add("services-active"),
+      onEnterBack: () => document.body.classList.add("services-active"),
+      onLeaveBack: () => document.body.classList.remove("services-active"),
+    },
+  }).to(animatedCards, {
     y: 0,
     rotate: 0,
     backgroundColor: "#f9f9f8",
+    duration: 0.75,
+    stagger: 0.18,
     ease: "none",
-    scrollTrigger: {
-      trigger: card,
-      start: `top ${105 - index * 5}%`,
-      end: `top ${5 + index * (isLarge?15:20)}%`,
-      scrub: true,
-    
-    },
   });
-  });
+
+  return () => document.body.classList.remove("services-active");
 }, {
   scope: sectionRef,
-  dependencies: [entryId, isSmall, isMedium, isLarge],
+  dependencies: [entryId],
   revertOnUpdate: true,
 });
 
@@ -106,14 +114,31 @@ const ServicesSection = () => {
 
 
   return (
-    <section
-      id="section-3"
-      ref={sectionRef}
-      className="relative z-30 h-screen flex flex-col overflow-hidden shadow-[0_-12px_20px_-10px_rgba(0,0,0,0.25)]"
-    >
+    <>
+      {/* Temporarily hidden; keep this marquee available for a future revision.
+      <div
+        className="relative z-20 flex h-16 w-full items-center overflow-hidden bg-[#f9f9f8] lg:h-20"
+        aria-hidden="true"
+      >
+        <div className="marketing-section-marquee-track text-[clamp(0.75rem,1vw,1rem)] font-semibold leading-none tracking-tight text-[#777773] whitespace-nowrap">
+          <span>{servicesMarqueeText}</span>
+          <span>{servicesMarqueeText}</span>
+        </div>
+      </div>
+      */}
 
-      <div className="relative w-full pt-25"></div>
-      <div className="relative flex flex-col h-full w-full  pb-10  font-sans overflow-hidden">
+    <div className="services-section-shell pt-20">
+      <section
+        id="section-3"
+        ref={sectionRef}
+        className="relative z-30 flex h-auto min-h-0 flex-col overflow-x-clip overflow-y-visible lg:h-screen lg:min-h-0 lg:overflow-hidden"
+      >
+        <header className="relative flex h-25 w-full flex-none items-center justify-start bg-[#f9f9f8] px-[clamp(1rem,4vw,2.5rem)] md:pl-[clamp(2rem,8vw,7.5rem)] md:pr-[clamp(1.5rem,4vw,2.5rem)]">
+        <h2 className="font-sans whitespace-nowrap text-left text-[clamp(0.6875rem,1.2vw,1rem)] font-medium leading-none tracking-tight text-[#777773]">
+          &quot;software, step by step&quot;
+        </h2>
+        </header>
+        <div className="relative flex w-full flex-col pb-10 font-sans lg:h-full lg:overflow-hidden">
         {services.map((service, index) => (
             
           <div
@@ -122,27 +147,31 @@ const ServicesSection = () => {
               cardRefs.current[index]= el;
             }}
             style={{ zIndex: 50 - index , transformOrigin: "left" }}
-            className={`relative h-[20%] w-full border-t-1 border-b-1 border-[#eeeeee] grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 overflow-hidden gap-1 lg:gap-3 px-4 md:pl-30 md:pr-6 lg:pl-30 lg:pr-10`}
+            className={`relative grid min-h-[8.5rem] w-full grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-x-[clamp(0.5rem,2vw,1rem)] overflow-hidden border-[#eeeeee] px-[clamp(1rem,4vw,2.5rem)] md:grid-cols-4 md:gap-x-[clamp(1.5rem,3vw,2rem)] md:pl-[clamp(2rem,8vw,7.5rem)] md:pr-[clamp(1.5rem,4vw,2.5rem)] lg:h-[20%] lg:min-h-0 lg:grid-cols-5 ${index === 0 ? "border-x border-b rounded-b-[var(--r-cta)]" : "border-y rounded-[var(--r-cta)]"}`}
           >
 
 {/* " h-[25%] w-full  border-t-1 border-[#eeeeee] grid grid-cols-6 overflow-hidden gap-3" */}
 
-            <div className="col-span-1 md:col-span-2 flex items-start gap-2 pt-6">
+            <div className="col-span-1 flex min-w-0 items-start gap-2 pt-6 md:col-span-2">
               <img
                 src={service.href}
                 alt=""
-                className="h-7 w-7 shrink-0 object-contain md:h-8 md:w-8 lg:hidden"
+                className="h-7 w-7 shrink-0 object-contain opacity-40 md:h-8 md:w-8 lg:hidden"
               />
-              <h2 className="   text-[1.3rem] leading-[1.3rem]  md:text-[2.5rem] font-semibold  lg:leading-[2rem] tracking-tight">{service.title}</h2>
+              <h2 className="min-w-0 flex-1 break-normal hyphens-none text-[clamp(0.9rem,5vw,1.2rem)] font-semibold leading-[1.05] tracking-tight md:text-[clamp(1.5rem,3.3vw,2rem)] lg:leading-[0.9]">
+                {service.title}
+              </h2>
             </div>
-            <p className="col-span-1 md:col-span-2 text-[0.8rem] leading-[0.8rem]  lg:text-[1rem] lg:leading-[1rem] font-medium tracking-tight pt-6">{service.description}</p>
+            <p className="col-span-1 min-w-0 break-normal hyphens-none pt-6 text-[clamp(0.68rem,2.8vw,0.8rem)] font-medium leading-[1.12] tracking-tight md:col-span-2 md:text-[clamp(0.78rem,1.5vw,1rem)]">
+              {service.description}
+            </p>
 
 
             <div className="hidden overflow-hidden px-2 py-2 lg:block">
               <img
                 src={service.href}
                 alt=""
-                className="h-full w-full object-contain"
+                className="h-full w-full object-contain opacity-40"
               />
             </div>
             
@@ -150,7 +179,7 @@ const ServicesSection = () => {
 
 
         ))}
-      </div>
+        </div>
 
       {/*       
       <div className="relative grid grid-cols-4 grid-rows-2 h-screen w-full gap-1 md:gap-2 lg:gap-2 px-6 pt-20 pb-5  md:px-26 md:pt-26 md:pb-5  lg:px-26 lg:pt-26 lg:pb-5">
@@ -196,7 +225,9 @@ const ServicesSection = () => {
           ))}
         </div>
       </div> */}
-    </section>
+      </section>
+    </div>
+    </>
   );
 };
 

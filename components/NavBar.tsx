@@ -13,10 +13,12 @@ const SERVICES_HREF = "/services";
 // nav-hover-pill) as the actual nav links, without colliding with a href.
 const LANGUAGE_KEY = "language";
 
-const navItems = [
-  { label: "services", href: "/services", analytics: "nav-services", Icon: ServicesIcon },
-  { label: "information", href: "/about", analytics: "nav-info", Icon: WorkIcon },
-];
+export type NavigationContent = {
+  servicesLabel: string;
+  informationLabel: string;
+  turkmenLanguageLabel: string;
+  englishLanguageLabel: string;
+};
 
 type NavBarProps = {
   collapsed?: boolean;
@@ -24,6 +26,7 @@ type NavBarProps = {
   onServicesHoverStart?: () => void;
   onServicesHoverEnd?: () => void;
   onOtherLinkHover?: () => void;
+  content: NavigationContent;
 };
 
 function NavBar({
@@ -32,16 +35,27 @@ function NavBar({
   onServicesHoverStart,
   onServicesHoverEnd,
   onOtherLinkHover,
+  content,
 }: NavBarProps) {
-  const { pathname } = useRouter();
+  const router = useRouter();
+  const { pathname } = router;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [hoveredHref, setHoveredHref] = useState<string | null>(null);
-  const [language, setLanguage] = useState<"tk" | "ru">("tk");
+  const language = router.locale === "en" ? "en" : "tk";
+  const navItems = [
+    { label: content.servicesLabel, href: "/services", analytics: "nav-services", Icon: ServicesIcon },
+    { label: content.informationLabel, href: "/about", analytics: "nav-info", Icon: WorkIcon },
+  ];
   const isActiveRoute = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+    pathname === href || Boolean(pathname?.startsWith(`${href}/`));
 
-  const toggleLanguage = () =>
-    setLanguage((current) => (current === "tk" ? "ru" : "tk"));
+  const toggleLanguage = () => {
+    const nextLocale = language === "tk" ? "en" : "tk";
+    void router.push(router.asPath, router.asPath, {
+      locale: nextLocale,
+      scroll: false,
+    });
+  };
 
   useLayoutEffect(() => {
     const node = rootRef.current;
@@ -160,7 +174,7 @@ function NavBar({
         onMouseLeave={() =>
           setHoveredHref((h) => (h === LANGUAGE_KEY ? null : h))
         }
-        aria-label={`Switch language to ${language === "tk" ? "Russian" : "Turkmen"}`}
+        aria-label={`Switch language to ${language === "tk" ? "English" : "Turkmen"}`}
               className="cta relative inline-flex items-center gap-2 h-[var(--cta-h)] rounded-[var(--r-cta)] px-4
           text-sm md:text-base lg:text-base font-sans font-extrabold tracking-tight
           text-(--ink)
@@ -184,7 +198,9 @@ function NavBar({
         </AnimatePresence>
         <span className="relative z-10 inline-flex items-center gap-2">
           <img src="/header-icons/language-svgrepo-com.svg" alt="" className="w-5 h-5" />
-          {language}
+          <span className="inline-flex w-6 justify-center">
+            {language === "tk" ? content.turkmenLanguageLabel : content.englishLanguageLabel}
+          </span>
         </span>
       </button>
     </nav>

@@ -1,9 +1,8 @@
 import ServiceHeroSection from "@/sections/ServiceHeroSection";
 import Paragraph from "@/animations/Paragraph";
-import { slugifyOffering, type ServiceItem } from "@/components/data/services";
-import { ArrowUpRight } from "lucide-react";
-import Link from "next/link";
-import { useRef, useState, type PointerEvent } from "react";
+import { type ServiceItem } from "@/components/data/services";
+import { ChevronDown } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { motion } from "framer-motion";
 
 type ServiceDetailPageProps = {
@@ -26,7 +25,25 @@ function ServiceDetailPage({ service }: ServiceDetailPageProps) {
     startScrollLeft: 0,
   });
   const [processIndex, setProcessIndex] = useState(0);
+  const [openSubserviceSlug, setOpenSubserviceSlug] = useState<string | null>(null);
   const processSteps = service.process ?? [];
+  const subservices = useMemo(() => service.subservices ?? [], [service.subservices]);
+
+  useEffect(() => {
+    const syncSubserviceFromHash = () => {
+      const hash = decodeURIComponent(window.location.hash.slice(1));
+      if (!subservices.some((subservice) => subservice.slug === hash)) return;
+
+      setOpenSubserviceSlug(hash);
+      window.requestAnimationFrame(() => {
+        document.getElementById(hash)?.scrollIntoView({ block: "center" });
+      });
+    };
+
+    syncSubserviceFromHash();
+    window.addEventListener("hashchange", syncSubserviceFromHash);
+    return () => window.removeEventListener("hashchange", syncSubserviceFromHash);
+  }, [subservices]);
 
   const handleProcessPointerDown = (event: PointerEvent<HTMLOListElement>) => {
     if (event.pointerType !== "mouse" || event.button !== 0) return;
@@ -96,7 +113,7 @@ function ServiceDetailPage({ service }: ServiceDetailPageProps) {
   };
 
   return (
-    <div className="w-full font-sans">
+    <div className="w-full overflow-x-clip pb-[20vh] font-sans md:pb-[25vh]">
       <ServiceHeroSection
         title={service.title}
         text={service.text}
@@ -150,30 +167,61 @@ function ServiceDetailPage({ service }: ServiceDetailPageProps) {
                 What we do
               </motion.h2>
               <ul className="service-page-offering-list grid grid-cols-1 gap-3">
-                {service.offerings?.map((offering, index) => {
-                  const offeringSlug = slugifyOffering(offering);
+                {subservices.map((subservice, index) => {
+                  const isOpen = openSubserviceSlug === subservice.slug;
+                  const descriptionId = `${subservice.slug}-description`;
 
                   return (
                     <motion.li
-                      key={offering}
-                      id={offeringSlug}
+                      key={subservice.slug}
+                      id={subservice.slug}
                       initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.55, delay: 0.6 + index * 0.06, ease: [0.32, 0.72, 0, 1] }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true, amount: 0.25 }}
+                      transition={{ duration: 0.55, delay: index * 0.08, ease: [0.32, 0.72, 0, 1] }}
+                      className={`cta scroll-mt-[var(--header-clearance)] overflow-hidden rounded-[var(--r-cta)] transition-colors duration-300 ${
+                        isOpen
+                          ? "bg-(--ink) text-white"
+                          : "bg-(--ink)/5 text-black hover:bg-(--ink) hover:text-white"
+                      }`}
                     >
-                      <Link
-                        href={`/service/${service.slug}/${offeringSlug}`}
-                        scroll={false}
-                        className="service-offering-link group cta flex w-full items-center justify-between rounded-[var(--r-cta)] bg-(--ink)/5 px-4 py-3 text-black transition-colors hover:bg-(--ink) hover:text-white"
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        aria-controls={descriptionId}
+                        onClick={() => {
+                          setOpenSubserviceSlug((current) =>
+                            current === subservice.slug ? null : subservice.slug,
+                          );
+                        }}
+                        className="service-offering-link group flex w-full items-center justify-between bg-transparent px-4 py-3 text-left text-inherit"
                       >
                         <span className="transition-transform duration-200 group-hover:translate-x-2">
-                          {offering}
+                          {subservice.title}
                         </span>
-                        <ArrowUpRight
+                        <ChevronDown
                           aria-hidden="true"
-                          className="size-[1.25em] shrink-0 transition-colors transition-transform duration-300 ease-out group-hover:-translate-x-2 group-hover:text-[#FDB813]"
+                          className={`size-[1.25em] shrink-0 transition-transform duration-300 ease-out ${
+                            isOpen
+                              ? "rotate-180 text-(--color-ce-primary)"
+                              : "rotate-0"
+                          }`}
                         />
-                      </Link>
+                      </button>
+                      <div
+                        id={descriptionId}
+                        className={`grid transition-[grid-template-rows,opacity] duration-400 ease-[cubic-bezier(.32,.72,0,1)] ${
+                          isOpen
+                            ? "grid-rows-[1fr] opacity-100"
+                            : "grid-rows-[0fr] opacity-0"
+                        }`}
+                      >
+                        <div className="min-h-0 overflow-hidden">
+                          <p className="service-page-intro-description px-4 pb-5 pt-2 text-white/65">
+                            {subservice.description}
+                          </p>
+                        </div>
+                      </div>
                     </motion.li>
                   );
                 })}

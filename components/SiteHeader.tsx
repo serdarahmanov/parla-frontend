@@ -5,34 +5,20 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import Header from "@/components/Header";
-import NavBar from "@/components/NavBar";
+import NavBar, { type NavigationContent } from "@/components/NavBar";
 import ServicesColumn from "@/components/ServicesColumn";
-import { services } from "@/components/data/services";
+import { categoryServices } from "@/components/data/services";
 import { ServicesIcon } from "@/icons/ServicesIcon";
 import { WorkIcon } from "@/icons/WorkIcon";
 
-const headerServices = [
-  {
-    ...services.find((service) => service.slug === "brand-strategy")!,
-    title: "Marketing",
-    icon: "/services/icons/marketing.svg",
-  },
-  {
-    ...services.find((service) => service.slug === "production-management")!,
-    title: "Production",
-    icon: "/services/icons/production.svg",
-  },
-  {
-    ...services.find((service) => service.slug === "web-mobile-applications")!,
-    title: "Software Development",
-    icon: "/services/icons/software-development.svg",
-  },
-  {
-    ...services.find((service) => service.slug === "interior-exterior-architecture-design")!,
-    title: "Design",
-    icon: "/services/icons/design.svg",
-  },
-];
+const headerServices = categoryServices;
+
+const fallbackNavigationContent: NavigationContent = {
+  servicesLabel: "Services",
+  informationLabel: "Information",
+  turkmenLanguageLabel: "tk",
+  englishLanguageLabel: "en",
+};
 
 type Props = {
   introDone: boolean;
@@ -40,7 +26,7 @@ type Props = {
 
 // Pages reached from the footer keep the island fully expanded — no
 // shrink-on-scroll there.
-const NO_COLLAPSE_ROUTES = ["/cookie", "/privacy-policy", "/by-rahmanov"];
+const NO_COLLAPSE_ROUTES = ["/cookie", "/privacy-policy"];
 
 // The services panel's exact height as a CSS calc(), not framer-motion's
 // "auto" — animating to "auto" requires briefly rendering unclipped to
@@ -54,19 +40,22 @@ const SERVICES_COLUMN_HEIGHT = "calc(24rem + (var(--pad) * 3))";
 const SERVICES_PANEL_HEIGHT = "calc(25.5rem + (var(--pad) * 3))";
 
 const SiteHeader = ({ introDone }: Props) => {
-  const { pathname, events } = useRouter();
+  const router = useRouter();
+  const { pathname, events } = router;
   const [isLifted, setIsLifted] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileMenuWidthExpanded, setMobileMenuWidthExpanded] = useState(false);
-  const [mobileLanguage, setMobileLanguage] = useState<"tk" | "ru">("tk");
+  const [navigationContent, setNavigationContent] = useState(fallbackNavigationContent);
+  const mobileLanguage = router.locale === "en" ? "en" : "tk";
   const mobileMenuTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mobileMenuOpenRef = useRef(false);
   const mobileMenuWidthExpandedRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const islandRef = useRef<HTMLDivElement | null>(null);
+  const mobileHeaderRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const topRowClipRef = useRef<HTMLDivElement | null>(null);
   const islandInnerRef = useRef<HTMLDivElement | null>(null);
@@ -76,7 +65,34 @@ const SiteHeader = ({ introDone }: Props) => {
   const canCollapse = !NO_COLLAPSE_ROUTES.includes(pathname ?? "");
   const navCollapsed = collapsed && !isHovered;
   const isMobileRouteActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+    pathname === href || Boolean(pathname?.startsWith(`${href}/`));
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const locale = router.locale === "en" ? "en" : "tk";
+
+    const loadNavigationContent = async () => {
+      try {
+        const response = await fetch(`/api/globals/navigation?locale=${locale}&depth=0`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+
+        const content = (await response.json()) as Partial<NavigationContent>;
+        setNavigationContent({
+          servicesLabel: content.servicesLabel || fallbackNavigationContent.servicesLabel,
+          informationLabel: content.informationLabel || fallbackNavigationContent.informationLabel,
+          turkmenLanguageLabel: content.turkmenLanguageLabel || fallbackNavigationContent.turkmenLanguageLabel,
+          englishLanguageLabel: content.englishLanguageLabel || fallbackNavigationContent.englishLanguageLabel,
+        });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    };
+
+    void loadNavigationContent();
+    return () => controller.abort();
+  }, [router.locale]);
 
   useEffect(() => {
     servicesOpenRef.current = servicesOpen;
@@ -294,8 +310,16 @@ const SiteHeader = ({ introDone }: Props) => {
       );
     };
 
-    outer.style.width = `${outerWidthFor(inner.getBoundingClientRect().width)}px`;
+    const rootStyles = getComputedStyle(document.documentElement);
+    const animationDuration =
+      parseFloat(rootStyles.getPropertyValue("--dur")) || 420;
+    const animationEase =
+      rootStyles.getPropertyValue("--ease").trim() || "cubic-bezier(.32,.72,0,1)";
+
+    const initialOuterWidth = outerWidthFor(inner.getBoundingClientRect().width);
+    outer.style.width = `${initialOuterWidth}px`;
     let currentAnimation: Animation | null = null;
+    let syncFrame: number | null = null;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const resizeObserver = new ResizeObserver(() => {
@@ -304,18 +328,34 @@ const SiteHeader = ({ introDone }: Props) => {
       if (Math.abs(toWidth - fromWidth) < 0.5) return;
 
       currentAnimation?.cancel();
+      if (syncFrame !== null) {
+        cancelAnimationFrame(syncFrame);
+        syncFrame = null;
+      }
       outer.style.width = `${toWidth}px`;
 
-      if (reduceMotion.matches) return;
+      if (reduceMotion.matches) {
+        return;
+      }
 
       clip.style.overflow = "hidden";
       currentAnimation = outer.animate(
         [{ width: `${fromWidth}px` }, { width: `${toWidth}px` }],
-        { duration: 420, easing: "cubic-bezier(.32,.72,0,1)" },
+        { duration: animationDuration, easing: animationEase },
       );
+      const syncAnimationFrame = () => {
+        if (!currentAnimation) return;
+        if (currentAnimation.playState === "running") {
+          syncFrame = requestAnimationFrame(syncAnimationFrame);
+        } else {
+          syncFrame = null;
+        }
+      };
+      syncFrame = requestAnimationFrame(syncAnimationFrame);
       currentAnimation.onfinish = () => {
         clip.style.overflow = "";
         currentAnimation = null;
+        syncFrame = null;
       };
     });
 
@@ -323,6 +363,62 @@ const SiteHeader = ({ introDone }: Props) => {
     return () => {
       resizeObserver.disconnect();
       currentAnimation?.cancel();
+      if (syncFrame !== null) cancelAnimationFrame(syncFrame);
+    };
+  }, [introDone]);
+
+  useEffect(() => {
+    const mobileHeader = mobileHeaderRef.current;
+    const mobileMenu = mobileMenuRef.current;
+    if (!mobileHeader || !mobileMenu) return;
+
+    let lastIntroHeight: number | null = null;
+
+    const syncImageRailMobileIntro = () => {
+      const root = document.documentElement;
+      const rootStyles = getComputedStyle(root);
+      const menuBounds = mobileMenu.getBoundingClientRect();
+      const menuStyles = getComputedStyle(mobileMenu);
+      const menuButton = mobileMenu.querySelector(":scope > button") as HTMLElement | null;
+      const menuNavigation = mobileMenu.querySelector("nav") as HTMLElement | null;
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const snap = (value: number) =>
+        Math.round(value * devicePixelRatio) / devicePixelRatio;
+
+      const topGap = menuBounds.top - 12;
+      const expandedMenuHeight =
+        parseFloat(menuStyles.paddingTop) +
+        parseFloat(menuStyles.paddingBottom) +
+        (menuButton?.offsetHeight || 0) +
+        (menuNavigation?.scrollHeight || 0);
+      const introHeight = snap(menuBounds.top + expandedMenuHeight + topGap);
+
+      root.style.setProperty(
+        "--image-rail-mobile-intro-height",
+        `${introHeight}px`,
+      );
+
+      if (lastIntroHeight === null || Math.abs(lastIntroHeight - introHeight) >= 0.5) {
+        lastIntroHeight = introHeight;
+        window.dispatchEvent(new CustomEvent("parla-layout-change"));
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(syncImageRailMobileIntro);
+    resizeObserver.observe(mobileHeader);
+    resizeObserver.observe(mobileMenu);
+    if (mobileMenu.querySelector("nav")) {
+      resizeObserver.observe(mobileMenu.querySelector("nav") as HTMLElement);
+    }
+    const mobileMenuContent = mobileMenu.querySelector("nav > div");
+    if (mobileMenuContent) resizeObserver.observe(mobileMenuContent);
+    window.addEventListener("resize", syncImageRailMobileIntro);
+    syncImageRailMobileIntro();
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", syncImageRailMobileIntro);
+      document.documentElement.style.removeProperty("--image-rail-mobile-intro-height");
     };
   }, [introDone]);
 
@@ -334,7 +430,7 @@ const SiteHeader = ({ introDone }: Props) => {
       <div
         className={`shell fixed left-0 right-0 z-150 flex items-start justify-between px-4 pointer-events-none md:justify-start md:px-0 md:pl-6 ${isLifted ? "is-lifted" : ""}`}
       >
-        <div className="header-island island pointer-events-auto inline-flex p-[var(--pad)] md:hidden">
+        <div ref={mobileHeaderRef} className="header-island island pointer-events-auto inline-flex p-[var(--pad)] md:hidden">
           <Header activePillLayoutId="nav-active-pill-mobile" />
         </div>
 
@@ -379,7 +475,7 @@ const SiteHeader = ({ introDone }: Props) => {
                   }`}
                 >
                   <ServicesIcon aria-hidden="true" className="size-4" />
-                  Services
+                  {navigationContent.servicesLabel}
                 </Link>
                 <Link
                   href="/about"
@@ -392,16 +488,27 @@ const SiteHeader = ({ introDone }: Props) => {
                   }`}
                 >
                   <WorkIcon aria-hidden="true" className="size-4" />
-                  Information
+                  {navigationContent.informationLabel}
                 </Link>
                 <button
                   type="button"
-                  onClick={() => setMobileLanguage((current) => (current === "tk" ? "ru" : "tk"))}
-                  aria-label="Switch language"
+                  onClick={() => {
+                    const nextLocale = mobileLanguage === "tk" ? "en" : "tk";
+                    closeMobileMenu();
+                    void router.push(router.asPath, router.asPath, {
+                      locale: nextLocale,
+                      scroll: false,
+                    });
+                  }}
+                  aria-label={`Switch language to ${mobileLanguage === "tk" ? "English" : "Turkmen"}`}
                   className="mobile-menu-link cta inline-flex items-center gap-2 rounded-[var(--r-cta)] px-3 py-2 text-left text-sm font-extrabold text-(--ink) transition-colors duration-300 ease-out hover:bg-(--ink)/10"
                 >
                   <img src="/header-icons/language-svgrepo-com.svg" alt="" aria-hidden="true" className="size-4" />
-                  {mobileLanguage}
+                  <span className="inline-flex w-6 justify-center">
+                    {mobileLanguage === "tk"
+                      ? navigationContent.turkmenLanguageLabel
+                      : navigationContent.englishLanguageLabel}
+                  </span>
                 </button>
               </div>
             </nav>
@@ -422,6 +529,7 @@ const SiteHeader = ({ introDone }: Props) => {
             >
               <Header />
               <NavBar
+                content={navigationContent}
                 collapsed={navCollapsed}
                 servicesOpen={servicesOpen}
                 onServicesHoverStart={openServicesMenu}
