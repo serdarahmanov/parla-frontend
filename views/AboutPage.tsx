@@ -38,7 +38,7 @@ const clients = [
 function About() {
   return (
     <div
-      className="about-page header-clearance-top relative px-6 pb-10 mt-6 w-full h-auto
+      className="about-page header-clearance-top relative mt-6 mb-[clamp(5rem,10vw,10rem)] h-auto w-full px-6 pb-10
      flex flex-col gap-y-10
       md:relative md:pb-10 md:px-6 md:w-full md:h-auto md:flex md:font-sans md:flex-col md:gap-y-5
       lg:relative lg:pb-10 lg:px-6 lg:grid lg:w-full   lg:font-sans

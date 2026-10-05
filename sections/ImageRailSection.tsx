@@ -4,7 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Navigation } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -16,6 +16,8 @@ const galleryImages = [
 ];
 
 const ImageRailSection = () => {
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(() => new Set());
+  const galleryImageRefs = useRef<(HTMLImageElement | null)[]>([]);
   const sectionRef = useRef<HTMLElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -27,6 +29,30 @@ const ImageRailSection = () => {
   const navigationIconRef = useRef<SVGSVGElement | null>(null);
   const mobileNavigationIconRef = useRef<SVGSVGElement | null>(null);
   const tabletNavigationIconRef = useRef<SVGSVGElement | null>(null);
+
+  useEffect(() => {
+    const alreadyLoaded = galleryImageRefs.current.reduce<number[]>((indexes, image, index) => {
+      if (image?.complete && image.naturalWidth > 0) indexes.push(index);
+      return indexes;
+    }, []);
+
+    if (alreadyLoaded.length) {
+      setLoadedImages((current) => {
+        const next = new Set(current);
+        alreadyLoaded.forEach((index) => next.add(index));
+        return next;
+      });
+    }
+  }, []);
+
+  const handleGalleryImageLoad = (index: number) => {
+    setLoadedImages((current) => {
+      const next = new Set(current);
+      next.add(index);
+      return next;
+    });
+    window.dispatchEvent(new CustomEvent("parla-layout-change"));
+  };
 
   useGSAP(
     () => {
@@ -206,13 +232,18 @@ const ImageRailSection = () => {
               {galleryImages.map((src, index) => (
                 <figure
                   key={src}
-                  className="image-rail-box image-rail-card h-[52vh] flex-none md:h-[68vh]"
+                  className={`image-rail-box image-rail-card h-[52vh] flex-none md:h-[68vh] ${
+                    loadedImages.has(index) ? "image-rail-card--loaded" : "image-rail-card--loading"
+                  }`}
                 >
                   <img
+                    ref={(image) => {
+                      galleryImageRefs.current[index] = image;
+                    }}
                     src={src}
                     alt={`Project image ${index + 1}`}
                     className="block h-full w-auto max-w-none object-contain"
-                    onLoad={() => window.dispatchEvent(new CustomEvent("parla-layout-change"))}
+                    onLoad={() => handleGalleryImageLoad(index)}
                   />
                 </figure>
               ))}
@@ -246,17 +277,17 @@ const ImageRailSection = () => {
               Interior design / Selected space
             </p>
           </div>
-          <div className="image-rail-box image-rail-bottom-progress min-w-0 w-full flex flex-col justify-end px-2 pb-8 md:px-0 md:pb-[4vw] md:pl-6 md:pr-9">
+          <div className="image-rail-box image-rail-bottom-progress min-w-0 w-full flex flex-col justify-center px-2 md:px-0 md:pl-6 md:pr-9">
             <div ref={progressTrackRef} className="relative mx-[1vw] h-5" aria-label="Gallery progress">
               <div
                 ref={progressRef}
-                className="image-rail-ruler-progress absolute left-0 top-0 h-4 w-px"
+                className="image-rail-ruler-progress absolute left-0 top-1/2 -mt-2 h-4 w-px"
               />
               {Array.from({ length: 101 }, (_, index) => (
                 <span
                   key={index}
                   aria-hidden="true"
-                  className="image-rail-ruler-tick absolute top-0 h-2 w-px"
+                  className="image-rail-ruler-tick absolute top-1/2 -mt-1 h-2 w-px"
                   style={{ left: `${index}%` }}
                 />
               ))}

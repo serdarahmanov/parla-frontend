@@ -27,6 +27,7 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const coverImageRefs = useRef<(HTMLImageElement | null)[]>([]);
   const selectedIndexRef = useRef(0);
   const shouldPlayRef = useRef(true);
   const railTweenRef = useRef<gsap.core.Tween | null>(null);
@@ -36,6 +37,7 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
   const suppressClickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [loadedCoverImages, setLoadedCoverImages] = useState<Set<number>>(() => new Set());
   const [revealedVideoIndex, setRevealedVideoIndex] = useState<number | null>(null);
   const [readinessAttempt, setReadinessAttempt] = useState(0);
   const [shouldPlay, setShouldPlay] = useState(true);
@@ -46,6 +48,24 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
 
   const activeWork = works[selectedIndex];
   const activeVideoSrc = videoLinks[selectedIndex] || activeWork.videoSrc;
+
+  const markCoverImageLoaded = useCallback((index: number) => {
+    setLoadedCoverImages((current) => {
+      if (current.has(index)) return current;
+      const next = new Set(current);
+      next.add(index);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const alreadyLoaded = coverImageRefs.current.reduce<number[]>((indexes, image, index) => {
+      if (image?.complete && image.naturalWidth > 0) indexes.push(index);
+      return indexes;
+    }, []);
+
+    alreadyLoaded.forEach(markCoverImageLoaded);
+  }, [markCoverImageLoaded]);
 
   const updateShouldPlay = useCallback((nextShouldPlay: boolean) => {
     shouldPlayRef.current = nextShouldPlay;
@@ -429,15 +449,25 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
                     >
                       <span className="production-library-card-media">
                         <span className="production-library-media-overscan">
-                          <span className="production-library-poster-layer" aria-hidden="true">
+                          <span
+                            className={`production-library-poster-layer ${
+                              loadedCoverImages.has(index) ? "is-cover-loaded" : "is-cover-loading"
+                            }`}
+                            aria-hidden="true"
+                          >
                             {/* This pre-optimized decorative asset intentionally bypasses next/image. */}
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
+                              ref={(image) => {
+                                coverImageRefs.current[index] = image;
+                              }}
                               src={productionCoverImages[index]}
                               alt=""
                               draggable={false}
                               loading="lazy"
                               decoding="async"
+                              onLoad={() => markCoverImageLoaded(index)}
+                              onError={() => markCoverImageLoaded(index)}
                             />
                           </span>
                           <video
