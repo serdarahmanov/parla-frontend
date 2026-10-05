@@ -9,6 +9,8 @@ import { works } from "@/components/data/works";
 import { EASE_BRAND } from "@/lib/gsap/customEase";
 import { usePageEntry } from "@/components/PageEntryProvider";
 import ParlaIcon from "@/components/ParlaIcon";
+import { useVideoPlayback } from "@/hooks/useVideoPlayback";
+import { useVideoReadiness } from "@/hooks/useVideoReadiness";
 
 type ProductionSectionProps = { videoLinks: string[] };
 
@@ -29,7 +31,6 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const coverImageRefs = useRef<(HTMLImageElement | null)[]>([]);
   const selectedIndexRef = useRef(0);
-  const shouldPlayRef = useRef(true);
   const railTweenRef = useRef<gsap.core.Tween | null>(null);
   const isRailEnteringRef = useRef(false);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -39,7 +40,6 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [loadedCoverImages, setLoadedCoverImages] = useState<Set<number>>(() => new Set());
   const [revealedVideoIndex, setRevealedVideoIndex] = useState<number | null>(null);
-  const [readinessAttempt, setReadinessAttempt] = useState(0);
   const [shouldPlay, setShouldPlay] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const { entry } = usePageEntry();
@@ -48,6 +48,14 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
 
   const activeWork = works[selectedIndex];
   const activeVideoSrc = videoLinks[selectedIndex] || activeWork.videoSrc;
+
+  const handlePlaybackError = useCallback(() => {
+    setShouldPlay(false);
+  }, []);
+
+  const handleVideoReady = useCallback(() => {
+    setRevealedVideoIndex(selectedIndex);
+  }, [selectedIndex]);
 
   const markCoverImageLoaded = useCallback((index: number) => {
     setLoadedCoverImages((current) => {
@@ -66,11 +74,6 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
 
     alreadyLoaded.forEach(markCoverImageLoaded);
   }, [markCoverImageLoaded]);
-
-  const updateShouldPlay = useCallback((nextShouldPlay: boolean) => {
-    shouldPlayRef.current = nextShouldPlay;
-    setShouldPlay(nextShouldPlay);
-  }, []);
 
   const centerSelectedCard = useCallback((index: number, animate = true) => {
     const viewport = viewportRef.current;
@@ -139,23 +142,9 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
     selectProject(selectedIndexRef.current + (deltaX < 0 ? 1 : -1));
   }, [selectProject]);
 
-  const toggleVideo = useCallback(async () => {
-    const video = videoRefs.current[selectedIndexRef.current];
-    if (!video) return;
-
-    if (shouldPlay) {
-      video.pause();
-      updateShouldPlay(false);
-      return;
-    }
-
-    try {
-      await video.play();
-      updateShouldPlay(true);
-    } catch {
-      updateShouldPlay(false);
-    }
-  }, [shouldPlay, updateShouldPlay]);
+  const toggleVideo = useCallback(() => {
+    setShouldPlay((current) => !current);
+  }, []);
 
   const toggleMute = useCallback(() => {
     const video = videoRefs.current[selectedIndexRef.current];
@@ -163,6 +152,21 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
     video.muted = !video.muted;
     setIsMuted(video.muted);
   }, []);
+
+  useVideoPlayback({
+    videoRefs,
+    selectedIndex,
+    shouldPlay,
+    isMuted,
+    onPlaybackError: handlePlaybackError,
+  });
+
+  useVideoReadiness({
+    videoRefs,
+    selectedIndex,
+    activeVideoSrc,
+    onReady: handleVideoReady,
+  });
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -275,115 +279,6 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
   }, []);
 
   useEffect(() => {
-    videoRefs.current.forEach((video, index) => {
-      if (!video) return;
-      video.muted = isMuted;
-
-      if (index === selectedIndex && shouldPlay) {
-        void video.play().catch(() => updateShouldPlay(false));
-      } else {
-        video.pause();
-      }
-    });
-  }, [activeVideoSrc, isMuted, selectedIndex, shouldPlay, updateShouldPlay]);
-
-  useEffect(() => {
-    const video = videoRefs.current[selectedIndex];
-    if (!video) return;
-
-    let cancelled = false;
-    let frameCallbackId: number | null = null;
-    let fallbackFrameId: number | null = null;
-    let bufferPollId: ReturnType<typeof setInterval> | null = null;
-    let frameWaitStarted = false;
-    let renderedFrameCount = 0;
-
-    const revealVideo = () => {
-      if (cancelled || selectedIndexRef.current !== selectedIndex) return;
-      setRevealedVideoIndex(selectedIndex);
-    };
-
-    const getBufferedSecondsAhead = () => {
-      const currentTime = video.currentTime;
-
-      for (let index = 0; index < video.buffered.length; index += 1) {
-        const start = video.buffered.start(index);
-        const end = video.buffered.end(index);
-        if (start <= currentTime + 0.05 && end >= currentTime) return end - currentTime;
-      }
-
-      return 0;
-    };
-
-    const waitForRenderedFrames = () => {
-      if (cancelled || frameWaitStarted) return;
-      frameWaitStarted = true;
-      if (bufferPollId !== null) {
-        clearInterval(bufferPollId);
-        bufferPollId = null;
-      }
-
-      if (!video.paused && "requestVideoFrameCallback" in video) {
-        const handleRenderedFrame = () => {
-          if (cancelled) return;
-          renderedFrameCount += 1;
-
-          if (renderedFrameCount >= 2) {
-            revealVideo();
-            return;
-          }
-
-          frameCallbackId = video.requestVideoFrameCallback(handleRenderedFrame);
-        };
-
-        frameCallbackId = video.requestVideoFrameCallback(handleRenderedFrame);
-        return;
-      }
-
-      const waitOneMorePaint = () => {
-        fallbackFrameId = window.requestAnimationFrame(revealVideo);
-      };
-      fallbackFrameId = window.requestAnimationFrame(waitOneMorePaint);
-    };
-
-    const checkBuffer = () => {
-      if (cancelled || frameWaitStarted) return;
-
-      const remainingDuration = Number.isFinite(video.duration)
-        ? Math.max(0, video.duration - video.currentTime)
-        : 1.5;
-      const requiredBuffer = Math.min(1.5, remainingDuration);
-      const hasForwardBuffer = getBufferedSecondsAhead() >= requiredBuffer;
-
-      if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA && hasForwardBuffer) {
-        waitForRenderedFrames();
-      }
-    };
-
-    video.addEventListener("progress", checkBuffer);
-    video.addEventListener("canplay", checkBuffer);
-    video.addEventListener("durationchange", checkBuffer);
-    bufferPollId = setInterval(checkBuffer, 100);
-
-    if (shouldPlayRef.current) {
-      void video.play().then(checkBuffer).catch(checkBuffer);
-    }
-    checkBuffer();
-
-    return () => {
-      cancelled = true;
-      video.removeEventListener("progress", checkBuffer);
-      video.removeEventListener("canplay", checkBuffer);
-      video.removeEventListener("durationchange", checkBuffer);
-      if (bufferPollId !== null) clearInterval(bufferPollId);
-      if (frameCallbackId !== null && "cancelVideoFrameCallback" in video) {
-        video.cancelVideoFrameCallback(frameCallbackId);
-      }
-      if (fallbackFrameId !== null) window.cancelAnimationFrame(fallbackFrameId);
-    };
-  }, [activeVideoSrc, readinessAttempt, selectedIndex]);
-
-  useEffect(() => {
     return () => {
       railTweenRef.current?.kill();
       if (suppressClickTimerRef.current) clearTimeout(suppressClickTimerRef.current);
@@ -474,22 +369,8 @@ const ProductionSection = ({ videoLinks }: ProductionSectionProps) => {
                             ref={(element) => { videoRefs.current[index] = element; }}
                             src={videoSrc}
                             playsInline
-                            autoPlay={isSelected && shouldPlay}
                             muted={isMuted}
-                            preload={Math.abs(index - selectedIndex) <= 1 ? "auto" : "metadata"}
-                            onPlaying={() => {
-                              if (index === selectedIndexRef.current) {
-                                setReadinessAttempt((attempt) => attempt + 1);
-                              }
-                            }}
-                            onWaiting={() => {
-                              if (index !== selectedIndexRef.current) return;
-                              setRevealedVideoIndex(null);
-                            }}
-                            onStalled={() => {
-                              if (index !== selectedIndexRef.current) return;
-                              setRevealedVideoIndex(null);
-                            }}
+                            preload="none"
                             onEnded={() => {
                               if (index !== selectedIndexRef.current) return;
                               if (selectedIndexRef.current < works.length - 1) selectProject(selectedIndexRef.current + 1);
